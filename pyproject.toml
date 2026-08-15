@@ -30,7 +30,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-webui = ["gradio>=4.44.0"]
+# app.py mounts Gradio on its own FastAPI app so the streaming-audio route exists
+# before the server starts. Both are imported directly, so both are named here
+# rather than relied on as transitive Gradio dependencies.
+webui = ["gradio>=4.44.0", "fastapi>=0.110", "uvicorn>=0.27", "requests>=2.31"]
 # Metrics only — the scorers are torch models. Inference stays torch-free.
 eval = [
     "torch>=2.4.0",

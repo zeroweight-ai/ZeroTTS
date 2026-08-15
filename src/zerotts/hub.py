@@ -28,6 +28,10 @@ _ALLOW_PATTERNS = [
     "config.json",
     "tokenizer.json",
     "null_voice_emb.npy",
+    # The codec's canonical silence frame, used to pad between segments in
+    # long-form streaming. Small, and there is no way to derive it without the
+    # codec encoder, which is not shipped.
+    "silence_frame.npy",
     "onnx/*",
     "onnx/codec/*",
     "voices/index.json",

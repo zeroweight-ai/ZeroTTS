@@ -158,12 +158,12 @@ export class MossStreamingDecoder {
     }
   }
 
-  /** (K, n) codes for this chunk -> mono float32. */
-  async decodeChunk(codesKT: Int32Array, K: number, n: number): Promise<Float32Array> {
-    const btk = transposeToBTK(codesKT, 1, K, n);
+  /** (K, frames) codes for this chunk -> mono float32. */
+  async decodeChunk(codesKT: Int32Array, K: number, frames: number): Promise<Float32Array> {
+    const btk = transposeToBTK(codesKT, 1, K, frames);
     const feeds: Record<string, ort.Tensor> = {
-      audio_codes: new ort.Tensor('int32', btk, [1, n, K]),
-      audio_code_lengths: new ort.Tensor('int32', Int32Array.from([n]), [1]),
+      audio_codes: new ort.Tensor('int32', btk, [1, frames, K]),
+      audio_code_lengths: new ort.Tensor('int32', Int32Array.from([frames]), [1]),
     };
     for (const [k, v] of this.state) feeds[k] = v;
 
