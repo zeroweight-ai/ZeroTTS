@@ -1,0 +1,21 @@
+ZeroTTS
+Copyright (c) 2026 ZeroWeight AI
+Licensed under the MIT License (see LICENSE).
+
+------------------------------------------------------------------------------
+This product redistributes third-party components.
+------------------------------------------------------------------------------
+
+MOSS-Audio-Tokenizer-Nano
+Copyright the OpenMOSS Team.
+Licensed under the Apache License, Version 2.0.
+Full text: LICENSES/MOSS-Audio-Tokenizer-Apache-2.0.txt
+
+The ZeroTTS weights repository (huggingface.co/zeroweight-ai/ZeroTTS) bundles
+the ONNX **decoder** graphs of MOSS-Audio-Tokenizer-Nano under onnx/codec/, so
+that ZeroTTS has no runtime dependency on an external model repository. The
+encoder graphs are not redistributed. The graphs are unmodified except for the
+removal of the encoder entries from the accompanying metadata file.
+
+  Upstream: https://github.com/OpenMOSS/MOSS-Audio-Tokenizer
+            https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX

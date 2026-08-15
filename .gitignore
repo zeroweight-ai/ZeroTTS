@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.wav
+!**/preview.wav
+outputs/
+models/
+js/node_modules/
+js/dist/
+.DS_Store
+
+# internal planning docs must never land in the public repo
+docs/PLAN.md

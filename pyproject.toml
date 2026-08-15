@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zerotts"
+version = "0.1.0"
+description = "Vietnamese zero-shot text-to-speech — ONNX runtime, no PyTorch required"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "ZeroWeight AI" }]
+keywords = ["tts", "text-to-speech", "vietnamese", "onnx", "speech-synthesis"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+# The inference path is numpy + onnxruntime + tokenizers only. No torch.
+dependencies = [
+    "numpy>=1.23",
+    "onnxruntime>=1.17.0",
+    "tokenizers>=0.20.0",
+    "huggingface_hub>=0.23.0",
+    "soundfile>=0.12.1",
+    "scipy>=1.10.0",
+]
+
+[project.optional-dependencies]
+webui = ["gradio>=4.44.0"]
+# Metrics only — the scorers are torch models. Inference stays torch-free.
+eval = [
+    "torch>=2.4.0",
+    "torchaudio>=2.4.0",
+    "transformers>=4.44.0",
+    "soe-vinorm>=0.1.0",
+]
+dev = ["pytest>=7.4", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/zeroweight-ai/ZeroTTS"
+Weights = "https://huggingface.co/zeroweight-ai/ZeroTTS"
+Benchmark = "https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS"
+
+[project.scripts]
+zerotts = "zerotts.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+ignore = [
+    # gr.Progress() as a default is Gradio's documented idiom, not a bug.
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Examples print and read top-to-bottom; module-level code is the point.
+"examples/*" = ["E402"]

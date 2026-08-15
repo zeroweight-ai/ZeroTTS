@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZeroTTS — browser demo</title>
+  <style>
+    :root {
+      --bg: #ffffff; --fg: #1a1a1a; --muted: #666; --line: #e2e2e2;
+      --accent: #2563eb; --panel: #f7f7f8;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14161a; --fg: #e8e8ea; --muted: #9aa0a6; --line: #2a2e35;
+        --accent: #60a5fa; --panel: #1b1e24;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 2rem 1rem; background: var(--bg); color: var(--fg);
+      font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    .sub { color: var(--muted); margin: 0 0 1.5rem; }
+    .panel {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
+    }
+    label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: .3rem; }
+    textarea, input, select {
+      width: 100%; padding: .5rem .6rem; border: 1px solid var(--line);
+      border-radius: 7px; background: var(--bg); color: var(--fg);
+      font: inherit;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    .row { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .row > div { flex: 1 1 140px; }
+    button, .btn {
+      padding: .5rem 1rem; border-radius: 7px; border: 1px solid var(--line);
+      background: var(--bg); color: var(--fg); font: inherit; cursor: pointer;
+    }
+    button.primary { background: var(--accent); color: #fff; border-color: transparent; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    #status { margin-top: .75rem; font-size: .88rem; color: var(--muted); min-height: 1.3em; }
+    #bar-wrap {
+      display: none; height: 6px; background: var(--line);
+      border-radius: 3px; overflow: hidden; margin-top: .6rem;
+    }
+    #bar { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+    .note { font-size: .82rem; color: var(--muted); }
+    a { color: var(--accent); }
+    details summary { cursor: pointer; font-size: .88rem; color: var(--muted); }
+    details[open] > summary { margin-bottom: .75rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ZeroTTS</h1>
+  <p class="sub">
+    Vietnamese text-to-speech running entirely in your browser. Nothing is
+    uploaded — the model runs on your machine.
+  </p>
+
+  <div class="panel">
+    <div class="row">
+      <div style="flex: 3 1 260px;">
+        <label for="repo">Model</label>
+        <input id="repo" value="zeroweight-ai/ZeroTTS" />
+      </div>
+      <div>
+        <label for="ep">Backend</label>
+        <select id="ep">
+          <option value="wasm">WASM (CPU)</option>
+          <option value="webgpu">WebGPU</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions" style="margin-top: .75rem;">
+      <button id="load" class="primary">Load model</button>
+      <button id="clear-cache">Clear cache</button>
+    </div>
+    <div id="bar-wrap"><div id="bar"></div></div>
+    <div id="size-note" class="note" style="margin-top: .6rem;"></div>
+  </div>
+
+  <div class="panel">
+    <label for="text">Text</label>
+    <textarea id="text">Xin chào các bạn, mình là ZeroTTS. Mô hình này chạy trực tiếp trong trình duyệt của bạn.</textarea>
+
+    <div class="row" style="margin-top: .75rem;">
+      <div style="flex: 2 1 220px;">
+        <label for="voice">Voice</label>
+        <select id="voice"><option value="">(load the model first)</option></select>
+      </div>
+      <div>
+        <label for="seed">Seed (−1 = random)</label>
+        <input id="seed" type="number" value="-1" />
+      </div>
+    </div>
+
+    <details style="margin-top: .75rem;">
+      <summary>Generation settings</summary>
+      <div class="row">
+        <div>
+          <label for="cfg">CFG scale (&gt;1 is 2× slower)</label>
+          <input id="cfg" type="number" step="0.1" min="1" max="3" value="1.0" />
+        </div>
+        <div>
+          <label for="temperature">Temperature</label>
+          <input id="temperature" type="number" step="0.05" min="0.1" max="1.5" value="0.8" />
+        </div>
+      </div>
+    </details>
+
+    <div class="actions" style="margin-top: .9rem;">
+      <button id="generate" class="primary" disabled>Generate</button>
+      <button id="stop" disabled>Stop</button>
+      <a id="download" class="btn" style="display: none; text-decoration: none;">Download WAV</a>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <p class="note">
+    Voice cloning is not available here — the voice encoder is not part of the
+    open-source release. See the
+    <a href="https://github.com/zeroweight-ai/ZeroTTS">repository</a> for
+    details, or <a href="https://zeroweight.ai">zeroweight.ai</a> to get latents
+    for your own speaker.
+  </p>
+</main>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
