@@ -42,3 +42,7 @@ jobs:
         working-directory: js
       - run: npm run typecheck
         working-directory: js
+      # The JS and Python normalizers are hand-maintained copies of the same
+      # rules; only this keeps them in step.
+      - run: npm run parity
+        working-directory: js

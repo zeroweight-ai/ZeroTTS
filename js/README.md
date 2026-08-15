@@ -31,6 +31,7 @@ downloading. Not suitable for mobile data.
 |---|---|
 | `src/synthesizer.ts` | the two-calls-per-frame loop — see [../docs/RUNTIME.md](../docs/RUNTIME.md) |
 | `src/chunking.ts` | long-form segmentation, port of `zerotts.chunking` |
+| `src/textNorm.ts` | Vietnamese text normalization, port of `zerotts.text_norm` |
 | `src/codec.ts` | MOSS decoder: batch + KV-cached streaming |
 | `src/tokenizer.ts` | BPE over `tokenizer.json` |
 | `src/loader.ts` | resolve repo URLs, create sessions, load voices |
@@ -54,6 +55,26 @@ this port correct across re-exports:
 Frame codes must match exactly. Audio samples may differ in the last bits at
 chunk seams when comparing streaming to batch decode — that is the KV-cached
 decoder, not an error — but the codes must not.
+
+## Normalizer parity
+
+`src/textNorm.ts` and `src/zerotts/text_norm/vi_normalizer.py` are
+hand-maintained copies of the same rules. Nothing but a test keeps them in
+step, and a divergence is invisible in normal use — it shows up only as the
+browser and the package speaking the same sentence differently.
+
+```bash
+npm run parity        # 1262 cases, must be 100%
+```
+
+After changing either side, regenerate the corpus from Python and re-run:
+
+```bash
+python test/gen_cases.py > test/cases.json
+npm run parity
+```
+
+CI runs it on every push.
 
 ## Cross-origin isolation
 
@@ -90,12 +111,6 @@ because each one fails *quietly*.
 
 ## Known gaps
 
-- **No text normalization.** The Python package runs
-  `zerotts.text_norm.normalize_vi_text` before chunking, turning dates, clock
-  times, versions, fractions and acronyms into spoken Vietnamese ("5:00" ->
-  "năm giờ"). It is pure stdlib regex, so porting it is mechanical — until then
-  the browser demo will read those forms as bare numbers and diverge from the
-  Python output for the same input.
 - Generation runs on the main thread. It should move into a Web Worker
   (`worker.ts`) — the per-frame loop otherwise competes with rendering and can
   stutter playback under load.

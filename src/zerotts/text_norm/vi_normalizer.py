@@ -24,13 +24,15 @@ Scope — the deliberately small set of cases this covers
     time       15h30, 15h, 15:30, 9g45, 15:30:20
     version    v1.2, 1.2.3   (3+ dot-separated groups, or a v-prefix)
     fraction   3/4           (when it isn't a date)
+    percent    25%, 12,5 %   -> "... phần trăm"
+    at         @             -> "a còng" (never inside an email — those are protected)
     abbrev     TP.HCM, ATM, UBND  -> dictionary lookup, uppercase forms only
     number     1.250.000, 12,5, -7, +3, 2+3, 5 * 4, 2^10
                  (integer, decimal, sign, thousand separators, arithmetic ops)
 
-Everything else soe-vinorm handles — money, measurement units, percentages,
-Roman numerals, ranges, scores, quarters, URLs/emails, letter-by-letter
-spelling of unknown sequences — is intentionally left alone: those either need
+Everything else soe-vinorm handles — money, measurement units, Roman numerals,
+ranges, scores, quarters, URLs/emails, letter-by-letter spelling of unknown
+sequences — is intentionally left alone: those either need
 the CRF's context to tag safely or were out of scope for this integration.
 URLs and emails are actively *protected* (matched and skipped) so a normalizer
 pass can never mangle one.
@@ -311,10 +313,16 @@ _SCANNER = re.compile(
     | (?<![\w.,])(?P<v_bare>\d+(?:\.\d+){{2,}})(?!\w|\.\d|,\d)
     # ── fraction: a/b (dates already claimed above) ──────────────────────────
     | (?<![\w/.,])(?P<f_a>\d+)\s*/\s*(?P<f_b>\d+)(?![\w/.,])
+    # ── percent: 25%, 12,5 % — BEFORE the number branch, or that claims the
+    #    digits and leaves a bare '%' behind ───────────────────────────────────
+    | (?<![\w.,])(?P<pct_num>[-+]?\d[\d.,]*?)\s*%(?!\w)
     # ── number: integer / decimal / thousand-separated / signed / arithmetic ─
     | (?<![\w.,])(?P<n_num>[-+]?\d[\d.,]*(?:\s*[*^+]\s*[-+]?\d[\d.,]*|\s+[-/]\s+[-+]?\d[\d.,]*|[*^]\s*[-+]?\d[\d.,]*)*)(?![.,]?\d)
     # ── abbreviation: uppercase acronym, optionally dotted ───────────────────
     | (?<![\w.])(?P<abbr>[{_VN_UPPER}][{_VN_UPPER}\d]+(?:\.[{_VN_UPPER}][{_VN_UPPER}\d]*)*)(?![{_VN_LOWER}\d])
+    # ── at sign: read as a word. Email addresses never reach here — they are
+    #    matched by _PROTECTED_RE and skipped ─────────────────────────────────
+    | (?P<at>@)
     """,
     re.VERBOSE,
 )
@@ -399,6 +407,9 @@ def _expand_match(match: re.Match) -> str:
     if g["f_a"] is not None:
         return f"{_num(g['f_a'])} trên {_num(g['f_b'])}"
 
+    if g["pct_num"] is not None:
+        return f"{expand_number(g['pct_num'].rstrip('.,'))} phần trăm"
+
     if g["n_num"] is not None:
         raw = g["n_num"]
         trail = _NUM_TRAIL_RE.search(raw)
@@ -425,6 +436,9 @@ def _expand_match(match: re.Match) -> str:
 
     if g["abbr"] is not None:
         return _expand_abbreviation(g["abbr"]) or g["abbr"]
+
+    if g["at"] is not None:
+        return "a còng"
 
     return match.group(0)
 

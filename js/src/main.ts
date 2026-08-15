@@ -2,6 +2,7 @@
 
 import { clearCache } from './cache';
 import { textSegments } from './chunking';
+import { normalizeViText } from './textNorm';
 import {
   DEFAULT_REPO, downloadInfo, loadModel, loadSampleTexts, loadVoice,
   repoBaseUrl, voicePreviewUrl,
@@ -26,6 +27,7 @@ const els = {
   cfg: $<HTMLInputElement>('cfg'),
   temperature: $<HTMLInputElement>('temperature'),
   chunkSec: $<HTMLInputElement>('chunk-sec'),
+  textNorm: $<HTMLInputElement>('text-norm'),
   status: $<HTMLDivElement>('status'),
   bar: $<HTMLDivElement>('bar'),
   barWrap: $<HTMLDivElement>('bar-wrap'),
@@ -125,10 +127,13 @@ els.generate.addEventListener('click', async () => {
   const started = performance.now();
   let firstChunkAt: number | null = null;
 
+  // Normalize BEFORE segmenting — an expansion is several times longer than
+  // what it replaces, and the chunk budget has to size the text the model
+  // actually receives. Same order as the Python engine.
+  const normalized = els.textNorm.checked ? normalizeViText(text) : text;
   // The model is bounded by maxFrames (120 s); a whole article as one utterance
-  // is silently truncated mid-sentence. Segment it exactly as the Python package
-  // does, and show what will actually be spoken.
-  const segments = textSegments(text, Number(els.chunkSec.value));
+  // is silently truncated mid-sentence.
+  const segments = textSegments(normalized, Number(els.chunkSec.value));
   els.segments.textContent = segments.map((s, i) => `[${i + 1}] ${s}`).join('\n');
 
   try {

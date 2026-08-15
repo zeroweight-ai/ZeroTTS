@@ -86,8 +86,8 @@ CASES: list[tuple[str, str, str]] = [
     ("untouched", "Hello world!", "Hello world!"),
 
     # ── out of scope but containing an in-scope number ───────────────────────
-    # Money/units/percent are NOT expanded; the bare number inside them is.
-    ("partial", "5%", "năm%"),
+    # Money and units are NOT expanded; the bare number inside them is.
+    # (Percent used to live here; it is now handled in full — see "percent".)
     ("partial", "5 km/h", "năm km/h"),
     ("partial", "1.250.000đ", "một triệu hai trăm năm mươi nghìn đ"),
     ("partial", "5G", "năm G"),
@@ -108,6 +108,18 @@ CASES: list[tuple[str, str, str]] = [
         "Ủy ban Nhân dân Thành phố Hồ Chí Minh họp lúc chín giờ, xem tại "
         "https://hcmcpv.org.vn nhé.",
     ),
+    # ── percent ──────────────────────────────────────────────────────────────
+    ("percent", "giảm 25%", "giảm hai mươi lăm phần trăm"),
+    ("percent", "lãi suất 12,5% một năm", "lãi suất mười hai phẩy năm phần trăm một năm"),
+    ("percent", "tăng 100%", "tăng một trăm phần trăm"),
+    ("percent", "chiếm 7,5 % tổng số", "chiếm bảy phẩy năm phần trăm tổng số"),
+    # ── at sign ──────────────────────────────────────────────────────────────
+    ("at", "liên hệ @peter_shop nhé", "liên hệ a còng peter_shop nhé"),
+    ("at", "@", "a còng"),
+    # An email is protected wholesale, so its @ must NOT be spoken.
+    ("untouched", "email abc@gmail.com nhé", "email abc@gmail.com nhé"),
+    # %20 inside a URL is percent-encoding, not a percentage.
+    ("untouched", "xem tại https://a.vn/x?q=1%20b", "xem tại https://a.vn/x?q=1%20b"),
 ]
 
 
@@ -125,4 +137,5 @@ def test_every_supported_form_is_covered():
     covered = {c for c, _, _ in CASES}
     assert covered >= {
         "number", "date", "time", "version", "fraction", "abbrev", "untouched",
+        "percent", "at",
     }, f"missing coverage for {covered}"

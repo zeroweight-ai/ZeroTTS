@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Browser demo for ZeroTTS — runs the model client-side with onnxruntime-web.",
+  "description": "Browser demo for ZeroTTS \u2014 runs the model client-side with onnxruntime-web.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "parity": "node --loader ./test/ts-loader.mjs test/parity.mjs"
   },
   "dependencies": {
     "onnxruntime-web": "^1.20.0",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "typescript": "^5.6.0",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "esbuild": "^0.24.0"
   }
 }
