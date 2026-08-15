@@ -13,10 +13,11 @@ npm run typecheck
 npm run build      # static bundle in dist/
 ```
 
-> **Not yet run end-to-end.** The Python runtime is verified bit-identical
-> against the reference implementation; this port is a faithful translation of
-> the same contract but has not been executed against real weights. Treat it as
-> a starting point, and run the parity check below before trusting it.
+> **Verified against the real model.** Driven through `onnxruntime-node`, this
+> port produces frame codes **bit-identical** to the Python package for the same
+> text, voice and random draws (`test/frames.mjs`). It has not yet been run in an
+> actual browser, where the differences are the ORT build and the audio path
+> rather than the model logic.
 
 ## The download
 
@@ -40,21 +41,25 @@ downloading. Not suitable for mobile data.
 | `src/rng.ts` | seedable PRNG — the sampler's draws are graph *inputs* |
 | `src/main.ts` | demo UI wiring |
 
-## Parity check (do this first)
+## Parity checks
 
-Sampling happens inside `local_frame_decode.onnx` and takes its random draws as
-graph inputs, so the caller owns the randomness. That makes an exact
-cross-language comparison possible, and it is the only practical way to keep
-this port correct across re-exports:
+Two, both of which have caught real bugs:
 
-1. In Python, seed `numpy.random` and record the exact draw sequence and the
-   resulting frame codes for a fixed text + voice.
-2. Feed the same draws through `Rng` (or stub it with the recorded values) and
-   assert the JS frame codes match element-for-element.
+**Frame codes vs. Python** — the end-to-end one. Sampling happens inside
+`local_frame_decode.onnx` and takes its random draws as graph *inputs*, so the
+caller owns the randomness and an exact cross-language comparison is possible:
 
-Frame codes must match exactly. Audio samples may differ in the last bits at
-chunk seams when comparing streaming to batch decode — that is the KV-cached
-decoder, not an error — but the codes must not.
+```bash
+npm install --no-save onnxruntime-node
+node --experimental-strip-types test/frames.mjs /path/to/model
+python test/py_frames.py /path/to/model
+```
+
+Frame codes must match element for element. (Audio *samples* may differ in the
+last bits at chunk seams when comparing streaming to batch decode — that is the
+KV-cached decoder, not an error — but the codes must not.)
+
+**Text normalization vs. Python** — see below.
 
 ## Normalizer parity
 

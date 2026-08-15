@@ -52,6 +52,35 @@ const i64 = (values: ArrayLike<number | bigint>, dims: number[]) =>
 
 const big = (values: ArrayLike<number>) => toBigInt64(values);
 
+/**
+ * Run a session, then return its outputs BY POSITION.
+ *
+ * The Python runtime reads outputs positionally (`h, kv, valid = sess.run(...)`)
+ * and so never depends on their names. Reading them by name here reintroduced
+ * that coupling and broke on the first mismatch: prefix_step's KV output is
+ * called `new_packed_kv`, not `packed_kv`, so `outputs.packed_kv` was undefined
+ * and the *next* call failed with "input 'packed_kv' is missing in 'feeds'" —
+ * an error pointing at the input, one call after the actual mistake.
+ *
+ * Feeds are checked too: ORT reports an undefined value as a missing input,
+ * which reads as "you forgot this" when the truth is "the value you passed was
+ * undefined". Failing here names the culprit.
+ */
+async function run(
+  session: ort.InferenceSession, feeds: Record<string, ort.Tensor>,
+): Promise<ort.Tensor[]> {
+  for (const [name, value] of Object.entries(feeds)) {
+    if (value == null) {
+      throw new Error(
+        `feed '${name}' is ${value} — an earlier graph output was probably read `
+        + `under the wrong name (this session's outputs are: `
+        + `${session.outputNames.join(', ')})`);
+    }
+  }
+  const outputs = await session.run(feeds);
+  return session.outputNames.map((name) => outputs[name] as ort.Tensor);
+}
+
 /** Frames of codec silence decoded between text segments. */
 const SILENCE_FRAMES_PER_SEGMENT = 4;
 
@@ -125,13 +154,10 @@ export class ZeroTTSBrowser {
       return out;
     })();
 
-    const encoded = await this.sessions.textEncoder.run({
+    const [textStates, textValid, soaEmbed] = await run(this.sessions.textEncoder, {
       text_ids: i64(idsBatched, [B, textLen]),
       txt_lengths: i64(new Array(B).fill(textLen), [B]),
     });
-    const textStates = encoded.text_states as ort.Tensor;
-    const textValid = encoded.text_valid as ort.Tensor;
-    const soaEmbed = encoded.soa_embed as ort.Tensor;
 
     // external_embed = [voice | soa]
     const T = V + 1;
@@ -148,7 +174,7 @@ export class ZeroTTSBrowser {
     const bidirectional = new Uint8Array(B * T);
     for (let b = 0; b < B; b++) bidirectional.fill(1, b * T, b * T + V);
 
-    const outputs = await this.sessions.prefixStep.run({
+    const [hidden, packedKv, fullValid] = await run(this.sessions.prefixStep, {
       external_embed: new ort.Tensor('float32', external, [B, T, D]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B * T).fill(1), [B, T]),
       frame_codes: i64(new BigInt64Array(B * T * this.numCodebooks),
@@ -164,10 +190,7 @@ export class ZeroTTSBrowser {
     });
 
     return {
-      hidden: lastPosition(outputs.hidden as ort.Tensor),
-      packedKv: outputs.packed_kv as ort.Tensor,
-      fullValid: outputs.full_valid as ort.Tensor,
-      textStates, textValid,
+      hidden: lastPosition(hidden), packedKv, fullValid, textStates, textValid,
     };
   }
 
@@ -186,7 +209,7 @@ export class ZeroTTSBrowser {
     // Position: the voice block holds 0..V-1, <soa> is at V, frame t at V+1+t.
     const pos = new BigInt64Array(B).fill(BigInt(nVoice + 1 + frameIndex));
 
-    const outputs = await this.sessions.prefixStep.run({
+    const [hidden, packedKv, fullValid] = await run(this.sessions.prefixStep, {
       external_embed: new ort.Tensor('float32', new Float32Array(B * this.dModel),
         [B, 1, this.dModel]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B), [B, 1]),
@@ -201,11 +224,8 @@ export class ZeroTTSBrowser {
     });
 
     return {
-      hidden: lastPosition(outputs.hidden as ort.Tensor),
-      packedKv: outputs.packed_kv as ort.Tensor,
-      fullValid: outputs.full_valid as ort.Tensor,
-      textStates: state.textStates,
-      textValid: state.textValid,
+      hidden: lastPosition(hidden), packedKv, fullValid,
+      textStates: state.textStates, textValid: state.textValid,
     };
   }
 
@@ -214,7 +234,7 @@ export class ZeroTTSBrowser {
     seenMask: Uint8Array, B: number, rng: Rng,
   ): Promise<{ isEoa: boolean; codes: BigInt64Array }> {
     const K = this.numCodebooks;
-    const outputs = await this.sessions.localFrameDecode.run({
+    const [isEoaT, codesT] = await run(this.sessions.localFrameDecode, {
       global_hidden: hidden,
       forbid_eoa: new ort.Tensor('bool', Uint8Array.from([forbidEoa ? 1 : 0]), [1]),
       text_temperature: new ort.Tensor('float32', Float32Array.from([opts.textTemperature]), [1]),
@@ -231,13 +251,13 @@ export class ZeroTTSBrowser {
     });
 
     // Coerced, not cast: this value is fed straight back in as frame_codes.
-    const codes = toBigInt64(outputs.codes.data as ArrayLike<number | bigint>);
+    const codes = toBigInt64(codesT.data as ArrayLike<number | bigint>);
     // The graph cannot carry a variable-length history, so the caller maintains
     // the repetition-penalty mask.
     for (let c = 0; c < K; c++) {
       seenMask[c * this.codebookSize + Number(codes[c])] = 1;
     }
-    return { isEoa: Boolean((outputs.is_eoa.data as Uint8Array)[0]), codes };
+    return { isEoa: Boolean((isEoaT.data as Uint8Array)[0]), codes };
   }
 
   // ── generation ─────────────────────────────────────────────────────────────
