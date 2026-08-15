@@ -43,17 +43,20 @@ js/src/
   synthesizer.ts   the two-calls-per-frame loop (see docs/RUNTIME.md)
   codec.ts         MOSS decoder: batch + KV-cached streaming
   tokenizer.ts     BPE over tokenizer.json
-  voices.ts        fetch voices/index.json + voice.bin
   chunking.ts      long-form segmentation (port of zerotts.chunking)
+  loader.ts        resolve repo URLs, create sessions, load voices
   cache.ts         Cache API persistence, download progress
-  worker.ts        generation off the main thread
+  rng.ts           seedable PRNG — the sampler's draws are graph inputs
   player.ts        AudioWorklet ring buffer for streaming playback
+  main.ts          demo UI wiring
 ```
 
-Generation runs in a Web Worker — the per-frame loop would otherwise block the
-main thread and stutter playback. Audio is pushed to an `AudioWorklet` ring
-buffer rather than scheduled as `AudioBufferSourceNode`s, so chunk boundaries
-don't click.
+Audio is pushed into an `AudioWorklet` ring buffer rather than scheduled as
+individual `AudioBufferSourceNode`s, so chunk boundaries don't click.
+
+Generation currently runs on the **main thread**; moving it into a Web Worker is
+a known gap (see [js/README.md](../js/README.md)) — the per-frame loop competes
+with rendering and can stutter playback under load.
 
 ## Porting notes
 
