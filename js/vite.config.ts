@@ -5,6 +5,9 @@ export default defineConfig({
   optimizeDeps: { exclude: ['onnxruntime-web'] },
   build: { target: 'es2022', assetsInlineLimit: 0 },
   server: {
+    // src/loader.ts imports ../../webui/test_samples.txt?raw so both demos read
+    // the same sample file; without this, Vite's dev server refuses to serve it.
+    fs: { allow: ['..'] },
     headers: {
       // Required for SharedArrayBuffer, which onnxruntime-web needs for
       // multi-threaded WASM. Without these it silently falls back to a single

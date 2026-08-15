@@ -1,7 +1,11 @@
 /** Demo UI wiring. The interesting code is in synthesizer.ts / codec.ts. */
 
 import { clearCache } from './cache';
-import { downloadInfo, loadModel, loadVoice, repoBaseUrl, DEFAULT_REPO } from './loader';
+import { textSegments } from './chunking';
+import {
+  DEFAULT_REPO, downloadInfo, loadModel, loadSampleTexts, loadVoice,
+  repoBaseUrl, voicePreviewUrl,
+} from './loader';
 import { StreamPlayer, toWavBlob } from './player';
 import { ZeroTTSBrowser } from './synthesizer';
 import { VoiceIndex } from './types';
@@ -21,11 +25,18 @@ const els = {
   seed: $<HTMLInputElement>('seed'),
   cfg: $<HTMLInputElement>('cfg'),
   temperature: $<HTMLInputElement>('temperature'),
+  chunkSec: $<HTMLInputElement>('chunk-sec'),
   status: $<HTMLDivElement>('status'),
   bar: $<HTMLDivElement>('bar'),
   barWrap: $<HTMLDivElement>('bar-wrap'),
   sizeNote: $<HTMLDivElement>('size-note'),
+  sample: $<HTMLSelectElement>('sample'),
+  preview: $<HTMLAudioElement>('preview'),
+  voiceMeta: $<HTMLDivElement>('voice-meta'),
+  segments: $<HTMLPreElement>('segments'),
 };
+
+let samples: Record<string, string> = {};
 
 let tts: ZeroTTSBrowser | null = null;
 let voices: VoiceIndex = { voices: [] };
@@ -83,6 +94,7 @@ els.load.addEventListener('click', async () => {
       els.voice.append(option);
     }
     if (voices.voices.length) els.voice.value = voices.voices[0].name;
+    updateVoiceUi();
 
     player = new StreamPlayer(tts.sampleRate);
     progress(null);
@@ -113,6 +125,12 @@ els.generate.addEventListener('click', async () => {
   const started = performance.now();
   let firstChunkAt: number | null = null;
 
+  // The model is bounded by maxFrames (120 s); a whole article as one utterance
+  // is silently truncated mid-sentence. Segment it exactly as the Python package
+  // does, and show what will actually be spoken.
+  const segments = textSegments(text, Number(els.chunkSec.value));
+  els.segments.textContent = segments.map((s, i) => `[${i + 1}] ${s}`).join('\n');
+
   try {
     status('Loading voice…');
     const voiceEmb = voiceName ? await loadVoice(base, voiceName) : null;
@@ -121,7 +139,7 @@ els.generate.addEventListener('click', async () => {
     status('Generating…');
 
     for await (const chunk of tts.synthesizeStream(
-      text, voiceEmb,
+      segments, voiceEmb,
       { cfgScale: Number(els.cfg.value), audioTemperature: Number(els.temperature.value) },
       seed, abort.signal,
     )) {
@@ -141,10 +159,16 @@ els.generate.addEventListener('click', async () => {
 
     const elapsed = (performance.now() - started) / 1000;
     const duration = total / tts.sampleRate;
+    const overflow = player.overflowed
+      ? ' — WARNING: playback buffer overflowed, live audio is incomplete (the ' +
+        'downloaded WAV is not)'
+      : '';
     status(`${duration.toFixed(2)}s audio in ${elapsed.toFixed(2)}s — ` +
            `${(duration / elapsed).toFixed(1)}x realtime, ` +
-           `first audio ${firstChunkAt?.toFixed(0) ?? '?'} ms`);
+           `first audio ${firstChunkAt?.toFixed(0) ?? '?'} ms, ` +
+           `${segments.length} segment(s)${overflow}`);
 
+    if (els.download.href) URL.revokeObjectURL(els.download.href);
     els.download.href = URL.createObjectURL(toWavBlob(audio, tts.sampleRate));
     els.download.download = 'zerotts.wav';
     els.download.style.display = 'inline-block';
@@ -169,5 +193,39 @@ els.clear.addEventListener('click', async () => {
   status('Cache cleared. The next load will re-download the model.');
 });
 
+function updateVoiceUi(): void {
+  const name = els.voice.value;
+  if (!name || !base) {
+    els.preview.removeAttribute('src');
+    els.preview.style.display = 'none';
+    els.voiceMeta.textContent = name ? '' : 'No voice — the model picks one itself, '
+      + 'and it is not consistent between segments.';
+    return;
+  }
+  const info = voices.voices.find((v) => v.name === name);
+  els.voiceMeta.textContent = info
+    ? [info.name, info.language, info.description].filter(Boolean).join(' · ')
+    : name;
+  // A 404 here should leave an empty player, not a broken one.
+  els.preview.onerror = () => { els.preview.style.display = 'none'; };
+  els.preview.src = voicePreviewUrl(base, name);
+  els.preview.style.display = 'block';
+}
+
+els.voice.addEventListener('change', updateVoiceUi);
+els.sample.addEventListener('change', () => {
+  const text = samples[els.sample.value];
+  if (text) els.text.value = text;
+});
 els.repo.addEventListener('change', refreshSizeNote);
+
 refreshSizeNote();
+loadSampleTexts().then((loaded) => {
+  samples = loaded;
+  for (const name of Object.keys(loaded)) {
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = name;
+    els.sample.append(option);
+  }
+});

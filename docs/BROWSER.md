@@ -44,7 +44,8 @@ js/src/
   codec.ts         MOSS decoder: batch + KV-cached streaming
   tokenizer.ts     BPE over tokenizer.json
   voices.ts        fetch voices/index.json + voice.bin
-  cache.ts         OPFS persistence, download progress
+  chunking.ts      long-form segmentation (port of zerotts.chunking)
+  cache.ts         Cache API persistence, download progress
   worker.ts        generation off the main thread
   player.ts        AudioWorklet ring buffer for streaming playback
 ```

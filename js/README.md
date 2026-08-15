@@ -30,6 +30,7 @@ downloading. Not suitable for mobile data.
 | File | Role |
 |---|---|
 | `src/synthesizer.ts` | the two-calls-per-frame loop — see [../docs/RUNTIME.md](../docs/RUNTIME.md) |
+| `src/chunking.ts` | long-form segmentation, port of `zerotts.chunking` |
 | `src/codec.ts` | MOSS decoder: batch + KV-cached streaming |
 | `src/tokenizer.ts` | BPE over `tokenizer.json` |
 | `src/loader.ts` | resolve repo URLs, create sessions, load voices |
@@ -62,6 +63,24 @@ to a single thread and generation is several times slower. **Whatever hosts the
 built bundle must send the same two headers** — GitHub Pages does not, so a Pages
 deployment will be slow unless you add a service-worker shim.
 
+## Things that are easy to get wrong here
+
+Three of these were real bugs in an earlier revision; they are called out
+because each one fails *quietly*.
+
+- **One codec session across all segments.** The backbone re-primes its
+  `[voice | soa]` prefix per segment, but the codec's streaming decoder is
+  causal and KV-cached — opening a fresh decoder per segment restarts that cache
+  cold and clicks at every boundary. Each segment sounds fine in isolation.
+- **The playback ring buffer must not lap itself.** Generation runs ~2x
+  realtime, so the writer gains about a second of audio per second played. An
+  unconditional modulo write silently overwrites unplayed samples once the lead
+  exceeds the buffer. It is sized for the model's 120 s ceiling and reports an
+  overflow rather than wrapping. A read/write index pair also makes "full" look
+  identical to "empty"; monotonic counters are used instead.
+- **One RNG across segments.** Sampling draws are graph *inputs*, so a fresh
+  `Rng(seed)` per segment replays the identical draw sequence for every segment.
+
 ## Known gaps
 
 - Generation runs on the main thread. It should move into a Web Worker
@@ -70,5 +89,3 @@ deployment will be slow unless you add a service-worker shim.
 - WebGPU is selectable but unvalidated. Its kernels are not bit-identical to the
   CPU path, and since this model samples *inside* the graph, small numeric
   differences change which token is drawn. Compare against WASM before using it.
-- No long-form chunking. The Python package has `zerotts.chunking`; the browser
-  demo synthesizes whatever it is given as one utterance.

@@ -32,6 +32,11 @@ const GRAPHS = [
   'onnx/codec/moss_audio_tokenizer_decode_shared.data',
 ];
 
+/** A voice's preview clip, for the picker. */
+export function voicePreviewUrl(base: string, name: string): string {
+  return `${base}/voices/${name}/preview.wav`;
+}
+
 export function modelUrls(base: string): string[] {
   return GRAPHS.map((g) => `${base}/${g}`);
 }
@@ -118,13 +123,43 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
     MossCodecDecoder.create(codecMeta, { decodeFull, decodeStep }, codecOptions),
   ]);
 
+  // The codec's canonical silence frame, used to pad between segments. Absent
+  // in model directories built before it was shipped; the synthesizer then
+  // skips padding rather than guessing (zeros are a real code, not silence).
+  let silenceFrame: BigInt64Array | null = null;
+  try {
+    silenceFrame = parseNpyInt64(await get('silence_frame.npy'));
+  } catch {
+    console.warn('silence_frame.npy missing — segments will not be padded');
+  }
+
   const tokenizer = await BpeTokenizer.create(tokenizerJson);
   const tts = new ZeroTTSBrowser(
     { textEncoder, prefixStep, localFrameDecode },
-    codec, tokenizer, config, parseNpyFloat32(nullVoiceBuf));
+    codec, tokenizer, config, parseNpyFloat32(nullVoiceBuf), silenceFrame);
 
   await tts.warmup();
   return { tts, voices, base };
+}
+
+/**
+ * Sample texts for the demo's picker.
+ *
+ * Imported as a raw string from the same webui/test_samples.txt the Python UI
+ * reads, so the two demos stay in step and the file has one home. Vite inlines
+ * it at build time (see vite.config.ts's `server.fs.allow`, which lets the
+ * import reach outside js/).
+ */
+export async function loadSampleTexts(): Promise<Record<string, string>> {
+  try {
+    const [{ parseSamples }, raw] = await Promise.all([
+      import('./chunking'),
+      import('../../webui/test_samples.txt?raw'),
+    ]);
+    return parseSamples((raw as { default: string }).default);
+  } catch {
+    return {};
+  }
 }
 
 /** Load a voice's latents. `voice.bin` is raw little-endian float32 — the repo
@@ -139,23 +174,30 @@ export async function loadVoice(base: string, name: string): Promise<Float32Arra
  * Only handles the little-endian float32, C-order case that file is written in;
  * anything else is a repo problem worth failing loudly on.
  */
-function parseNpyFloat32(buffer: ArrayBuffer): Float32Array {
+function npyPayload(buffer: ArrayBuffer, descr: RegExp, what: string): [number, string] {
   const bytes = new Uint8Array(buffer);
-  const magic = String.fromCharCode(...bytes.subarray(1, 6));
-  if (magic !== 'NUMPY') throw new Error('null_voice_emb.npy: not a .npy file');
-
+  if (String.fromCharCode(...bytes.subarray(1, 6)) !== 'NUMPY') {
+    throw new Error(`${what}: not a .npy file`);
+  }
   const major = bytes[6];
-  const headerLen = major >= 2
-    ? new DataView(buffer).getUint32(8, true)
-    : new DataView(buffer).getUint16(8, true);
+  const view = new DataView(buffer);
+  const headerLen = major >= 2 ? view.getUint32(8, true) : view.getUint16(8, true);
   const headerStart = major >= 2 ? 12 : 10;
   const header = new TextDecoder().decode(bytes.subarray(headerStart, headerStart + headerLen));
 
-  if (!/'descr':\s*'[<|]f4'/.test(header)) {
-    throw new Error(`null_voice_emb.npy: expected little-endian float32, got ${header}`);
-  }
+  if (!descr.test(header)) throw new Error(`${what}: unexpected dtype — ${header}`);
   if (/'fortran_order':\s*True/.test(header)) {
-    throw new Error('null_voice_emb.npy: Fortran order is not supported');
+    throw new Error(`${what}: Fortran order is not supported`);
   }
-  return new Float32Array(buffer, headerStart + headerLen);
+  return [headerStart + headerLen, header];
+}
+
+function parseNpyFloat32(buffer: ArrayBuffer): Float32Array {
+  const [offset] = npyPayload(buffer, /'descr':\s*'[<|]f4'/, 'null_voice_emb.npy');
+  return new Float32Array(buffer, offset);
+}
+
+function parseNpyInt64(buffer: ArrayBuffer): BigInt64Array {
+  const [offset] = npyPayload(buffer, /'descr':\s*'[<|]i8'/, 'silence_frame.npy');
+  return new BigInt64Array(buffer, offset);
 }

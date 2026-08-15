@@ -22,6 +22,9 @@ import { DEFAULT_SAMPLING, SamplingOptions, ZeroTTSConfig } from './types';
 const big = (values: ArrayLike<number>) =>
   BigInt64Array.from(Array.from(values, (v) => BigInt(v)));
 
+/** Frames of codec silence decoded between text segments. */
+const SILENCE_FRAMES_PER_SEGMENT = 4;
+
 export interface Sessions {
   textEncoder: ort.InferenceSession;
   prefixStep: ort.InferenceSession;
@@ -52,6 +55,9 @@ export class ZeroTTSBrowser {
     private tokenizer: BpeTokenizer,
     private config: ZeroTTSConfig,
     private nullVoiceEmb: Float32Array,
+    /** The codec's canonical silence frame (length numCodebooks), or null when
+     *  the model directory predates silence_frame.npy — see synthesizeStream. */
+    private silenceFrame: BigInt64Array | null = null,
   ) {
     this.sampleRate = config.sample_rate;
     this.numCodebooks = config.num_codebooks;
@@ -209,9 +215,13 @@ export class ZeroTTSBrowser {
   async *generateFrames(
     text: string, voiceEmb: Float32Array | null, options: Partial<SamplingOptions> = {},
     seed?: number, signal?: AbortSignal,
+    /** Supply one to continue a draw sequence across several segments. Creating
+     *  a fresh Rng per segment from the same seed would replay the identical
+     *  draws for every segment. */
+    sharedRng?: Rng,
   ): AsyncGenerator<BigInt64Array> {
     const opts = { ...DEFAULT_SAMPLING, ...options };
-    const rng = new Rng(seed);
+    const rng = sharedRng ?? new Rng(seed);
     let voice = voiceEmb ?? this.nullVoiceEmb;
     const B = opts.cfgScale > 1.0 ? 2 : 1;
     if (B === 2) {
@@ -262,18 +272,43 @@ export class ZeroTTSBrowser {
   }
 
   /**
-   * Streaming: yields audio chunks as they are produced. The chunk size ramps —
-   * the first is one frame so playback starts fast, then it doubles up to 16 so
-   * the per-call codec overhead is amortized once a buffer exists.
+   * Streaming synthesis over one or more text segments.
+   *
+   * Each segment is its own generate call — the architecture re-primes the
+   * global transformer's [voice | soa] prefix fresh per call, so segments cannot
+   * share that.
+   *
+   * The CODEC, however, is ONE continuous streaming session across every
+   * segment. Its decoder is causal and KV-cached; opening a fresh decoder per
+   * segment restarts that cache cold, and the discontinuity is audible as a
+   * click at every segment boundary. This is the single easiest thing to get
+   * wrong here, and it fails quietly — each segment on its own sounds correct.
+   *
+   * Between segments a few frames of the codec's canonical silence are decoded
+   * through the same session, so the previous segment's last phone gets a breath
+   * instead of butting straight against the next one's first. Those codes are
+   * not zeros (code 0 is a real code, not silence) — they are shipped alongside
+   * the weights as silence_frame.npy, because deriving them needs the codec
+   * encoder, which is not part of this release. Without the file, padding is
+   * skipped rather than guessed.
+   *
+   * The chunk-size ramp (1, 2, 4 … frames per decode call) only buys
+   * time-to-first-audio, which only matters once, so it applies to the first
+   * segment only; later segments decode straight at `maxChunkFrames`.
    */
   async *synthesizeStream(
-    text: string, voiceEmb: Float32Array | null, options: Partial<SamplingOptions> = {},
+    segments: string | string[], voiceEmb: Float32Array | null,
+    options: Partial<SamplingOptions> = {},
     seed?: number, signal?: AbortSignal,
     firstChunkFrames = 1, maxChunkFrames = 16,
   ): AsyncGenerator<Float32Array> {
+    const texts = Array.isArray(segments) ? segments : [segments];
     const stream: MossStreamingDecoder = this.codec.streamingDecoder();
-    let target = Math.max(1, firstChunkFrames);
-    const cap = Math.max(target, maxChunkFrames);
+    const cap = Math.max(1, maxChunkFrames);
+    // ONE draw sequence across all segments: a fresh Rng per segment from the
+    // same seed would give every segment identical random draws.
+    const rng = new Rng(seed);
+    const silence = this.silenceFrame;
     let buffer: BigInt64Array[] = [];
 
     const flush = async () => {
@@ -282,14 +317,26 @@ export class ZeroTTSBrowser {
       return stream.decodeChunk(codes, K, n);
     };
 
-    for await (const frame of this.generateFrames(text, voiceEmb, options, seed, signal)) {
-      buffer.push(frame);
-      if (buffer.length >= target) {
+    for (let segIdx = 0; segIdx < texts.length; segIdx++) {
+      if (signal?.aborted) return;
+      let target = segIdx === 0 ? Math.max(1, firstChunkFrames) : cap;
+
+      for await (const frame of this.generateFrames(
+        texts[segIdx], voiceEmb, options, seed, signal, rng,
+      )) {
+        buffer.push(frame);
+        if (buffer.length >= target) {
+          yield await flush();
+          if (segIdx === 0) target = Math.min(cap, target * 2);
+        }
+      }
+      if (buffer.length) yield await flush();
+
+      if (silence) {
+        buffer = Array.from({ length: SILENCE_FRAMES_PER_SEGMENT }, () => silence);
         yield await flush();
-        target = Math.min(cap, target * 2);
       }
     }
-    if (buffer.length) yield await flush();
   }
 }
 
