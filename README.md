@@ -76,6 +76,22 @@ for chunk in tts.synthesize_stream("Một đoạn văn bản dài hơn…", voic
     play(chunk)   # (1, n) float32 at 48 kHz
 ```
 
+Dates, clock times, fractions and acronyms are expanded to spoken Vietnamese
+before synthesis:
+
+```python
+from zerotts import normalize_vi_text
+
+normalize_vi_text("Ngày 23/8/2024 lúc 15h30, giá 1.250.000")
+# 'Ngày hai mươi ba tháng tám năm hai nghìn không trăm hai mươi tư lúc
+#  mười lăm giờ ba mươi phút, giá một triệu hai trăm năm mươi nghìn'
+```
+
+`synthesize()` does **not** apply it — it is a separate step so you stay in
+control (the expansions are Vietnamese words, so they are wrong for English
+text). The CLI and web UI apply it by default; `zerotts say --no_text_norm`
+turns it off.
+
 Long input should be segmented — the model is trained on utterances, not
 paragraphs:
 
@@ -249,6 +265,11 @@ the weights repo so there is no external runtime dependency; see
   year={2026}, eprint={2602.10934}, archivePrefix={arXiv}, primaryClass={cs.SD}
 }
 ```
+
+Vietnamese text normalization adapts the expansion rules and abbreviation table
+of **[soe-vinorm](https://github.com/vinhdq842/soe-vinorm)** (MIT), reimplemented
+as pure stdlib regex so the inference path keeps its no-torch, no-download
+guarantee. See [NOTICE](NOTICE).
 
 Benchmark reference audio comes from
 [VIVOS](https://huggingface.co/datasets/AILAB-VNUHCM/vivos),

@@ -19,3 +19,18 @@ removal of the encoder entries from the accompanying metadata file.
 
   Upstream: https://github.com/OpenMOSS/MOSS-Audio-Tokenizer
             https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX
+
+------------------------------------------------------------------------------
+
+soe-vinorm
+Copyright (c) vinhdq842.
+Licensed under the MIT License.
+Full text: src/zerotts/text_norm/data/LICENSE.soe-vinorm
+
+src/zerotts/text_norm/vi_normalizer.py adapts soe-vinorm's Vietnamese number,
+date, time, version and fraction expansion rules, and vendors its abbreviation
+table as data/abbreviations.txt. None of soe-vinorm's machinery is carried over
+— that project tags tokens with a CRF and disambiguates acronyms with an ONNX
+scorer, both downloaded at runtime; this module is pure stdlib regex.
+
+  Upstream: https://github.com/vinhdq842/soe-vinorm

@@ -54,6 +54,11 @@ zerotts = "zerotts.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# abbreviations.txt is data, not code — without this it is missing from the
+# wheel and acronym expansion silently degrades to a no-op.
+[tool.setuptools.package-data]
+"zerotts.text_norm" = ["data/*.txt", "data/LICENSE.soe-vinorm"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py39"
@@ -68,3 +73,6 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Examples print and read top-to-bottom; module-level code is the point.
 "examples/*" = ["E402"]
+# One verbose regex whose alternation branches are a line each — wrapping them
+# would obscure the pattern without making it shorter.
+"src/zerotts/text_norm/vi_normalizer.py" = ["E501"]

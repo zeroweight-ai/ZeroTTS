@@ -21,6 +21,7 @@ from zerotts.chunking import (
     load_text_samples,
     normalize_punctuation,
 )
+from zerotts.text_norm import normalize_vi_text
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
@@ -138,10 +139,23 @@ def get_sample_texts() -> dict:
     return load_text_samples(SAMPLE_TEXTS_PATH)
 
 
-def get_text_segments(text: str, max_chunk_sec: float = 15.0) -> list:
-    """Exactly the segments generate_stream will synthesize, after chunking and
-    per-segment punctuation cleanup — exposed so the UI can show what will
-    actually be spoken before generation starts."""
+def get_text_segments(text: str, max_chunk_sec: float = 15.0,
+                      normalize_numbers: bool = True) -> list:
+    """Exactly the segments generate_stream will synthesize, after Vietnamese
+    text normalization, chunking and per-segment punctuation cleanup — exposed
+    so the UI can show what will actually be spoken before generation starts.
+
+    ``normalize_numbers`` runs zerotts.text_norm.normalize_vi_text first,
+    turning dates, clock times, versions, fractions, acronyms and numbers into
+    spoken Vietnamese. It runs BEFORE chunking because an expansion is several
+    times longer than what it replaces, and the chunk budget has to size the
+    text the model actually receives.
+
+    Turn it off for non-Vietnamese text: the expansions are Vietnamese words, so
+    "3/4" in an English sentence would come out "ba trên bốn".
+    """
+    if normalize_numbers:
+        text = normalize_vi_text(text)
     raw = chunk_text(normalize_punctuation(text), max_chunk_sec=max_chunk_sec)
     return [c for c in (clean_segment_punctuation(x) for x in raw) if c]
 
@@ -162,6 +176,7 @@ def generate_stream(
     max_chunk_frames: int = 16,
     eoa_extra_frames: int = 1,
     use_voice: bool = True,
+    normalize_numbers: bool = True,
     result: dict | None = None,
 ):
     """Generator yielding (sample_rate, int16 ndarray) chunks for streaming.
@@ -201,7 +216,8 @@ def generate_stream(
         # IS the unconditional branch is a no-op that costs twice as much.
         cfg_scale = 1.0
 
-    segments = get_text_segments(text, max_chunk_sec=max_chunk_sec)
+    segments = get_text_segments(text, max_chunk_sec=max_chunk_sec,
+                                 normalize_numbers=normalize_numbers)
     silence_frame = _get_silence_frame(tts)
 
     stream = tts.codec.streaming_decoder()

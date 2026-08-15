@@ -12,6 +12,7 @@ from . import hub
 from .audio import concat_with_silence
 from .chunking import chunk_text, clean_segment_punctuation, normalize_punctuation
 from .synthesizer import ZeroTTS
+from .text_norm import normalize_vi_text
 
 
 def _add_model_args(p: argparse.ArgumentParser) -> None:
@@ -49,6 +50,10 @@ def cmd_say(a: argparse.Namespace) -> int:
                                   intra_op_num_threads=a.threads)
 
     text = a.text if a.text != "-" else sys.stdin.read()
+    # Before chunking: an expansion is several times longer than what it
+    # replaces, and the chunk budget has to size the text the model receives.
+    if not a.no_text_norm:
+        text = normalize_vi_text(text)
     segments = [text]
     if a.chunk:
         segments = [clean_segment_punctuation(s)
@@ -127,6 +132,10 @@ def main(argv=None) -> int:
     say.add_argument("--max_chunk_sec", type=float, default=15.0)
     say.add_argument("--gap_sec", type=float, default=0.15,
                      help="Silence inserted between chunks.")
+    say.add_argument("--no_text_norm", action="store_true",
+                     help="Skip Vietnamese normalization of dates/times/numbers. "
+                          "Use for non-Vietnamese text — the expansions are "
+                          "Vietnamese words.")
     _add_model_args(say)
     _add_sampling_args(say)
     say.set_defaults(func=cmd_say)

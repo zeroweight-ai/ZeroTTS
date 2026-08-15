@@ -1,0 +1,2258 @@
+ANĐT:an ninh điều tra
+anđt:an ninh điều tra
+ANTT:an ninh trật tự
+antt:an ninh trật tự
+ANTQ:an ninh tổ quốc
+antq:an ninh tổ quốc
+ATGT:An toàn Giao thông
+atgt:An toàn Giao thông
+ATM:máy rút tiền tự động
+atm:máy rút tiền tự động
+ATNĐ:áp thấp nhiệt đới
+atnđ:áp thấp nhiệt đới
+ATTT:an toàn trật tự
+attt:an toàn trật tự
+ATTTGT:an toàn trật tự giao thông
+atttgt:an toàn trật tự giao thông
+ATVSTP:an toàn vệ sinh thực phẩm
+atvstp:an toàn vệ sinh thực phẩm
+BBCVT:Bộ Bưu chính Viễn thông
+bbcvt:Bộ Bưu chính Viễn thông
+BCS:ban cán sự,bao cao su
+bcs:ban cán sự,bao cao su
+BCSĐ:ban cán sự đảng
+bcsđ:ban cán sự đảng
+BCVN:bưu chính Việt Nam
+bcvn:bưu chính Việt Nam
+BCVT:Bưu chính Viễn thông
+bcvt:Bưu chính Viễn thông
+BBT:Ban biên tập
+bbt:Ban biên tập
+BC:báo cáo,bán công,bưu chính
+bc:báo cáo,bán công,bưu chính
+BCĐ:Ban chỉ đạo
+bcđ:Ban chỉ đạo
+BCĐĐMĐH:Ban chỉ đạo đổi mới đại học
+bcđđmđh:Ban chỉ đạo đổi mới đại học
+BCĐPCTNTƯ:Ban chỉ đạo phòng chống tham nhũng trung ương
+bcđpctntư:Ban chỉ đạo phòng chống tham nhũng trung ương
+BCĐQG:Ban chỉ đạo Quốc gia
+bcđqg:Ban chỉ đạo Quốc gia
+BCĐT:Bưu chính điện tử
+bcđt:Bưu chính điện tử
+BCĐTS:Ban chỉ đạo tuyển sinh
+bcđts:Ban chỉ đạo tuyển sinh
+BCH:Ban chấp hành,Ban chỉ huy
+bch:Ban chấp hành,Ban chỉ huy
+BCHCD:Ban chỉ huy chiến dịch
+bchcd:Ban chỉ huy chiến dịch
+BCHQS:Bộ chỉ huy quân sự
+bchqs:Bộ chỉ huy quân sự
+BCHTƯ:Ban chỉ huy trung ương
+bchtư:Ban chỉ huy trung ương
+BCHTW:Ban chỉ huy trung ương
+bchtw:Ban chỉ huy trung ương
+BĐS:bất động sản
+bđs:bất động sản
+BĐVN:bóng đá Việt Nam
+bđvn:bóng đá Việt Nam
+BĐH:Ban điều hành
+bđh:Ban điều hành
+BGD:Bộ Giáo dục
+bgd:Bộ Giáo dục
+BGDĐT:Bộ Giáo dục và Đào tạo
+bgdđt:Bộ Giáo dục và Đào tạo
+BGH:Ban giám hiệu
+bgh:Ban giám hiệu
+BGK:Ban giám khảo
+bgk:Ban giám khảo
+BH:bảo hiểm,bảo hành
+bh:bảo hiểm,bảo hành
+BHĐC:bán hàng đa cấp
+bhđc:bán hàng đa cấp
+BHL:Ban huấn luyện
+bhl:Ban huấn luyện
+BHXH:bảo hiểm xã hội
+bhxh:bảo hiểm xã hội
+BHTN:bảo hiểm thất nghiệp
+bhtn:bảo hiểm thất nghiệp
+BHYT:bảo hiểm y tế
+bhyt:bảo hiểm y tế
+BK:Bách khoa
+bk:Bách khoa
+BKHCN:bộ khoa học công nghệ
+bkhcn:bộ khoa học công nghệ
+BKS:biển kiểm soát,Ban kiểm soát
+bks:biển kiểm soát,Ban kiểm soát
+BLHS:Bộ luật Hình sự
+blhs:Bộ luật Hình sự
+BLDS:Bộ luật Dân sự
+blds:Bộ luật Dân sự
+BLV:bình luận viên
+blv:bình luận viên
+BLX:bằng lái xe
+blx:bằng lái xe
+BP:biên phòng
+bp:biên phòng
+BQL:ban quản lý
+bql:ban quản lý
+BQP:Bộ Quốc phòng
+bqp:Bộ Quốc phòng
+BQLDA:Ban Quản lý dự án
+bqlda:Ban Quản lý dự án
+BS:bác sĩ,biển số
+bs:bác sĩ,biển số
+BS.CKI:bác sĩ chuyên khoa một
+BS.CKII:bác sĩ chuyên khoa hai
+BS.CK1:bác sĩ chuyên khoa một
+BS.CK2:bác sĩ chuyên khoa hai
+BSC:công ty Chứng khoán Ngân hàng Đầu tư và Phát triển Việt Nam
+bsc:công ty Chứng khoán Ngân hàng Đầu tư và Phát triển Việt Nam
+BST:bộ sưu tập
+bst:bộ sưu tập
+BT:bảo trì,bộ trưởng
+bt:bảo trì,bộ trưởng
+BTBNN:bảo trợ bệnh nhân nghèo
+btbnn:bảo trợ bệnh nhân nghèo
+BTC:Ban tổ chức
+btc:Ban tổ chức
+BTS:Ban tuyển sinh
+bts:Ban tuyển sinh
+BTV:biên tập viên
+btv:biên tập viên
+BTVH:bổ túc văn hóa
+btvh:bổ túc văn hóa
+BV:bệnh viện
+bv:bệnh viện
+BVMT:bảo vệ môi trường
+bvmt:bảo vệ môi trường
+BVĐK:bệnh viện Đa khoa
+bvđk:bệnh viện Đa khoa
+BVTV:bảo vệ thực vật
+bvtv:bảo vệ thực vật
+BX:bến xe
+bx:bến xe
+BXL:bộ xử lý
+bxl:bộ xử lý
+CA:Công an
+ca:Công an
+CAHN:Công an Hà Nội
+cahn:Công an Hà Nội
+CAND:Công an Nhân dân
+cand:công an Nhân dân
+CATP:Công an Thành phố
+catp:Công an Thành phố
+CB:cơ bản,chế biến,cán bộ
+cb:cơ bản,chế biến,cán bộ
+CBYT:cán bộ y tế
+cbyt:cán bộ y tế
+CBCC:cán bộ công chức
+cbcc:cán bộ công chức
+CBCNV:cán bộ công nhân viên
+cbcnv:cán bộ công nhân viên
+CBQLGD:cán bộ quản lý giáo dục
+cbqlgd:cán bộ quản lý giáo dục
+CCB:Cựu chiến binh
+ccb:Cựu chiến binh
+CCCD:Căn cước công dân
+cccd:Căn cước công dân
+CCHC:cải cách hành chính
+cchc:cải cách hành chính
+CĐ:Cao đẳng,công điện
+cđ:Cao đẳng,công điện
+CĐDC:chất độc da cam
+cđdc:chất độc da cam
+CĐS:Chuyển đổi số
+cđs:Chuyển đổi số
+CĐSP:Cao đẳng Sư phạm
+cđsp:Cao đẳng Sư phạm
+CĐV:cổ động viên
+cđv:cổ động viên
+CHDC:Cộng hòa Dân chủ
+chdc:Cộng hòa Dân chủ
+CHDCND:Cộng hòa Dân chủ Nhân dân
+chdcnd:Cộng hòa Dân chủ Nhân dân
+CHLB:Cộng hòa Liên bang
+chlb:Cộng hòa Liên bang
+CHND:Cộng hòa Nhân dân
+chnd:Cộng hòa Nhân dân
+CHXNCN:Cộng hòa Xã hội Chủ nghĩa
+chxncn:Cộng hòa Xã hội Chủ nghĩa
+CHXHCNVN:Cộng hòa Xã hội Chủ nghĩa Việt Nam
+chxhcnvn:Cộng hòa Xã hội Chủ nghĩa Việt Nam
+CK:chứng khoán,chuyên khoa
+ck:chứng khoán,chuyên khoa
+CKI:chuyên khoa một
+CKII:chuyên khoa hai
+CK1:chuyên khoa một
+CK2:chuyên khoa hai
+CLB:câu lạc bộ
+clb:câu lạc bộ
+CMND:Chứng minh nhân dân
+cmnd:Chứng minh nhân dân
+CMT:Chứng minh thư
+cmt:Chứng minh thư
+CN:công nhân,công nghệ,công nghiệp
+cn:công nhân,công nghệ,công nghiệp
+CNCN:Chi nhánh Cấp nước
+cncn:Chi nhánh Cấp nước
+CNH:công nghiệp hóa
+cnh:công nghiệp hóa
+CNKT:công nhân kỹ thuật
+cnkt:công nhân kỹ thuật
+CNQSDĐ:chứng nhận quyền sử dụng đất
+cnqsdđ:chứng nhận quyền sử dụng đất
+CNSH:công nghệ sinh học
+cnsh:công nghệ sinh học
+CNTN:cử nhân tài năng
+cntn:cử nhân tài năng
+CNTT:công nghệ thông tin
+cntt:công nghệ thông tin
+CNV:công nhân viên
+cnv:công nhân viên
+CNVC:công nhân viên chức
+cnvc:công nhân viên chức
+COPD:bệnh phổi tắc nghẽn mãn tính
+copd:bệnh phổi tắc nghẽn mãn tính
+CP:cổ phiếu,cổ phần,Chính phủ
+cp:cổ phiếu,cổ phần,Chính phủ
+CPH:cổ phần hóa
+cph:cổ phần hóa
+CPSXTM:cổ phần xây dựng sản xuất thương mại
+cpsxtm:cổ phần xây dựng sản xuất thương mại
+CPTD:cổ phiếu tự do
+cptd:cổ phiếu tự do
+CPXD:cấp phép xây dựng
+cpxd:cấp phép xây dựng
+CQĐT:Cơ quan điều tra
+cqđt:Cơ quan điều tra
+CS:cảnh sát
+cs:cảnh sát
+CSCĐ:cảnh sát cơ động
+cscđ:cảnh sát cơ động
+CSDC:cảnh sát dã chiến
+csdc:cảnh sát dã chiến
+CSDL:cơ sở dữ liệu
+csdl:cơ sở dữ liệu
+CSĐN:cảnh sát đặc nhiệm
+csđn:cảnh sát đặc nhiệm
+CSĐT:cơ sở đào tạo,Cảnh sát điều tra
+csđt:cơ sở đào tạo,Cảnh sát điều tra
+CSĐTLX:cơ sở đào tạo lái xe
+csđtlx:cơ sở đào tạo lái xe
+CSĐTTP:Cảnh sát Điều tra tội phạm
+csđttp:Cảnh sát Điều tra tội phạm
+CSĐTTPMT:Cảnh sát điều tra tội phạm ma túy
+csđttpmt:Cảnh sát điều tra tội phạm ma túy
+CSG:cảng Sài Gòn
+csg:cảng Sài Gòn
+CSGT:Cảnh sát giao thông
+csgt:Cảnh sát giao thông
+CSHS:Cảnh sát Hình sự
+cshs:Cảnh sát Hình sự
+CSKH:chăm sóc khách hàng
+cskh:chăm sóc khách hàng
+CSKT:Cảnh sát Kinh tế
+cskt:Cảnh sát Kinh tế
+CSKV:Cảnh sát khu vực
+cskv:Cảnh sát khu vực
+CSPCTPMT:Cục Cảnh sát phòng chống tội phạm ma túy
+cspctpmt:Cục Cảnh sát phòng chống tội phạm ma túy
+CSPK:công suất phản kháng
+cspk:công suất phản kháng
+CSQLHC:Cảnh sát Quản lý hành chính
+csqlhc:Cảnh sát Quản lý hành chính
+CSSD:Đảng Xã hội Dân chủ cánh tả
+cssd:Đảng Xã hội Dân chủ cánh tả
+CSSX:cơ sở sản xuất
+cssx:cơ sở sản xuất
+CSVC:cơ sở vật chất
+csvc:cơ sở vật chất
+CSVN:Cộng sản Việt Nam
+csvn:Cộng sản Việt Nam
+CSXH:chính sách xã hội
+csxh:chính sách xã hội
+CT:chính trị,công ty,chỉ thị,cắt lớp vi tính
+ct:chính trị,công ty,chỉ thị,cắt lớp vi tính
+CTCC:công trình công cộng
+ctcc:công trình công cộng
+CTCH:chấn thương chỉnh hình
+ctch:chấn thương chỉnh hình
+CTCK:công ty chứng khoán
+ctck:công ty chứng khoán
+CTCLQG:chương trình chống lao quốc gia
+ctclqg:chương trình chống lao quốc gia
+CTCN:công ty cấp nước
+ctcn:công ty cấp nước
+CTCP:công ty cổ phần
+ctcp:công ty cổ phần
+CTĐ:Chữ thập đỏ
+ctđ:Chữ thập đỏ
+CTĐL:công ty điện lực
+ctđl:công ty điện lực
+CTN:chuyển tiền nhanh
+ctn:chuyển tiền nhanh
+CTSN:chấn thương sọ não
+ctsn:chấn thương sọ não
+CTTC:cho thuê tài chính
+cttc:cho thuê tài chính
+CTTH:chương trình truyền hình
+ctth:chương trình truyền hình
+CTTNHH:công ty Trách nhiệm Hữu hạn
+cttnhh:công ty Trách nhiệm Hữu hạn
+CTTT:chương trình tiên tiến
+cttt:chương trình tiên tiến
+CTV:cộng tác viên
+ctv:cộng tác viên
+CTXH:công tác xã hội
+ctxh:công tác xã hội
+CV:chuyên viên
+cv:chuyên viên
+CVĐC:công viên địa chất
+cvđc:công viên địa chất
+DAGTĐT:dự án giao thông đô thị
+dagtđt:dự án giao thông đô thị
+ĐATP:Đông Á - Thép Pomina
+đatp:Đông Á - Thép Pomina
+ĐB:đại biểu,đồng bằng
+đb:đại biểu,đồng bằng
+ĐBDT:đồng bào dân tộc
+đbdt:đồng bào dân tộc
+ĐBP:Điện Biên Phủ
+đbp:Điện Biên Phủ
+ĐBQH:đại biểu Quốc hội
+đbqh:đại biểu Quốc hội
+ĐBSCL:Đồng bằng sông Cửu Long
+đbscl:Đồng bằng sông Cửu Long
+ĐBTN:đại biểu thanh niên
+đbtn:đại biểu thanh niên
+ĐBTSXB:đánh bắt thủy sản xa bờ
+đbtsxb:đánh bắt thủy sản xa bờ
+ĐC:đồng chí,điều chế,địa chỉ
+đc:đồng chí,điều chế,địa chỉ
+ĐCNN:độ chia nhỏ nhất
+đcnn:độ chia nhỏ nhất
+DCCH:Dân chủ Cộng hòa
+dcch:Dân chủ Cộng hòa
+ĐCS:Đảng Cộng sản
+đcs:Đảng Cộng sản
+ĐCSTQ:Đảng Cộng sản Trung Quốc
+đcstq:Đảng Cộng sản Trung Quốc
+ĐCSVN:Đảng Cộng sản Việt Nam
+đcsvn:Đảng Cộng sản Việt Nam
+DD:dinh dưỡng,dân dụng
+dd:dinh dưỡng,dân dụng
+ĐD:đại diện
+đd:đại diện
+ĐĐ:động đất,đất đai
+đđ:động đất,đất đai
+DDVN:Duyên Dáng Việt Nam
+ddvn:Duyên Dáng Việt Nam
+ĐGNL:Đánh giá năng lực
+đgnl:Đánh giá năng lực
+ĐH:Đại học,Đại hội
+đh:Đại học,Đại hội
+ĐHBC:Đại học Bán công
+đhbc:Đại học Bán công
+ĐHBK:Đại học Bách khoa
+đhbk:Đại học Bách khoa
+ĐHBKHCM:Đại học Bách khoa Thành phố Hồ Chí Minh
+đhbkhcm:Đại học Bách khoa Thành phố Hồ Chí Minh
+ĐHBKHN:Đại học Bách khoa Hà Nội
+đhbkhn:Đại học Bách khoa Hà Nội
+ĐHBKTPHCM:Đại học Bách khoa Thành phố Hồ Chí Minh
+đhbktphcm:Đại học Bách khoa Thành phố Hồ Chí Minh
+ĐHCĐ:Đại học Công đoàn,đại hội cổ đông
+đhcđ:Đại học Công đoàn,đại hội cổ đông
+ĐHCLC:đại học chất lượng cao
+đhclc:đại học chất lượng cao
+ĐHCN:đại học Công nghệ
+đhcn:đại học Công nghệ
+ĐHCT:Đại học Cần Thơ
+đhct:Đại học Cần Thơ
+ĐHĐD:Đại học Đông Dương
+đhđd:Đại học Đông Dương
+ĐHĐCĐ:Đại hội đồng cổ đông
+đhđcđ:Đại hội đồng cổ đông
+ĐHDL:Đại học Dân lập
+đhdl:Đại học Dân lập
+ĐHĐN:Đại học Đà nẵng
+đhđn:Đại học Đà nẵng
+ĐHGTVT:Đại học Giao thông Vận tải
+đhgtvt:Đại học Giao thông Vận tải
+ĐHHB:Đại học Hồng Bàng
+đhhb:Đại học Hồng Bàng
+ĐHKH:Đại học Khoa học
+đhkh:Đại học Khoa học
+ĐHKHTN:Đại học Khoa học Tự nhiên
+đhkhtn:Đại học Khoa học Tự nhiên
+ĐHKHTNHN:Đại học Khoa học Tự nhiên Hà nội
+đhkhtnhn:Đại học Khoa học Tự nhiên Hà nội
+ĐHKHXH:Đại học Khoa học Xã hội
+đhkhxh:Đại học Khoa học Xã hội
+ĐHKT:Đại học Kỹ thuật
+đhkt:Đại học Kỹ thuật
+DHKTCN:Đại học Kỹ thuật Công nghệ
+dhktcn:Đại học Kỹ thuật Công nghệ
+ĐHKTCN:Đại học Kỹ thuật Công nghệ
+đhktcn:Đại học Kỹ thuật Công nghệ
+ĐHKTQD:Đại học Kinh tế Quốc dân
+đhktqd:Đại học Kinh tế Quốc dân
+ĐHN:đồng hồ nước,điện hạt nhân
+đhn:đồng hồ nước,điện hạt nhân
+ĐHNT:Đại học Nha Trang
+đhnt:Đại học Nha Trang
+ĐHQG:Đại học Quốc gia
+đhqg:Đại học Quốc gia
+ĐHQGHN:Đại học Quốc gia Hà nội
+đhqghn:Đại học Quốc gia Hà nội
+DHS:du học sinh
+dhs:du học sinh
+ĐHSP:Đại học Sư phạm
+đhsp:Đại học Sư phạm
+ĐK:đăng ký
+đk:đăng ký
+ĐKDT:đăng ký dự thi
+đkdt:đăng ký dự thi
+ĐKĐT:điện kế điện tử
+đkđt:điện kế điện tử
+ĐKĐĐ:Đăng ký đất đai
+đkđđ:Đăng ký đất đai
+ĐKHK:đăng ký hộ khẩu
+đkhk:đăng ký hộ khẩu
+ĐKKD:đăng ký kinh doanh
+đkkd:đăng ký kinh doanh
+ĐKKH:đăng ký kết hôn
+đkkh:đăng ký kết hôn
+ĐKNKTT:đăng ký nhân khẩu thường trú
+đknktt:đăng ký nhân khẩu thường trú
+ĐKVĐ:đương kim vô địch
+đkvđ:đương kim vô địch
+ĐKVN:điền kinh Việt Nam
+đkvn:điền kinh Việt Nam
+ĐKXT:đăng ký xét tuyển
+đkxt:đăng ký xét tuyển
+DL:du lịch
+dl:du lịch
+ĐL:đo lường
+đl:đo lường
+ĐLTP:điện kế điện tử
+đltp:điện kế điện tử
+ĐMN:Đá Mỹ Nghệ
+đmn:Đá Mỹ Nghệ
+DN:doanh nghiệp
+dn:doanh nghiệp
+ĐN:Đồng Nai,Đà Nẵng
+đn:Đồng Nai,Đà Nẵng
+ĐNA:Đông Nam Á
+đna:Đông Nam Á
+ĐNÁ:Đông Nam Á
+đná:Đông Nam Á
+DNNN:doanh nghiệp Nhà nước
+dnnn:doanh nghiệp Nhà nước
+DNT:doanh nghiệp trẻ
+dnt:doanh nghiệp trẻ
+DNTN:doanh nghiệp Tư nhân
+dntn:doanh nghiệp Tư nhân
+DNVN:doanh nghiệp Việt Nam
+dnvn:doanh nghiệp Việt Nam
+DNVVN:doanh nghiệp vừa và nhỏ
+dnvvn:doanh nghiệp vừa và nhỏ
+ĐRL:điểm rèn luyện
+đrl:điểm rèn luyện
+DS:dân số
+ds:dân số
+ĐS:đường sắt
+đs:đường sắt
+ĐSQ:đại sứ quán
+đsq:đại sứ quán
+DT:dự tuyển
+dt:dự tuyển
+ĐT:điện thoại,đào tạo,đội tuyển
+đt:điện thoại,đào tạo,đội tuyển
+ĐTA:đồng tính ái
+đta:đồng tính ái
+ĐTB:điểm trung bình
+đtb:điểm trung bình
+ĐTĐ:đái tháo đường
+đtđ:đái tháo đường
+ĐTDĐ:điện thoại di động
+đtdđ:điện thoại di động
+DTHT:dạy thêm học thêm
+dtht:dạy thêm học thêm
+ĐTHVN:đài truyền hình Việt Nam
+đthvn:đài truyền hình Việt Nam
+ĐTLA:đồng tính luyến ái
+đtla:đồng tính luyến ái
+ĐTLT:đào tạo liên thông
+đtlt:đào tạo liên thông
+ĐTNN:đầu tư nước ngoài
+đtnn:đầu tư nước ngoài
+DTQG:đội tuyển quốc gia
+dtqg:đội tuyển quốc gia
+ĐTQG:đội tuyển quốc gia
+đtqg:đội tuyển quốc gia
+ĐTTX:đào tạo từ xa
+đttx:đào tạo từ xa
+ĐTTXQM:đào tạo từ xa qua mạng
+đttxqm:đào tạo từ xa qua mạng
+ĐTV:điều tra viên
+đtv:điều tra viên
+ĐTVHD:động thực vật hoang dã
+đtvhd:động thực vật hoang dã
+ĐTVN:đội tuyển Việt Nam
+đtvn:đội tuyển Việt Nam
+ĐTXDCB:đầu tư xây dựng cơ bả
+đtxdcb:đầu tư xây dựng cơ bả
+DV:dịch vụ,diễn viên
+dv:dịch vụ,diễn viên
+ĐV:đơn vị,đoàn viên
+đv:đơn vị,đoàn viên
+ĐVHT:đơn vị học trình
+đvht:đơn vị học trình
+DVTMCM:dịch vụ thương mại Cà Mau
+dvtmcm:dịch vụ thương mại Cà Mau
+ĐVTN:đoàn viên thanh niên
+đvtn:đoàn viên thanh niên
+DVTT:dịch vụ trực tuyến,dịch vụ thông tin
+dvtt:dịch vụ trực tuyến,dịch vụ thông tin
+ĐVTTN:đoàn viên thanh thiếu nhi
+đvttn:đoàn viên thanh thiếu nhi
+ĐVƯT:đoàn viên ưu tú
+đvưt:đoàn viên ưu tú
+DVVL:dịch vụ việc làm
+dvvl:dịch vụ việc làm
+GCMND:giấy chứng minh nhân dân
+gcmnd:giấy chứng minh nhân dân
+GCN:giấy chứng nhận
+gcn:giấy chứng nhận
+GCNĐKKD:giấy chứng nhận đăng ký kinh doanh
+gcnđkkd:giấy chứng nhận đăng ký kinh doanh
+GCNKQT:giấy chứng nhận kết quả thi
+gcnkqt:giấy chứng nhận kết quả thi
+GCNQSD:giấy chứng nhận quyền sử dụng
+gcnqsd:giấy chứng nhận quyền sử dụng
+GCNQSDĐ:giấy chứng nhận quyền sử dụng đất
+gcnqsdđ:giấy chứng nhận quyền sử dụng đất
+GCNQSDĐƠ:giấy chứng nhận quyền sử dụng đất ở
+gcnqsdđơ:giấy chứng nhận quyền sử dụng đất ở
+GCNQSH:giấy chứng nhận quyền sở hữu
+gcnqsh:giấy chứng nhận quyền sở hữu
+GCNQSHN:giấy chứng nhận quyền sở hữu nhà
+gcnqshn:giấy chứng nhận quyền sở hữu nhà
+GCNQSHNƠ:giấy chứng nhận quyền sở hữu nhà ở
+gcnqshnơ:giấy chứng nhận quyền sở hữu nhà ở
+GCNSK:giấy chứng nhận sức khỏe
+gcnsk:giấy chứng nhận sức khỏe
+GCQ:giấy chủ quyền
+gcq:giấy chủ quyền
+GD:Giáo dục
+gd:Giáo dục
+GD&ĐT:Giáo dục và đào tạo
+GĐ:Giám đốc
+gđ:Giám đốc
+GĐNS:giám đốc nhân sự
+gđns:giám đốc nhân sự
+GDĐH:giáo dục dục đại học
+gdđh:giáo dục dục đại học
+GĐĐH:giám đốc điều hành
+gđđh:giám đốc điều hành
+GDĐT:Giáo dục và Đào tạo
+gdđt:Giáo dục và Đào tạo
+GDGT:giáo dục giới tính
+gdgt:giáo dục giới tính
+GDNN:giáo dục nghề nghiệp
+gdnn:giáo dục nghề nghiệp
+GĐT:Gạch Đồng Tâm
+gđt:Gạch Đồng Tâm
+GĐTLA:Gạch Đồng Tâm Long An
+gđtla:Gạch Đồng Tâm Long An
+GDTX:giáo dục thường xuyên
+gdtx:giáo dục thường xuyên
+GHPGVN:Giáo hội Phật giáo Việt Nam
+ghpgvn:Giáo hội Phật giáo Việt Nam
+GK:Giáo khoa
+gk:Giáo khoa
+GL:Gia Lai
+gl:Gia Lai
+GP:giấy phép
+gp:giấy phép
+GPLHĐB:giấy phép lưu hành đặc biệt
+gplhđb:giấy phép lưu hành đặc biệt
+GPLX:giấy phép lái xe
+gplx:giấy phép lái xe
+GPNK:phép nhập khẩu
+gpnk:phép nhập khẩu
+GPTM:giải phẫu thẩm mỹ
+gptm:giải phẫu thẩm mỹ
+GPXD:giấy phép xây dựng
+gpxd:giấy phép xây dựng
+GS:Giáo sư
+gs:Giáo sư
+GSTS:Giáo sư Tiến sĩ
+gsts:Giáo sư Tiến sĩ
+GS.TS:Giáo sư Tiến sĩ
+GSTSKH:Giáo sư Tiến sĩ Khoa học
+gstskh:Giáo sư Tiến sĩ Khoa học
+GS.TSKH:Giáo sư Tiến sĩ Khoa học
+GS.TS.BS:Giáo sư Tiến sĩ Bác sĩ
+GSTT:giám sát trọng tài
+gstt:giám sát trọng tài
+GT:giao thông,giá trị
+gt:giao thông,giá trị
+GTCC:Giao thông Công chánh
+gtcc:Giao thông Công chánh
+GTGT:giá trị gia tăng
+gtgt:giá trị gia tăng
+GTMT:giãn tĩnh mạch tinh
+gtmt:giãn tĩnh mạch tinh
+GTVT:Giao thông Vận tải
+gtvt:Giao thông Vận tải
+GV:giáo viên,giảng viên
+gv:giáo viên,giảng viên
+GVCN:giáo viên chủ nhiệm
+gvcn:giáo viên chủ nhiệm
+GVG:giáo viên giỏi
+gvg:giáo viên giỏi
+GVMN:giáo viên miền núi,giáo viên mầm non
+gvmn:giáo viên miền núi,giáo viên mầm non
+GVTH:giáo viên tiểu học
+gvth:giáo viên tiểu học
+GVTN:giáo viên tình nguyện
+gvtn:giáo viên tình nguyện
+H:huyện
+HTX:Hợp tác xã
+htx:Hợp tác xã
+HTXDVNN:Hợp tác xã dịch vụ Nông nghiệp
+htxdvnn:Hợp tác xã dịch vụ Nông nghiệp
+HAGL:Hoàng Anh Gia Lai
+hagl:Hoàng Anh Gia Lai
+HB:học bổng
+hb:học bổng
+HC:hành chính,huy chương
+hc:hành chính,huy chương
+HCB:huy chương bạc
+hcb:huy chương bạc
+HCĐ:huy chương đồng
+hcđ:huy chương đồng
+HCM:Hồ Chí Minh
+hcm:Hồ Chí Minh
+HCTC:học chế tín chỉ
+hctc:học chế tín chỉ
+HCTL:hội chợ triển lăm
+hctl:hội chợ triển lăm
+HCV:huy chương vàng
+hcv:huy chương vàng
+HCVL:hội chợ việc làm
+hcvl:hội chợ việc làm
+HD:hướng dẫn
+hd:hướng dẫn
+HĐ:hợp đồng,hội đồng
+hđ:hợp đồng,hội đồng
+HĐBA:Hội đồng Bảo an Liên Hiệp Quốc
+hđba:Hội đồng Bảo an Liên Hiệp Quốc
+HĐCD:Hội đồng chức danh
+hđcd:Hội đồng chức danh
+HĐCDGS:Hội đồng chức danh giáo sư
+hđcdgs:Hội đồng chức danh giáo sư
+HĐCDGSCS:Hội đồng chức danh giáo sư cơ sở
+hđcdgscs:Hội đồng chức danh giáo sư cơ sở
+HĐCDGSN:Hội đồng Chức danh giáo sư ngành
+hđcdgsn:Hội đồng Chức danh giáo sư ngành
+HĐCDGSNN:Hội đồng Chức danh giáo sư nhà nước
+hđcdgsnn:Hội đồng Chức danh giáo sư nhà nước
+HĐCT:hội đồng coi thi
+hđct:hội đồng coi thi
+HĐĐB:Hội đồng đền bù
+hđđb:Hội đồng đền bù
+HĐĐG:Hội đồng định giá
+hđđg:Hội đồng định giá
+HĐH:hệ điều hành
+hđh:hệ điều hành
+HĐKT:hợp đồng kinh tế
+hđkt:hợp đồng kinh tế
+HĐLĐ:hợp đồng lao động
+hđlđ:hợp đồng lao động
+HĐND:Hội đồng Nhân dân
+hđnd:Hội đồng Nhân dân
+HĐNDTP:Hội đồng Nhân dân thành phố
+hđndtp:Hội đồng Nhân dân thành phố
+HĐNT:hội đồng nghệ thuật
+hđnt:hội đồng nghệ thuật
+HĐQT:Hội đồng Quản trị
+hđqt:Hội đồng Quản trị
+HĐT:hội đồng trường,hội đồng thi
+hđt:hội đồng trường,hội đồng thi
+HĐTĐ:Hội đồng thẩm định
+hđtđ:Hội đồng thẩm định
+HĐTS:Hội đồng tuyển sinh
+hđts:Hội đồng tuyển sinh
+HĐTT:Hội đồng Trọng tài
+hđtt:Hội đồng Trọng tài
+HĐTV:Hội đồng thành viên
+hđtv:Hội đồng thành viên
+HDV:hướng dẫn viên
+hdv:hướng dẫn viên
+HĐXX:Hội đồng Xét xử
+hđxx:Hội đồng Xét xử
+HH:Hoa hậu
+hh:Hoa hậu
+HHTG:Hoa hậu Thế giới
+hhtg:Hoa hậu Thế giới
+HHVN:Hoa hậu Việt Nam
+hhvn:Hoa hậu Việt Nam
+HK:học kỳ
+hk:học kỳ
+HKDD:Hàng không dân dụng
+hkdd:hàng không dân dụng
+HKDDVN:hàng không dân dụng Việt Nam
+hkddvn:hàng không dân dụng Việt Nam
+HKHKT:hội khoa học kỹ thuật
+hkhkt:hội khoa học kỹ thuật
+HKHKTVN:hội khoa học kỹ thuật Việt Nam
+hkhktvn:hội khoa học kỹ thuật Việt Nam
+HKTT:hộ khẩu thường trú
+hktt:hộ khẩu thường trú
+HL:huấn luyện
+hl:huấn luyện
+HLBĐ:Hoa Lâm Bình Định
+hlbđ:Hoa Lâm Bình Định
+HLQG:Huấn luyện Quốc gia
+hlqg:Huấn luyện Quốc gia
+HLTTQG:Huấn luyện Thể thao Quốc gia
+hlttqg:Huấn luyện Thể thao Quốc gia
+HLV:huấn luyện viên
+hlv:huấn luyện viên
+HMNĐ:hiến máu nhân đạo
+hmnđ:hiến máu nhân đạo
+HN:Hà Nội,hội nghị
+hn:Hà Nội,hội nghị
+HND:Hội nông dân
+hnd:Hội nông dân
+HNGĐ:hôn nhân gia đình
+hngđ:hôn nhân gia đình
+HNHT:hội nghị hiệp thương
+hnht:hội nghị hiệp thương
+HNV:Hội Nhà văn
+hnv:Hội Nhà văn
+HP:học phần,Hải phòng
+hp:học phần,Hải phòng
+HPHN:Hòa Phát Hà Nội
+hphn:Hòa Phát Hà Nội
+HQ:Hàn Quốc,Hải quan
+hq:Hàn Quốc,Hải quan
+HQĐT:Hải quan điện tử
+hqđt:Hải quan điện tử
+HQHP:Hải quan Hải Phòng
+hqhp:Hải quan Hải Phòng
+HS:học sinh
+hs:học sinh
+HSBC:học sinh bán công
+hsbc:học sinh bán công
+HSĐKDT:hồ sơ đăng ký dự thi
+hsđkdt:hồ sơ đăng ký dự thi
+HSDPA:truy nhập gói đường xuống tốc độ cao
+hsdpa:truy nhập gói đường xuống tốc độ cao
+HSG:học sinh giỏi
+hsg:học sinh giỏi
+HSGQG:Học sinh giỏi Quốc gia
+hsgqg:Học sinh giỏi Quốc gia
+HSGQT:Học sinh giỏi Quốc tế
+hsgqt:Học sinh giỏi Quốc tế
+HSPT:học sinh phổ thông
+hspt:học sinh phổ thông
+HSSV:học sinh sinh viên
+hssv:học sinh sinh viên
+HSV:Hội sinh viên
+hsv:Hội sinh viên
+HTCĐ:học tập cộng đồng
+htcđ:học tập cộng đồng
+HUD:Tổng công ty Đầu tư phát triển nhà và đô thị
+hud:Tổng công ty Đầu tư phát triển nhà và đô thị
+HV:học viên
+hv:học viên
+HVANND:Học viện An ninh Nhân dân
+hvannd:Học viện An ninh Nhân dân
+HVBCVT:Học viện Bưu chính Viễn thông
+hvbcvt:Học viện Bưu chính Viễn thông
+HVCH:Học viên Cao học
+hvch:Học viên Cao học
+HVCNBCVT:Học viện Công nghệ Bưu chính Viễn thông
+hvcnbcvt:Học viện Công nghệ Bưu chính Viễn thông
+HVKHQS:Học viện Khoa học Quân sự
+hvkhqs:Học viện Khoa học Quân sự
+HVN:Honda Việt Nam
+hvn:Honda Việt Nam
+HVNCL:Hàng Việt Nam chất lượng
+hvncl:Hàng Việt Nam chất lượng
+HVNCLC:Hàng Việt Nam chất lượng cao
+hvnclc:Hàng Việt Nam chất lượng cao
+HVNH:Học viện Ngân hàng
+hvnh:Học viện Ngân hàng
+KBNN:Kho bạc Nhà nước
+kbnn:Kho bạc Nhà nước
+KCB:khám chữa bệnh
+kcb:khám chữa bệnh
+KCN:Khu công nghiệp
+kcn:Khu công nghiệp
+KCX:Khu chế xuất
+kcx:Khu chế xuất
+KDC:khu dân cư
+kdc:khu dân cư
+KĐCL:kiểm định chất lượng
+kđcl:kiểm định chất lượng
+KĐCLGD:kiểm định chất lượng giáo dục
+kđclgd:kiểm định chất lượng giáo dục
+KDCN:kiểu dáng công nghiệp
+kdcn:kiểu dáng công nghiệp
+KDDV:kinh doanh dịch vụ
+kddv:kinh doanh dịch vụ
+KDĐV:kiểm dịch động vật
+kdđv:kiểm dịch động vật
+KDHĐC:kinh doanh hàng đa cấp
+kdhđc:kinh doanh hàng đa cấp
+KDL:khu du lịch
+kdl:khu du lịch
+KDN:kinh doanh nhà
+kdn:kinh doanh nhà
+KDNPN:kinh doanh nhà Phú Nhuận
+kdnpn:kinh doanh nhà Phú Nhuận
+KĐS:Khu đường sông
+kđs:khu đường sông
+KĐT:khu đô thị
+kđt:khu đô thị
+KĐTM:khu đô thị mới
+kđtm:khu đô thị mới
+KĐTNTL:đô thị Nam Thăng Long
+kđtntl:đô thị Nam Thăng Long
+KH:kế hoạch,khoa học
+kh:kế hoạch,khoa học
+KHCN:Khoa học Công nghệ
+khcn:Khoa học Công nghệ
+KHĐT:Kế hoạch Đầu tư
+khđt:Kế hoạch Đầu tư
+KHKD:Kế hoạch Kinh doanh
+khkd:Kế hoạch Kinh doanh
+KHKT:Khoa học Kỹ thuật
+khkt:Khoa học Kỹ thuật
+KHKTHN:Khoa học Kỹ thuật Hạt nhân
+khkthn:Khoa học Kỹ thuật Hạt nhân
+KHKTHS:Khoa học Kỹ thuật Hình sự
+khkths:Khoa học Kỹ thuật Hình sự
+KHKTNN:Khoa học Kỹ thuật Nông nghiệp
+khktnn:Khoa học Kỹ thuật Nông nghiệp
+KHKTNNMN:Khoa học Kỹ thuật Nông nghiệp miền Nam
+khktnnmn:Khoa học Kỹ thuật Nông nghiệp miền Nam
+KHLS:Khoa học Lịch sử
+khls:Khoa học Lịch sử
+KHTN:Khoa học Tự nhiên
+khtn:Khoa học Tự nhiên
+KHXH:Khoa học Xã hội
+khxh:Khoa học Xã hội
+KK:khuyến khích
+kk:khuyến khích
+KKT:khu kinh tế
+kkt:khu kinh tế
+KM:khuyến mại
+km:khuyến mại
+KL:kết luận
+kl:kết luận
+KLĐT:kết luận điều tra
+klđt:kết luận điều tra
+KLQG:Kỷ lục Quốc gia
+klqg:Kỷ lục Quốc gia
+KN:khuyến nông
+kn:khuyến nông
+KNTC:khiếu nại tố cáo
+kntc:khiếu nại tố cáo
+KP:khu phố
+kp:khu phố
+KS:khách sạn,kỹ sư
+ks:khách sạn,kỹ sư
+KSND:Kiểm sát Nhân dân
+ksnd:Kiểm sát Nhân dân
+KSNDTC:Kiểm sát Nhân dân Tối cao
+ksndtc:Kiểm sát Nhân dân Tối cao
+KST:ký sinh trùng
+kst:ký sinh trùng
+KSV:kiểm sát viên
+ksv:kiểm sát viên
+KT:kinh tế,kỹ thuật
+kt:kinh tế,kỹ thuật
+KTCT:kinh tế chính trị
+ktct:kinh tế chính trị
+KTM:Khu thương mại
+ktm:Khu thương mại
+KTNN:Kinh tế Nhà nước
+ktnn:Kinh tế Nhà nước
+KTQD:kinh tế quốc dân
+ktqd:kinh tế quốc dân
+KTQDHN:Kinh tế Quốc dân Hà Nội
+ktqdhn:Kinh tế Quốc dân Hà Nội
+KTS:kiến trúc sư
+kts:kiến trúc sư
+KTTV:khí tượng thủy văn
+kttv:khí tượng thủy văn
+KTV:kỹ thuật viên
+ktv:kỹ thuật viên
+KTX:ký túc xá
+ktx:ký túc xá
+KV:khu vực
+kv:khu vực
+KV1:khu vực một
+kv1:khu vực một
+KV2:khu vực hai
+kv2:khu vực hai
+KV3:khu vực ba
+kv3:khu vực ba
+LB:liên bang
+lb:liên bang
+LCT:luật công ty,luật cạnh tranh
+lct:luật công ty,luật cạnh tranh
+LĐ:lao động
+lđ:lao động
+LĐXS:lao động sản xuất
+lđxs:lao động sản xuất
+LĐBĐ:Liên đoàn bóng đá
+lđbđ:Liên đoàn bóng đá
+LĐBĐVN:Liên đoàn bóng đá Việt Nam
+lđbđvn:Liên đoàn bóng đá Việt Nam
+LĐLĐ:Liên đoàn Lao động
+lđlđ:Liên đoàn Lao động
+LDP:Đảng Dân chủ Tự do
+ldp:Đảng Dân chủ Tự do
+LĐTB:Lao động Thương binh
+lđtb:Lao động Thương binh
+LĐTBXH:Lao động Thương binh Xã hội
+lđtbxh:Lao động Thương binh Xã hội
+LH:Liên hiệp,liên hoan
+lh:Liên hiệp,liên hoan
+LHP:Liên hoan phim
+lhp:Liên hoan phim
+LHPN:Liên hiệp Phụ nữ
+lhpn:Liên hiệp Phụ nữ
+LHQ:Liên Hợp Quốc
+lhq:Liên Hợp Quốc
+LHS:lưu học sinh
+lhs:lưu học sinh
+LHTN:Liên hiệp Thanh niên
+lhtn:Liên hiệp Thanh niên
+LHTNVN:Hội Liên hiệp Thanh niên Việt Nam
+lhtnvn:Hội Liên hiệp Thanh niên Việt Nam
+LL:lực lượng
+ll:lực lượng
+LLLĐ:lực lượng lao động
+lllđ:lực lượng lao động
+LS:luật sư
+ls:luật sư
+LSQ:Lãnh sự quán
+lsq:Lãnh sự quán
+LTQĐTD:lây truyền qua đường tình dục
+ltqđtd:lây truyền qua đường tình dục
+MBH:mũ bảo hiểm
+mbh:mũ bảo hiểm
+MHX:Mùa Hè Xanh
+mhx:Mùa Hè Xanh
+MS:mã số
+ms:mã số
+MT:môi trường,mặt trận
+mt:môi trường,mặt trận
+MTĐT:Máy tính điện tử
+mtđt:Máy tính điện tử
+MTDTGPMNVN:Mặt trận dân tộc giải phóng miền nam Việt Nam
+mtdtgpmnvn:Mặt trận dân tộc giải phóng miền nam Việt Nam
+MTTQ:Mặt trận Tổ quốc
+mttq:Mặt trận Tổ quốc
+MTTQVN:Mặt trận Tổ quốc Việt Nam
+mttqvn:Mặt trận Tổ quốc Việt Nam
+MTV:một thành viên
+mtv:một thành viên
+MTXT:máy tính xách tay
+mtxt:máy tính xách tay
+NC:nghiên cứu
+nc:nghiên cứu
+NCC:nhà cung cấp
+ncc:nhà cung cấp
+NCKH:nghiên cứu khoa học
+nckh:nghiên cứu khoa học
+NCL:ngoài công lập
+ncl:ngoài công lập
+NCS:nghiên cứu sinh
+ncs:nghiên cứu sinh
+NCTO:hội đồng các tổ chức dệt may quốc gia Mỹ
+ncto:hội đồng các tổ chức dệt may quốc gia Mỹ
+NCTT:nghiên cứu thị trường
+nctt:nghiên cứu thị trường
+ND:nhân dân
+nd:nhân dân
+NĐ:Nghị định
+nđ:Nghị định
+NDC:Trung tâm dữ liệu Viễn thám Quốc gia
+ndc:Trung tâm dữ liệu Viễn thám Quốc gia
+NDT:Nhân dân tệ
+ndt:Nhân dân tệ
+NĐT:nhà đầu tư
+nđt:nhà đầu tư
+NĐVN:người đẹp Việt Nam
+nđvn:người đẹp Việt Nam
+NH:ngân hàng
+nh:ngân hàng
+NHCSXH:Ngân hàng Chính sách xã hội
+nhcsxh:Ngân hàng Chính sách xã hội
+NHCTCN:Ngân hàng Công thương Chi nhánh
+nhctcn:Ngân hàng Công thương Chi nhánh
+NHCTHP:Ngân hàng Công thương Hải Phòng
+nhcthp:Ngân hàng Công thương Hải Phòng
+NHCTVN:Ngân hàng Công thương Việt Nam
+nhctvn:Ngân hàng Công thương Việt Nam
+NHĐA:Ngân hàng Đông Á
+nhđa:Ngân hàng Đông Á
+NHĐÁ:Ngân hàng Đông Á
+nhđá:Ngân hàng Đông Á
+NHĐT:Ngân hàng Đầu tư
+nhđt:Ngân hàng Đầu tư
+NHĐTPT:Ngân hàng Đầu tư phát triển
+nhđtpt:Ngân hàng Đầu tư phát triển
+NHK:Đài truyền hình quốc gia Nhật Bản
+nhk:Đài truyền hình quốc gia Nhật Bản
+NHNN:Ngân hàng Nhà nước
+nhnn:Ngân hàng Nhà nước
+NHNNo:Ngân hàng Nông nghiệp và Phát triển Nông thôn
+nhnno:Ngân hàng Nông nghiệp và Phát triển Nông thôn
+NHNNPTNT:Ngân hàng Nông nghiệp và Phát triển Nông thôn
+nhnnptnt:Ngân hàng Nông nghiệp và Phát triển Nông thôn
+NHNNVN:Ngân hàng Nhà nước Việt Nam
+nhnnvn:Ngân hàng Nhà nước Việt Nam
+NHNoVN:Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam
+nhnovn:Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam
+NHNT:Ngân hàng Ngoại thương
+nhnt:Ngân hàng Ngoại thương
+NHRC:Ủy ban Nhân quyền Quốc gia
+nhrc:Ủy ban Nhân quyền Quốc gia
+NHTM:Ngân hàng Thương mại
+nhtm:Ngân hàng Thương mại
+NHTMCP:ngân hàng thương mại cổ phần
+nhtmcp:ngân hàng thương mại cổ phần
+NHTMNN:ngân hàng thương mại nhà nước
+nhtmnn:ngân hàng thương mại nhà nước
+NHTMQD:ngân hàng thương mại quốc doanh
+nhtmqd:ngân hàng thương mại quốc doanh
+NHTQ:Ngân hàng Trung ương Trung Quốc
+nhtq:Ngân hàng Trung ương Trung Quốc
+NHTSA:Cục an toàn xa lộ quốc gia Mỹ
+nhtsa:Cục an toàn xa lộ quốc gia Mỹ
+NHTƯ:Ngân hàng Trung ương
+nhtư:Ngân hàng Trung ương
+NHTW:Ngân hàng Trung ương
+nhtw:Ngân hàng Trung ương
+NK:nhập khẩu
+nk:nhập khẩu
+NKBV:nhiễm khuẩn bệnh viện
+nkbv:nhiễm khuẩn bệnh viện
+NKKN:Nam Kỳ Khởi Nghĩa
+nkkn:Nam Kỳ Khởi Nghĩa
+NKNV:năng khiếu nghiệp vụ
+nknv:năng khiếu nghiệp vụ
+NKT:người khuyết tật
+nkt:người khuyết tật
+NL:năng lượng
+nl:năng lượng
+NLĐ:Người lao động
+nlđ:Người lao động
+NLMT:năng lượng mặt trời
+nlmt:năng lượng mặt trời
+NLS:nông lâm sản
+nls:nông lâm sản
+NLTT:năng lượng tái tạo
+nltt:năng lượng tái tạo
+NMĐ:nhà máy điện
+nmđ:nhà máy điện
+NN:Nhà nước
+nn:Nhà nước
+NNCĐDC:nạn nhân chất độc da cam
+nncđdc:nạn nhân chất độc da cam
+NNPTNT:Nông nghiệp và Phát triển Nông thôn
+NN&PTNT:Nông nghiệp và Phát triển Nông thôn
+nnptnt:Nông nghiệp và Phát triển Nông thôn
+NPP:Nhà phân phối
+npp:Nhà phân phối
+NQ:Nghị quyết
+nq:Nghị quyết
+NQD:ngoài quốc doanh
+nqd:ngoài quốc doanh
+NS:Nghệ sĩ
+ns:Nghệ sĩ
+NSND:Nghệ sĩ nhân dân
+nsnd:Nghệ sĩ nhân dân
+NSƯT:Nghệ sĩ ưu tú
+nsưt:Nghệ sĩ ưu tú
+NSNN:ngân sách nhà nước
+nsnn:ngân sách nhà nước
+NST:nhiễm sắc thể
+nst:nhiễm sắc thể
+NTBD:nghệ thuật biểu diễn
+ntbd:nghệ thuật biểu diễn
+NTD:người tiêu dùng,Nhà tuyển dụng
+ntd:người tiêu dùng,Nhà tuyển dụng
+NTK:nhà thiết kế
+ntk:nhà thiết kế
+NV:nhân viên,nguyện vọng
+nv:nhân viên,nguyện vọng
+NV1:nguyện vọng một
+nv1:nguyện vọng một
+NV2:nguyện vọng hai
+nv2:nguyện vọng hai
+NV3:nguyện vọng ba
+nv3:nguyện vọng ba
+NVH:nhà văn hóa
+nvh:nhà văn hóa
+NVHTN:nhà văn hóa Thanh niên
+nvhtn:nhà văn hóa Thanh niên
+NXB:Nhà xuất bản
+nxb:Nhà xuất bản
+NXBGD:Nhà xuất bản Giáo dục
+nxbgd:Nhà xuất bản Giáo dục
+NXBKHXH:Nhà xuất bản Khoa học Xã hội
+nxbkhxh:Nhà xuất bản Khoa học Xã hội
+NXBQĐND:Nhà xuất bản Quân đội Nhân dân
+nxbqđnd:Nhà xuất bản Quân đội Nhân dân
+NXBTN:Nhà xuất bản Tự nhiên
+nxbtn:Nhà xuất bản Tự nhiên
+NXBVHTT:Nhà xuất bản Văn hóa Thể thao
+nxbvhtt:Nhà xuất bản Văn hóa Thể thao
+PC14:Phòng Cảnh sát điều tra tội phạm về trật tự xã hội
+pc14:Phòng Cảnh sát điều tra tội phạm về trật tự xã hội
+PC15:Phòng Cảnh sát điều tra tội phạm về quản lý kinh tế và chức vụ
+pc15:Phòng Cảnh sát điều tra tội phạm về quản lý kinh tế và chức vụ
+PC16:Phòng Cảnh sát điều tra
+pc16:Phòng Cảnh sát điều tra
+PC17:Phòng cảnh sát phòng chống tội phạm ma tuý
+pc17:Phòng cảnh sát phòng chống tội phạm ma tuý
+PCBL:phòng chống bão lụt
+pcbl:phòng chống bão lụt
+PCBLTKCN:phòng chống bão lụt và tìm kiếm cứu nạn
+pcbltkcn:phòng chống bão lụt và tìm kiếm cứu nạn
+PCBTH:phổ cập bậc trung học
+pcbth:phổ cập bậc trung học
+PCC:phòng công chứng
+pcc:phòng công chứng
+PCCC:phòng cháy chữa cháy
+pccc:phòng cháy chữa cháy
+PCGD:phổ cập giáo dục
+pcgd:phổ cập giáo dục
+PCGDBTH:phổ cập giáo dục bậc trung học
+pcgdbth:phổ cập giáo dục bậc trung học
+PCGDTH:phổ cập giáo dục tiểu học
+pcgdth:phổ cập giáo dục tiểu học
+PCGDTHCS:phổ cập giáo dục trung học cơ sở
+pcgdthcs:phổ cập giáo dục trung học cơ sở
+PCLBMN:phòng chống lụt bão miền Nam
+pclbmn:phòng chống lụt bão miền Nam
+PCLBTƯ:phòng chống lụt bão Trung ương
+pclbtư:phòng chống lụt bão Trung ương
+PCLBTW:phòng chống lụt bão Trung ương
+pclbtw:phòng chống lụt bão Trung ương
+PCT:Phó chủ tịch
+pct:Phó chủ tịch
+PCTT:phòng chống thiên tai
+pctt:phòng chống thiên tai
+PCTH:phổ cập tiểu học
+pcth:phổ cập tiểu học
+PCTHCS:phổ cập trung học cơ sở
+pcthcs:phổ cập trung học cơ sở
+PCTN:phòng chống tệ nạn
+pctn:phòng chống tệ nạn
+PCTNXH:phòng chống tệ nạn xã hội
+pctnxh:phòng chống tệ nạn xã hội
+PCTPCNC:phòng chống tội phạm công nghệ cao
+pctpcnc:phòng chống tội phạm công nghệ cao
+PGĐ:Phó giám đốc
+pgđ:Phó giám đốc
+PGHH:Phật giáo Hòa Hảo
+pghh:Phật giáo Hòa Hảo
+PGS:Phó Giáo sư
+pgs:Phó Giáo sư
+PGS.TS:Phó Giáo sư Tiến sĩ
+PGSTS:Phó Giáo sư Tiến sĩ
+PGS.TS.BS:Phó Giáo sư Tiến sĩ Bác sĩ
+PGS.TSKH:Phó Giáo sư Tiến sĩ Khoa học
+PGSTSKH:Phó Giáo sư Tiến sĩ Khoa học
+PHHS:phụ huynh học sinh
+phhs:phụ huynh học sinh
+PL:pháp luật
+pl:pháp luật
+PM:phần mềm
+pm:phần mềm
+PMU:ban quản lý dự án
+pmu:ban quản lý dự án
+PN:phụ nữ
+pn:phụ nữ
+PP:phương pháp
+pp:phương pháp
+PS:phóng sự
+ps:phóng sự
+PT:phát thanh
+PTCS:phổ thông cơ sở
+ptcs:phổ thông cơ sở
+PTN:phòng thí nghiệm
+ptn:phòng thí nghiệm
+PTNT:Phát triển Nông thôn
+ptnt:Phát triển Nông thôn
+PTSC:Công ty Dịch vụ Kỹ thuật dầu khí
+ptsc:Công ty Dịch vụ Kỹ thuật dầu khí
+PTT:Phó Thủ tướng
+ptt:Phó Thủ tướng
+PTTH:Phổ thông Trung học
+ptth:Phổ thông Trung học
+PTTM:phẫu thuật thẩm mỹ
+pttm:phẫu thuật thẩm mỹ
+PTTT:phát triển trẻ thơ
+pttt:phát triển trẻ thơ
+PTV:phát thanh viên
+ptv:phát thanh viên
+PV:phỏng vấn,phóng viên
+pv:phỏng vấn,phóng viên
+PY:Phú Yên
+Q:quận
+QBLTD:Quỹ bảo lãnh tín dụng
+qbltd:Quỹ bảo lãnh tín dụng
+QC:Quy chế,quảng cáo
+qc:Quy chế,quảng cáo
+QCDCCS:quy chế dân chủ cơ sở
+qcdccs:quy chế dân chủ cơ sở
+QCGNHH:Quy chế ghi nhãn hàng hóa
+qcgnhh:Quy chế ghi nhãn hàng hóa
+QCHQ:quan chức hải quan
+qchq:quan chức hải quan
+QCKDTXD:Quy chế kinh doanh thép xây dựng
+qckdtxd:Quy chế kinh doanh thép xây dựng
+QCKT:quy chuẩn kĩ thuật
+qckt:quy chuẩn kĩ thuật
+QĐ:quy định,quyết định
+qđ:quy định,quyết định
+QĐND:Quân đội Nhân dân
+qđnd:Quân đội Nhân dân
+QG:Quốc gia
+qg:Quốc gia
+QH:Quốc hội
+qh:Quốc hội
+QHTD:quan hệ tình dục
+qhtd:quan hệ tình dục
+QK:Quân khu
+qk:Quân khu
+QL:quốc lộ,quản lý
+ql:quốc lộ,quản lý
+QLGTĐT:quản lý giao thông đô thị
+qlgtđt:quản lý giao thông đô thị
+QLVNCH:Quân lực Việt Nam Cộng Hòa
+qlvnch:Quân lực Việt Nam Cộng Hòa
+QLD:Quản lý dược
+qld:Quản lý dược
+QLDA:Quản lý dự án
+qlda:Quản lý dự án
+QLĐT:Quản lý Đào tạo
+qlđt:Quản lý Đào tạo
+QLTT:Quản lý thị trường
+qltt:Quản lý thị trường
+QSD:quyền sử dụng
+qsd:quyền sử dụng
+QSDĐ:quyền sử dụng đất
+qsdđ:quyền sử dụng đất
+QTKD:Quản trị Kinh doanh
+qtkd:Quản trị Kinh doanh
+RLCD:rối loạn cương dương
+rlcd:rối loạn cương dương
+SARS:Hội chứng hô hấp cấp tính nặng
+sars:Hội chứng hô hấp cấp tính nặng
+SBD:số báo danh
+sbd:số báo danh
+SBS:Công ty Chứng khoán Ngân hàng Sài Gòn Thương Tín
+sbs:Công ty Chứng khoán Ngân hàng Sài Gòn Thương Tín
+SD:sử dụng
+sd:sử dụng
+SDLĐ:sử dụng lao động
+sdlđ:sử dụng lao động
+SDĐ:sử dụng đất
+sdđ:sử dụng đất
+SDĐNN:sử dụng đất nông nghiệp
+sdđnn:sử dụng đất nông nghiệp
+SĐH:sau đại học
+sđh:sau đại học
+SĐK:số đăng ký
+sđk:số đăng ký
+SĐNĐ:Sông Đà Nam Định
+sđnđ:Sông Đà Nam Định
+SĐT:số điện thoại
+sđt:số điện thoại
+SG:Sài Gòn
+sg:Sài Gòn
+SGD:Sở Giáo dục
+sgd:Sở Giáo dục
+SGGP:Sài gòn giải phóng
+sggp:Sài gòn giải phóng
+SGK:sách giáo khoa
+sgk:sách giáo khoa
+SGTT:Sài Gòn Tiếp Thị
+sgtt:Sài Gòn Tiếp Thị
+SGTVT:Sở Giao thông Vận tải
+sgtvt:Sở Giao thông Vận tải
+SH:sinh hoạt
+sh:sinh hoạt
+SHNN:sở hữu nhà nước
+shnn:sở hữu nhà nước
+SHTD:sinh hoạt tình dục
+shtd:sinh hoạt tình dục
+SHTT:sở hữu trí tuệ
+shtt:sở hữu trí tuệ
+SK:sân khấu
+sk:sân khấu
+SKHCN:Sở Khoa học Công nghệ
+skhcn:Sở Khoa học Công nghệ
+SKHCNMT:Sở Khoa học Công nghệ và Môi trường
+skhcnmt:Sở Khoa học Công nghệ và Môi trường
+SKHĐT:Sở Kế hoạch và Đầu tư
+skhđt:Sở Kế hoạch và Đầu tư
+SKSS:sức khỏe sinh sản
+skss:sức khỏe sinh sản
+SLNA:Sông Lam Nghệ An
+slna:Sông Lam Nghệ An
+SMĐH:Sao mai Điểm hẹn
+smđh:Sao mai Điểm hẹn
+SN:sinh năm,sinh ngày
+sn:sinh năm,sinh ngày
+SNN:sở Nông nghiệp
+snn:sở Nông nghiệp
+SP:Sư phạm,sản phẩm
+sp:Sư phạm,sản phẩm
+SPKT:Sư phạm Kỹ thuật
+spkt:Sư phạm Kỹ thuật
+SS:sĩ số
+ss:sĩ số
+STT:số thứ tự
+stt:số thứ tự
+SV:sinh viên
+sv:sinh viên
+SVĐ:sân vận động
+svđ:sân vận động
+SVĐV:Sao Vàng Đất Việt
+svđv:Sao Vàng Đất Việt
+SVHS:sinh viên học sinh
+svhs:sinh viên học sinh
+SVNCKH:sinh viên nghiên cứu khoa học
+svnckh:sinh viên nghiên cứu khoa học
+SVTN:sinh viên tình nguyện
+svtn:sinh viên tình nguyện
+SVVN:sinh viên Việt Nam
+svvn:sinh viên Việt Nam
+SX:sản xuất
+sx:sản xuất
+SXH:sốt xuất huyết
+sxh:sốt xuất huyết
+SYLL:Sơ yếu lý lịch
+syll:Sơ yếu lý lịch
+TACN:thức ăn chăn nuôi
+tacn:thức ăn chăn nuôi
+TAND:Tòa án Nhân dân
+tand:Tòa án Nhân dân
+TANDTC:Tòa án Nhân dân Tối cao
+tandtc:Tòa án Nhân dân Tối cao
+TBD:Thái Bình Dương
+tbd:Thái Bình Dương
+TBKTSG:Thời báo kinh tế Sài Gòn
+tbktsg:Thời báo kinh tế Sài Gòn
+TBKTVN:Thời báo Kinh tế Việt Nam
+tbktvn:Thời báo Kinh tế Việt Nam
+TBMMN:tai biến mạch máu não
+tbmmn:tai biến mạch máu não
+TBT:tổng biên tập
+tbt:tổng biên tập
+TBTT:thuê bao trả trước
+tbtt:thuê bao trả trước
+TBXH:Thương binh Xã hội
+tbxh:Thương binh Xã hội
+TC:tổng cộng,Thông cáo,tài chính,tiêu chuẩn
+tc:tổng cộng,Thông cáo,tài chính,tiêu chuẩn
+TCBVNTD:tiêu chuẩn và bảo vệ người tiêu dùng
+tcbvntd:tiêu chuẩn và bảo vệ người tiêu dùng
+TCCN:trung cấp chuyên nghiệp
+tccn:trung cấp chuyên nghiệp
+TCCS:tổ chức cơ sở,Tạp chí Cộng sản
+tccs:tổ chức cơ sở,Tạp chí Cộng sản
+TCDL:Tổng cục Du lịch
+tcdl:Tổng cục Du lịch
+TCHL:tuyệt chủng hàng loạt
+tchl:tuyệt chủng hàng loạt
+TCHQ:Tổng cục Hải quan
+tchq:Tổng cục Hải quan
+TCKH:trái cây không hạt,Tạp chí Khoa học,Tài chính - Kế hoạch
+tckh:trái cây không hạt,Tạp chí Khoa học,Tài chính - Kế hoạch
+TCKT:Tài chính - Kế toán
+tckt:Tài chính - Kế toán
+TCMN:thủ công mỹ nghệ
+tcmn:thủ công mỹ nghệ
+TCMR:tiêm chủng mở rộng
+tcmr:tiêm chủng mở rộng
+TCN:trước công nguyên,trung cấp nghề
+tcn:trước công nguyên,trung cấp nghề
+TCNN:Tài chính Nhà nước
+tcnn:Tài chính Nhà nước
+TCS:Trịnh Công Sơn
+tcs:Trịnh Công Sơn
+TCT:tổng công ty
+tct:tổng công ty
+TCTD:tổ chức tín dụng
+tctd:tổ chức tín dụng
+TCTT:trò chơi trực tuyến
+tctt:trò chơi trực tuyến
+TCTTMSG:Tổng công ty Thương mại Sài Gòn
+tcttmsg:Tổng công ty Thương mại Sài Gòn
+TCVN:Tiêu chuẩn Việt Nam
+tcvn:Tiêu chuẩn Việt Nam
+TD:tình dục,thể dục
+td:tình dục,thể dục
+TĐ:từ điển
+tđ:từ điển
+TĐBKVN:Từ Điển Bách Khoa Việt Nam
+tđbkvn:Từ Điển Bách Khoa Việt Nam
+TĐC:tái định cư
+tđc:tái định cư
+TDTT:Thể dục thể thao
+tdtt:Thể dục thể thao
+TDTTQG:Thể dục thể thao Quốc gia
+tdttqg:Thể dục thể thao Quốc gia
+TDV:trình dược viên
+tdv:trình dược viên
+TG:thế giới
+tg:thế giới
+TGĐ:Tổng giám đốc
+tgđ:Tổng giám đốc
+TGPL:trợ giúp pháp lý
+tgpl:trợ giúp pháp lý
+TH:truyền hình,tiểu học,trường hợp
+th:truyền hình,tiểu học,trường hợp
+THCB:trung học chuyên ban
+thcb:trung học chuyên ban
+THCN:trung học chuyên nghiệp
+thcn:trung học chuyên nghiệp
+THCS:trung học cơ sở
+thcs:trung học cơ sở
+THCSND:thực hiện chính sách nhà đất
+thcsnd:thực hiện chính sách nhà đất
+THCSNĐ:thực hiện chính sách nhà đất
+thcsnđ:thực hiện chính sách nhà đất
+THDL:trung học dân lập
+thdl:trung học dân lập
+THGT:tín hiệu giao thông
+thgt:tín hiệu giao thông
+THKTS:truyền hình kỹ thuật số
+thkts:truyền hình kỹ thuật số
+THKTSMĐ:truyền hình kỹ thuật số mặt đất
+thktsmđ:truyền hình kỹ thuật số mặt đất
+THPT:trung học phổ thông
+thpt:trung học phổ thông
+THQG:thương hiệu quốc gia
+thqg:thương hiệu quốc gia
+THS:tín hiệu số
+ths:Thạc sĩ,tín hiệu số
+ThS.BS:Thạc sĩ Bác sĩ
+Ths-BS:Thạc sĩ Bác sĩ
+THTT:truyền hình trực tiếp
+thtt:truyền hình trực tiếp
+THVN:Truyền hình Việt Nam
+thvn:Truyền hình Việt Nam
+THX:Tân hoa xã
+thx:Tân hoa xã
+TK:thiết kế,thế kỷ
+tk:thiết kế,thế kỷ
+TKCN:tìm kiếm cứu nạn
+tkcn:tìm kiếm cứu nạn
+TM:Thương mại
+tm:Thương mại
+TMCP:Thương mại cổ phần
+tmcp:Thương mại cổ phần
+TMĐT:Thương mại Điện tử
+tmđt:Thương mại Điện tử
+TMN:Thép Miền Nam
+tmn:Thép Miền Nam
+TMV:Công ty ôtô Toyota Việt Nam
+tmv:Công ty ôtô Toyota Việt Nam
+TN:thanh niên
+tn:thanh niên
+TNCN:thu nhập cá nhân
+tncn:thu nhập cá nhân
+TNCS:Thanh niên Cộng sản
+tncs:Thanh niên Cộng sản
+TNĐH:tốt nghiệp đại học
+tnđh:tốt nghiệp đại học
+TNDN:thu nhập doanh nghiệp
+tndn:thu nhập doanh nghiệp
+TNĐT:Thoát nước Đô thị
+tnđt:Thoát nước Đô thị
+TNGT:tai nạn giao thông
+tngt:tai nạn giao thông
+TNHC:trinh nữ hoàng cung
+tnhc:trinh nữ hoàng cung
+TNHH:Trách nhiệm Hữu hạn
+tnhh:Trách nhiệm Hữu hạn
+TNK:thuế nhập khẩu
+tnk:thuế nhập khẩu
+TNKQ:trắc nghiệm khách quan
+tnkq:trắc nghiệm khách quan
+TNLN:thanh niên lập nghiệp
+tnln:thanh niên lập nghiệp
+TNMT:Tài nguyên Môi trường
+tnmt:Tài nguyên Môi trường
+TNND:Tiếng nói Nhân dân
+tnnd:Tiếng nói Nhân dân
+TNNT:thanh niên nông thôn
+tnnt:thanh niên nông thôn
+TNO:Thanh niên Online
+tno:Thanh niên Online
+TNS:tu nghiệp sinh
+tns:tu nghiệp sinh
+TNSV:thanh niên sinh viên
+tnsv:thanh niên sinh viên
+TNSVVN:thanh niên sinh viên Việt Nam
+tnsvvn:thanh niên sinh viên Việt Nam
+TNT:Tình Nguyện Trẻ
+tnt:Tình Nguyện Trẻ
+TNTN:thanh niên tình nguyện,tài nguyên thiên nhiên
+tntn:thanh niên tình nguyện,tài nguyên thiên nhiên
+TNTP:Thiếu niên Tiền phong
+tntp:Thiếu niên Tiền phong
+TNV:tình nguyện viên
+tnv:tình nguyện viên
+TNVN:Thanh niên Việt Nam
+tnvn:Thanh niên Việt Nam
+TNXH:tệ nạn xã hội
+tnxh:tệ nạn xã hội
+TNXK:Thanh niên xung kích
+tnxk:Thanh niên xung kích
+TNXP:Thanh niên xung phong
+tnxp:Thanh niên xung phong
+TP:thành phố
+Tp:thành phố
+tp:thành phố
+TPCĐ:trái phiếu chuyển đổi
+tpcđ:trái phiếu chuyển đổi
+TPCN:thực phẩm chức năng
+tpcn:thực phẩm chức năng
+TPCT:Thành phố Cần Thơ
+tpct:Thành phố Cần Thơ
+TPHCM:Thành phố Hồ Chí Minh
+tphcm:Thành phố Hồ Chí Minh
+TP.HCM:Thành phố Hồ Chí Minh
+TPO:Tiền phong Online
+tpo:Tiền phong Online
+TQ:Trung Quốc
+tq:Trung Quốc
+TSDĐ:tiền sử dụng đất,tái sử dụng đất
+tsdđ:tiền sử dụng đất,tái sử dụng đất
+TSKH:Tiến sĩ Khoa học
+tskh:Tiến sĩ Khoa học
+TS:Tiến sĩ,Thí sinh
+ts:Tiến sĩ,Thí sinh
+TS-BS:Tiến sĩ Bác sĩ
+TS.BS:Tiến sĩ Bác sĩ
+TS-DS:Tiến sĩ Dược sĩ
+TT:thông tin,truyền thông,thị trường,trung tâm,thể thao,thị trấn
+tt:thông tin,truyền thông,thị trường,trung tâm,thể thao,thị trấn
+TTDN:trung tâm dạy nghề
+ttdn:trung tâm dạy nghề
+TTBĐS:thị trường bất động sản
+ttbđs:thị trường bất động sản
+TTBDVH:Trung tâm bồi dưỡng văn hóa
+ttbdvh:Trung tâm bồi dưỡng văn hóa
+TTBDVHNG:Trung tâm bồi dưỡng văn hóa ngoài giờ
+ttbdvhng:Trung tâm bồi dưỡng văn hóa ngoài giờ
+TTBVQTG:Trung tâm bảo vệ quyền tác giả
+ttbvqtg:Trung tâm bảo vệ quyền tác giả
+TTBYT:trang thiết bị y tế
+ttbyt:trang thiết bị y tế
+TTCK:Trung tâm chứng khoán,Thị trường Chứng khoán
+ttck:Trung tâm chứng khoán,Thị trường Chứng khoán
+TTCN:Trung tâm cai nghiện,tiểu thủ công nghiệp
+ttcn:Trung tâm cai nghiện,tiểu thủ công nghiệp
+TTCP:Thanh tra Chính phủ,Thủ tướng Chính phủ
+ttcp:Thanh tra Chính phủ,Thủ tướng Chính phủ
+TTCT:Thể Thao Cuối Tuần
+ttct:Thể Thao Cuối Tuần
+TTĐB:thuế Tiêu thụ đặc biệt
+ttđb:thuế Tiêu thụ đặc biệt
+TTDD:Trung tâm Dinh dưỡng
+ttdd:Trung tâm Dinh dưỡng
+TTĐM:Trung tâm Điện máy
+ttđm:Trung tâm Điện máy
+TTDV:Trung tâm Dịch vụ
+ttdv:Trung tâm Dịch vụ
+TTDVVL:Trung tâm Dịch vụ việc làm
+ttdvvl:Trung tâm Dịch vụ việc làm
+TTGDCK:Trung tâm giao dich chứng khoán
+ttgdck:Trung tâm giao dich chứng khoán
+TTGDTX:Trung tâm Giáo dục thường xuyên
+ttgdtx:Trung tâm Giáo dục thường xuyên
+TTGT:Trật tự Giao thông
+ttgt:Trật tự Giao thông
+TTH:Thừa Thiên Huế
+tth:Thừa Thiên Huế
+TTHTCĐ:Trung tâm học tập cộng đồng
+tthtcđ:Trung tâm học tập cộng đồng
+TTHTSV:trung tâm hỗ trợ sinh viên
+tthtsv:trung tâm hỗ trợ sinh viên
+TTK:Tổng thư ký
+ttk:Tổng thư ký
+TTLT:Thông tư liên tịch
+ttlt:Thông tư liên tịch
+TTN:thanh thiếu niên
+ttn:thanh thiếu niên
+TTNN:Trung tâm Ngoại Ngữ
+ttnn:Trung tâm Ngoại Ngữ
+TTO:Tuổi trẻ online
+tto:Tuổi trẻ online
+TTQLKT:trật tự quản lý kinh tế
+ttqlkt:trật tự quản lý kinh tế
+TTATGT:trật tự an toàn giao thông
+ttatgt:trật tự an toàn giao thông
+TTTT:Thông tin Truyền thông
+tttt:Thông tin Truyền thông
+TTTH:Trung tâm Tin học
+ttth:Trung tâm Tin học
+TTTM:Trung tâm Thương mại
+tttm:Trung tâm Thương mại
+TTTON:thụ tinh trong ống nghiệm
+ttton:thụ tinh trong ống nghiệm
+TTTTN:trí thức trẻ tình nguyện
+ttttn:trí thức trẻ tình nguyện
+TTVGT:trật tự viên giao thông
+ttvgt:trật tự viên giao thông
+TTVH:Trung tâm Văn hóa
+ttvh:Trung tâm Văn hóa
+TTVN:Thể thao Việt Nam,Trí tuệ Việt Nam,Trái tim Việt Nam
+ttvn:Thể thao Việt Nam,Trí tuệ Việt Nam,Trái tim Việt Nam
+TTXH:trật tự xã hội
+ttxh:trật tự xã hội
+TTXVN:Thông tấn xã Việt Nam
+ttxvn:Thông tấn xã Việt Nam
+TTX:Thông tấn xã
+ttx:Thông tấn xã
+TTYT:Trung tâm Y tế
+ttyt:Trung tâm T tế
+TTYTDP:Trung tâm Y tế dự phòng
+ttytdp:Trung tâm Y tế dự phòng
+TV:ti vi,thư viện
+tv:ti vi,thư viện
+TVHK:tiếp viên hàng không
+tvhk:tiếp viên hàng không
+TVN:Than Việt Nam
+tvn:Than Việt Nam
+TVQH:Thường vụ Quốc hội
+tvqh:Thường vụ Quốc hội
+TVV:tư vấn viên
+tvv:tư vấn viên
+TƯ:Trung Ương
+tư:Trung Ương
+TW:Trung ương
+tw:Trung ương
+TX:Thị xã
+tx:Thị xã
+UB:Ủy ban
+ub:Ủy ban
+UBĐT:Ủy ban Điều tra
+ubđt:Ủy ban Điều tra
+UBCKNN:Ủy ban Chứng khoán Nhà nước
+ubcknn:Ủy ban Chứng khoán Nhà nước
+UBKT:Uỷ ban Kiểm tra,Ủy ban Kinh tế
+ubkt:Uỷ ban Kiểm tra,Ủy ban Kinh tế
+UBMTTQ:Ủy ban Mặt trận Tổ quốc
+ubmttq:Ủy ban Mặt trận Tổ quốc
+UBND:Ủy ban Nhân dân
+ubnd:Ủy ban Nhân dân
+UBMTTQVN:Ủy ban Mặt trận Tổ quốc Việt Nam
+ubmttqvn:Ủy ban Mặt trận Tổ quốc Việt Nam
+UBNDTP:Ủy ban Nhân dân Thành phố
+ubndtp:Ủy ban Nhân dân Thành phố
+UBTƯ:Ủy ban Trung Ương
+ubtư:Ủy ban Trung Ương
+UBTW:Ủy ban Trung Ương
+ubtw:Ủy ban Trung Ương
+UBTDTT:Ủy ban Thể dục Thể thao
+ubtdtt:Ủy ban Thể dục Thể thao
+UBTVQH:Ủy ban Thường vụ Quốc hội
+ubtvqh:Ủy ban Thường vụ Quốc hội
+ƯCV:ứng cử viên
+ưcv:ứng cử viên
+UV:Ủy viên
+uv:Ủy viên
+UVBCH:Ủy viên Ban chấp hành
+uvbch:Ủy viên Ban chấp hành
+UVBCT:Ủy viên Bộ Chính trị
+uvbct:Ủy viên Bộ Chính trị
+VCB:Ngân hàng Ngoại thương Việt Nam
+vcb:Ngân hàng Ngoại thương Việt Nam
+VCK:vòng chung kết
+vck:vòng chung kết
+VD:ví dụ,vận dụng,vận động
+vd:ví dụ,vận dụng,vận động
+VĐ:vô địch
+vđ:vô địch
+VDC:vận dụng cao
+vdc:vận dụng cao
+VĐQG:vô địch Quốc gia
+vđqg:vô địch Quốc gia
+VĐTG:vô địch thế giới
+vđtg:vô địch thế giới
+VĐV:vận động viên
+vđv:vận động viên
+VĐVQG:Vận động viên Quốc gia
+vđvqg:Vận động viên Quốc gia
+VFF:Liên đoàn bóng đá Việt Nam
+vff:Liên đoàn bóng đá Việt Nam
+VH:Văn hóa
+vh:Văn hóa
+VHTH:Văn hóa tổng hợp
+vhth:Văn hóa tổng hợp
+VHGDTNTN:Văn hóa Giáo dục Thanh niên Thiếu niên
+vhgdtntn:Văn hóa Giáo dục Thanh niên Thiếu niên
+VHGDTTNNĐ:Văn hóa Giáo dục Thanh thiếu niên và Nhi đồng
+vhgdttnnđ:Văn hóa Giáo dục Thanh thiếu niên và Nhi đồng
+VHNT:Văn học Nghệ thuật
+vhnt:Văn học Nghệ thuật
+VHTT:Văn hóa thể thao,Văn hóa thông tin
+vhtt:Văn hóa thể thao,Văn hóa thông tin
+VH-TT:Văn hóa Thể thao
+VKS:Viện Kiểm sát
+vks:Viện Kiểm sát
+VKSND:Viện Kiểm sát Nhân dân
+vksnd:Viện Kiểm sát Nhân dân
+VKSNDTC:Viện Kiểm sát Nhân dân Tối cao
+vksndtc:Viện Kiểm sát Nhân dân Tối cao
+VL:Vật lý
+vl:Vật lý
+VLTK:Võ Lâm Truyền Kỳ
+vltk:Võ Lâm Truyền Kỳ
+VLXD:Vật liệu xây dựng
+vlxd:Vật liệu xây dựng
+VN:Việt Nam
+vn:Việt Nam
+VNCH:Việt Nam Cộng Hòa
+vnch:Việt Nam Cộng Hòa
+VNCC:Tổng Công ty Xi măng Việt Nam
+vncc:Tổng Công ty Xi măng Việt Nam
+VNM:Vinamilk
+vnm:Vinamilk
+VP:văn phòng
+vp:văn phòng
+VPCP:Văn phòng Chính phủ
+vpcp:Văn phòng Chính phủ
+VPĐD:văn phòng đại diện
+vpđd:văn phòng đại diện
+VQG:Vườn Quốc gia
+vqg:Vườn Quốc gia
+VS:vệ sinh
+vs:vệ sinh
+VT:vũ trụ,viễn thông,vi tính
+vt:vũ trụ,viễn thông,vi tính
+VTV:Đài truyền hình Việt Nam
+vtv:Đài truyền hình Việt Nam
+VYSA:Hội Thanh niên Sinh viên Việt Nam tại Nhật Bản
+vysa:Hội Thanh niên Sinh viên Việt Nam tại Nhật Bản
+WB:Ngân hàng thế giới
+wb:Ngân hàng thế giới
+WTO:Tổ chức Thương mại thế giới
+wto:Tổ chức Thương mại thế giới
+XD:Xây dựng
+xd:Xây dựng
+XDCB:xây dựng cơ bản
+xdcb:xây dựng cơ bản
+XDCĐ:xây dựng cầu đường
+xdcđ:xây dựng cầu đường
+XĐGN:xoá đói giảm nghèo
+xđgn:xoá đói giảm nghèo
+XDHK:xăng dầu hàng không
+xdhk:xăng dầu hàng không
+XH:xã hội
+xh:xã hội
+XHCN:xã hội chủ nghĩa
+xhcn:xã hội chủ nghĩa
+XHH:xã hội hóa
+xhh:xã hội hóa
+XK:xuất khẩu
+xk:xuất khẩu
+XKLĐ:xuất khẩu lao động
+xklđ:xuất khẩu lao động
+XN:xí nghiệp
+xn:xí nghiệp
+XNK:xuất nhập khẩu
+xnk:xuất nhập khẩu
+XSKT:xổ số kiến thiết
+xskt:xổ số kiến thiết
+XSMB:xổ số miền Bắc
+xsmb:xổ số miền Bắc
+XSMN:xổ số miền Nam
+xsmn:xổ số miền Nam
+XSMT:xổ số miền Tây
+xsmt:xổ số miền Tây
+XTTM:xúc tiến thương mại
+xttm:xúc tiến thương mại
+XX:xét xử
+xx:xét xử
+YKVN:Y khoa Việt Nam
+ykvn:Y khoa Việt Nam
+YTDP:Y tế Dự phòng
+ytdp:Y tế Dự phòng
+TB:thông báo,thương binh
+tb:thông báo,thương binh
+P:phố,phường
+PA:phương án
+p/a:phản ánh,phương án
+ĐA:đồ án,đề án
+đ/a:đồ án
+đ/c:đồng chí
+DA:dự án
+d/a:dự án
+BB:Biên bản
+bb:Biên bản
+BGN:Bản ghi nhớ
+bgn:Bản ghi nhớ
+BTT:Bản thỏa thuận
+btt:Bản thỏa thuận
+BTTTT:Bộ thông tin truyền thông
+btttt:Bộ thông tin truyền thông
+GUQ:Giấy Ủy Quyền
+guq:Giấy Ủy Quyền
+GM:Giấy Mời
+gm:Giấy Mời
+GGT:Giấy giới thiệu
+ggt:Giấy giới thiệu
+GNP:Giấy nghỉ phép
+gnp:Giấy nghỉ phép
+PG:phiếu gửi
+pg:phiếu gửi
+PC:phiếu chuyển
+pc:phiếu chuyển
+PB:phiếu báo
+pb:phiếu báo
+SY:Bản sao y
+sy:Bản sao y
+SL:Bản sao lục,số lượng
+sl:Bản sao lục,số lượng
+FB:facebook
+fb:facebook
+ThS:Thạc sĩ
+Ths:Thạc sĩ
+Th.s:Thạc sĩ
+TTg:Thủ tướng
+ttg:Thủ tướng
+TrS:Bản trích sao
+trs:Bản trích sao
+QyĐ:Quy định
+qyđ:Quy định
+YTế:Y tế
+ytế:Y tế
+TTr:tờ trình
+ttr:tờ trình
+thg:thân gửi
+th/g:thân gửi
+vv:về việc
+v.v:vân vân
+v/v:về việc
+cty:công ty
+ngta:người ta
+VNĐ:việt nam đồng
+vnđ:việt nam đồng
+USD:đô la mỹ
+usd:đô la mỹ
+KQXN:kết quả xét nghiệm
+kqxn:kết quả xét nghiệm
+LM:liên minh
+lm:liên minh
+K/G:kính gửi
+k/g:kính gửi
+AHLĐ:anh hùng lao động
+ahlđ:anh hùng lao động
+ahls:anh hùng liệt sĩ
+AHLS:anh hùng liệt sĩ
+ANQG:An ninh Quốc gia
+anqg:An ninh Quốc gia
+ANQP:An ninh Quốc phòng
+anqp:An ninh Quốc phòng
+ASXH:An sinh Xã hội
+asxh:An sinh Xã hội
+ATGTQG:An toàn Giao thông Quốc gia
+atgtqg:An toàn Giao thông Quốc gia
+ATLĐ:An toàn Lao động
+atlđ:An toàn Lao động
+BĐBP:Bộ đội Biên phòng
+bđbp:Bộ đội Biên phòng
+BGTVT:Bộ Giao thông Vận tải
+bgtvt:Bộ Giao thông Vận tải
+BHXHVN:Bảo hiểm Xã hội Việt Nam
+bhxhvn:Bảo hiểm Xã hội Việt Nam
+BLĐTBXH:Bộ Lao động Thương binh Xã hội
+blđtbxh:Bộ Lao động Thương binh Xã hội
+BNG:Bộ Ngoại giao
+bng:Bộ Ngoại giao
+BNN:Bộ Nông nghiệp
+bnn:Bộ Nông nghiệp
+BTNMT:Bộ Tài nguyên Môi trường
+btnmt:Bộ Tài nguyên Môi trường
+BTP:Bộ Tư pháp
+btp:Bộ Tư pháp
+BVTƯ:Bệnh viện trung ương
+bvtư:Bệnh viện trung ương
+BXD:Bộ Xây dựng
+bxd:Bộ Xây dựng
+BYT:Bộ Y tế
+byt:Bộ Y tế
+CATPHCM:Công an thành phố Hồ Chí Minh
+catphcm:Công an thành phố Hồ Chí Minh
+CBNV:cán bộ nhân viên
+cbnv:cán bộ nhân viên
+CBVC:cán bộ viên chức
+cbvc:cán bộ viên chức
+CBĐV:cán bộ đảng viên
+cbđv:cán bộ đảng viên
+CHCN:cứu hộ cứu nạn
+chcn:cứu hộ cứu nạn
+CHQS:chỉ huy quân sự
+chqs:chỉ huy quân sự
+CHXH:Cộng hòa Xã hội
+chxh:Cộng hòa Xã hội
+CLC:chất lượng cao
+clc:chất lượng cao
+CMTND:chứng minh thư nhân dân
+cmtnd:chứng minh thư nhân dân
+CNC:công nghệ cao
+cnc:công nghệ cao
+CNCH:cứu nạn cứu hộ
+CNPM:công nghệ phần mềm
+cnpm:công nghệ phần mềm
+CPN:chuyển phát nhanh
+cpn:chuyển phát nhanh
+CNXH:Chủ nghĩa Xã hội
+cnxh:Chủ nghĩa Xã hội
+CPTM:Cổ phần Thương mại
+cptm:Cổ phần hương mại
+CQCA:Cơ quan Công an
+cqca:Cơ quan Công an
+CQCSĐT:Cơ quan Cảnh sát điều tra
+cqcsđt:Cơ quan Cảnh sát điều tra
+CQNN:Cơ quan Nhà nước
+cqnn:Cơ quan Nhà nước
+CSHT:cơ sở hạ tầng
+csht:cơ sở hạ tầng
+CSND:Cảnh sát nhân dân
+csnd:Cảnh sát nhân dân
+CSPCCC:Cảnh sát phòng cháy chữa cháy
+cspccc:Cảnh sát phòng cháy chữa cháy
+CSSK:chăm sóc sức khỏe
+cssk:chăm sóc sức khỏe
+CTHĐQT:Chủ tịch hội đồng quản trị
+cthđqt:Chủ tịch hội đồng quản trị
+CTYTNHH:Công ty trách nhiệm hữu hạn
+ctytnhh:Công ty trách nhiệm hữu hạn
+DVTM:dịch vụ thương mại
+dvtm:dịch vụ thương mại
+ĐBSH:đồng bằng sông Hồng
+đbsh:đồng bằng sông Hồng
+ĐHKHXHNV:Đại học Khoa học Xã hội nhân văn
+đhkhxhnv:Đại học Khoa học Xã hội nhân văn
+ĐHYD:Đại học Y Dược
+đhyd:Đại học Y Dược
+ĐHL:Đại học luật
+đhl:Đại học luật
+ĐHNN:Đại học Nông nghiệp
+đhnn:Đại học Nông nghiệp
+ĐHSPKT:Đại học sư phạm kỹ thuật
+đhspkt:Đại học sư phạm kỹ thuật
+ĐHTH:Đại học Tổng hợp
+đhth:Đại học Tổng hợp
+ĐHXD:Đại học Xây dựng
+đhxd:Đại học Xây dựng
+ĐH-CĐ:Đại học Cao đẳng
+đh-cđ:Đại học Cao đẳng
+ĐKDN:đăng ký doanh nghiệp
+đkdn:đăng ký doanh nghiệp
+ĐPTTH:Đài phát thanh truyền hình
+đptth:Đài phát thanh truyền hình
+ĐSVN:Đường sắt Việt Nam
+đsvn:Đường sắt Việt Nam
+ĐTBĐQG:Đội tuyển bóng đá quốc gia
+đtbđqg:Đội tuyển bóng đá quốc gia
+ĐTCĐ:điện thoại cố định
+đtcđ:điện thoại cố định
+ĐTDD:điện thoại di động
+đtdd:điện thoại di động
+ĐTNCS:đoàn Thanh niên Cộng sản
+đtncs:Đoàn Thanh niên Cộng sản
+ĐTPT:đầu tư phát triển
+đtpt:đầu tư phát triển
+ĐTVT:điện tử viễn thông
+đtvt:điện tử viễn thông
+GCCN:giai cấp công nhân
+gccn:giai cấp công nhân
+GDCD:giáo dục công dân
+gdcd:giáo dục công dân
+GDMN:giáo dục mầm non
+gdmn:giáo dục mầm non
+GDTH:giáo dục tiểu học
+gdth:giáo dục tiểu học
+GPKD:giấy phép kinh doanh
+gpkd:giấy phép kinh doanh
+GĐCA:giám đốc công an
+gđca:giám đốc công an
+GĐVH:gia đình văn hóa
+gđvh:gia đình văn hóa
+HCLĐ:huân chương lao động
+hclđ:huân chương lao động
+HCMHS:hội cha mẹ học sinh
+hcmhs:hội cha mẹ học sinh
+HCTĐ:hội chữ thập đỏ
+hctd:hội chữ thập đỏ
+HHK:hãng hàng không
+hhk:hãng hàng không
+HKVN:Hàng không Việt Nam
+hkvn:Hàng không Việt Nam
+HNB:hội nhà báo
+hnb:hội nhà báo
+HSD:hạn sử dụng
+hsd:hạn sử dụng
+HĐBALHQ:Hội đồng Bảo an Liên Hợp Quốc
+hđbalhq:Hội đồng Bảo an Liên Hợp Quốc
+KQXS:kết quả xổ số
+kqxs:kết quả xổ số
+KTTM:kinh tế thương mại
+kttm:kinh tế thương mại
+KTTT:kinh tế thị trường
+kttt:kinh tế thị trường
+KTXH:kinh tế xã hội
+ktxh:kinh tế xã hội
+LĐPT:lao động phổ thông
+lđpt:lao động phổ thông
+XKLD:xuất khẩu lao động
+xkld:xuất khẩu lao động
+LLVT:lực lượng vũ trang
+llvt:lực lượng vũ trang
+LLVTND:lực lượng vũ trang nhân dân
+llvtnd:lực lượng vũ trang nhân dân
+LTTP:lương thực thực phẩm
+lttp:lương thực thực phẩm
+LĐLĐVN:Liên đoàn Lao động Việt Nam
+lđlđvn:Liên đoàn Lao động Việt Nam
+MST:mã số thuế
+mst:mã số thuế
+MVT:máy vi tính
+mvt:máy vi tính
+NCCDV:nhà cung cấp dịch vụ
+nccdv:nhà cung cấp dịch vụ
+NCT:người cao tuổi
+nct:người cao tuổi
+NHCP:ngân hàng cổ phần
+nhcp:ngân hàng cổ phần
+NHTG:ngân hàng thế giới
+nhtg:ngân hàng thế giới
+NHQD:ngân hàng quốc doanh
+nhqd:ngân hàng quốc doanh
+NLN:nông lâm nghiệp
+nln:nông lâm nghiệp
+NMNĐ:nhà máy nhiệt điện
+nmnđ:nhà máy nhiệt điện
+NMTĐ:nhà máy thủy điện
+nmtđ:nhà máy thủy điện
+NOXH:nhà ở xã hội
+NƠXH:nhà ở xã hội
+noxh:nhà ở xã hội
+NSDLĐ:Người sử dụng lao động
+nsdlđ:Người sử dụng lao động
+NSX:ngày sản xuất
+nsx:ngày sản xuất
+NTKTT:nhà thiết kế thời trang
+ntktt:nhà thiết kế thời trang
+NVKD:nhân viên kinh doanh
+nvkd:nhân viên kinh doanh
+NVNONN:người Việt Nam ở nước ngoài
+nvnonn:người Việt Nam ở nước ngoài
+NXBT:nhà xuất bản trẻ
+nxbt:nhà xuất bản trẻ
+PCCN:phòng chống cháy nổ
+pccn:phòng chống cháy nổ
+PCLB:phòng chống lụt bão
+pclb:phòng chống lụt bão
+PKKQ:phòng không không quân
+pkkq:phòng không không quân
+PNVN:phụ nữ việt nam
+pnvn:phụ nữ việt nam
+PTGĐ:Phó tổng giám đốc
+ptgd:Phó tổng giám đốc
+QĐNDVN:Quân đội Nhân dân Việt Nam
+qđndvn:Quân đội Nhân dân Việt Nam
+QHCC:quan hệ công chúng
+qhcc:quan hệ công chúng
+QHCT:quy hoạch chi tiết
+qhct:quy hoạch chi tiết
+QHQT:quan hệ quốc tế
+qhqt:quan hệ quốc tế
+QHVN:Quốc hội Việt Nam
+qhvn:Quốc hội Việt Nam
+QHXD:quy hoạch xây dựng
+qhxd:quy hoạch xây dựng
+QLCL:quản lý chất lượng
+qlcl:quản lý chất lượng
+QLĐĐ:quản lý đất đai
+qlđđ:quản lý đất đai
+QLGD:quản lý giáo dục
+qlgd:quản lý giáo dục
+QLKD:quản lý kinh doanh
+qlkd:quản lý kinh doanh
+QLNS:quản lý nhân sự
+qlns:quản lý nhân sự
+QSH:quyền sở hữu
+qsh:quyền sở hữu
+QTV:quản trị viên
+qtv:quản trị viên
+QTDN:quản trị doanh nghiệp
+qtdn:quản trị doanh nghiệp
+SDT:số điện thoại
+sdt:số điện thoại
+SDH:sau đại học
+sdh:sau đại học
+SGDCK:sở giao dịch chứng khoán
+sgdck:sở giao dịch chứng khoán
+SKCĐ:sức khoẻ cộng đồng
+skcđ:sức khoẻ cộng đồng
+SKLĐ:sức khỏe lao động
+sklđ:sức khỏe lao động
+SLĐTBXH:Sở Lao động Thương binh Xã hội
+slđtbxh:Sở Lao động Thương binh Xã hội
+SVĐQG:sân vận động quốc gia
+svđqg:sân vận động quốc gia
+SXCN:sản xuất công nghiệp
+sxcn:sản xuất công nghiệp
+SXD:Sở Xây dựng
+sxd:Sở Xây dựng
+TANDTP:Tòa án nhân dân thành phố
+tandtp:Tòa án nhân dân thành phố
+TANDTPHCM:Tòa án Nhân dân thành phố Hồ Chí Minh
+tandtphcm:Tòa án Nhân dân thành phố Hồ Chí Minh
+TBDĐ:thuê bao di động
+tbdđ:thuê bao di động
+TBYT:thiết bị y tế
+tbyt:thiết bị y tế
+TCDN:tài chính doanh nghiệp
+tcdn:tài chính doanh nghiệp
+TCYTTG:tổ chức y tế thế giới
+tcyttg:tổ chức y tế thế giới
+THADS:thi hành án dân sự
+thads:thi hành án dân sự
+TLD:tổng liên đoàn
+tld:tổng liên đoàn
+TPCP:trái phiếu chính phủ
+tpcp:trái phiếu chính phủ
+TPHN:Thành phố Hà Nội
+tphn:Thành phố Hà Nội
+TTATXH:trật tự an toàn xã hội
+ttatxh:trật tự an toàn xã hội
+TTCKVN:Thị trường chứng khoán Việt Nam
+ttckvn:Thị trường chứng khoán Việt Nam
+TTHLQG:Trung tâm huấn luyện quốc gia
+tthlqg:Trung tâm huấn luyện quốc gia
+TTHNQG:Trung tâm hội nghị quốc gia
+tthnqg:Trung tâm hội nghị quốc gia
+TTMS:Trung tâm mua sắm
+ttms:Trung tâm mua sắm
+TTXKLĐ:Trung tâm xuất khẩu lao động
+ttxklđ:Trung tâm xuất khẩu lao động
+TVPL:tư vấn pháp luật
+tvpl:tư vấn pháp luật
+TMDV:thương mại dịch vụ
+tmdv:thương mại dịch vụ
+UBNDTPHCM:Ủy ban Nhân dân thành phố Hồ Chí Minh
+ubndtphcm:Ủy ban Nhân dân thành phố Hồ Chí Minh
+UBKTTƯ:Ủy ban Kiểm tra Trung ương
+ubkttư:Ủy ban Kiểm tra Trung ương
+UBMT:Ủy ban Mặt trận
+ubmt:Ủy ban Mặt trận
+UBQG:Ủy ban Quốc gia
+ubqg:Ủy ban Quốc gia
+UBTV:Ủy ban Thường vụ
+ubtv:Ủy ban Thường vụ
+UCV:ứng cử viên
+ucv:ứng cử viên
+VBQPPL:văn bản quy phạm pháp luật
+vbqppl:văn bản quy phạm pháp luật
+VHTTDL:Văn hóa thể thao du lịch
+vhttdl:Văn hóa thể thao du lịch
+VND:việt nam đồng
+vnd:việt nam đồng
+VPQH:Văn phòng Quốc hội
+vpqh:Văn phòng Quốc hội
+VSATTP:vệ sinh an toàn thực phẩm
+vsattp:vệ sinh an toàn thực phẩm
+VSMT:vệ sinh môi trường
+vsmt:vệ sinh môi trường
+VTHH:vận tải hàng hóa
+vthh:vận tải hàng hóa
+XDCN:xây dựng công nghiệp
+xdcn:xây dựng công nghiệp
+XHCNVN:Xã hội Chủ nghĩa Việt Nam
+xhcnvn:Xã hội Chủ nghĩa Việt Nam
+XPHC:xử phạt hành chính
+xphc:xử phạt hành chính
+XTDL:xúc tiến du lịch
+xtdl:xúc tiến du lịch
+YT:y tế
+yt:y tế
+YHCT:y học cổ truyền
+yhct:y học cổ truyền
+KTCK:kinh tế cửa khẩu
+ktck:kinh tế cửa khẩu
+KKTCK:khu kinh tế cửa khẩu
+kktck:khu kinh tế cửa khẩu
+QLNĐ:quản lý nhà đất
+qlnđ:quản lý nhà đất
+VPLS:văn phòng luật sư
+vpls:văn phòng luật sư
+QLXD:quản lý xây dựng
+qlxd:quản lý xây dựng
+GDBĐS:giao dịch bất động sản
+gdbđs:giao dịch bất động sản
+TBĐT:thuê bao điện thoại
+tbđt:thuê bao điện thoại
+TTDBKTTVTW:Trung tâm dự báo khí tượng thủy văn trung ương
+ttdbkttvtw:Trung tâm dự báo khí tượng thủy văn trung ương
+TTCPQG:Trung tâm chiếu phim quốc gia
+ttcpqg:Trung tâm chiếu phim quốc gia
+BQLRPHĐN:Ban quản lý rừng phòng hộ đầu nguồn
+bqlrphđn:Ban quản lý rừng phòng hộ đầu nguồn
+AHLLVTND:anh hùng lực lượng vũ trang nhân dân
+ahllvtnd:anh hùng lực lượng vũ trang nhân dân
+BHXHTN:bảo hiểm xã hội tự nguyện
+bhxhtn:bảo hiểm xã hội tự nguyện
+DTNT:dân tộc nội trú
+dtnt:dân tộc nội trú
+TCTC:tổ chức tài chính
+tctc:tổ chức tài chính
+UBATGTQG:Ủy ban an toàn giao thông quốc gia
+ubatgtqg:Ủy ban an toàn giao thông quốc gia
+SBH:sổ bảo hiểm
+sbh:sổ bảo hiểm
+BHNT:bảo hiểm nhân thọ
+bhnt:bảo hiểm nhân thọ
+VDCN:vật dụng cá nhân
+vdcn:vật dụng cá nhân
+HCTH:hành chính tổng hợp
+hcth:hành chính tổng hợp
+PTDTNT:phổ thông dân tộc nội trú
+ptdtnt:phổ thông dân tộc nội trú
+SLL:số lượng lớn
+sll:số lượng lớn
+HĐGĐYK:hội đồng giám định y khoa
+hđgđyk:hội đồng giám định y khoa
+tthcm:tư tưởng Hồ Chí Minh
+TTHCM:tư tưởng Hồ Chí Minh
+qrtd:quấy rối tình dục
+QRTD:quấy rối tình dục
+bltths:bộ luật tố tụng hình sự
+BLTTHS:bộ luật tố tụng hình sự
+TTGTVL:Trung tâm giới thiệu việc làm
+ttgtvl:Trung tâm giới thiệu việc làm

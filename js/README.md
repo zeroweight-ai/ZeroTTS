@@ -90,6 +90,12 @@ because each one fails *quietly*.
 
 ## Known gaps
 
+- **No text normalization.** The Python package runs
+  `zerotts.text_norm.normalize_vi_text` before chunking, turning dates, clock
+  times, versions, fractions and acronyms into spoken Vietnamese ("5:00" ->
+  "năm giờ"). It is pure stdlib regex, so porting it is mechanical — until then
+  the browser demo will read those forms as bare numbers and diverge from the
+  Python output for the same input.
 - Generation runs on the main thread. It should move into a Web Worker
   (`worker.ts`) — the per-frame loop otherwise competes with rendering and can
   stutter playback under load.
