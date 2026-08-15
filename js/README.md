@@ -78,6 +78,13 @@ because each one fails *quietly*.
   exceeds the buffer. It is sized for the model's 120 s ceiling and reports an
   overflow rather than wrapping. A read/write index pair also makes "full" look
   identical to "empty"; monotonic counters are used instead.
+- **int64 must literally be a `BigInt64Array`.** ORT rejects anything else
+  ("A int64 tensor's data must be type of function BigInt64Array()"). A graph's
+  int64 *output* is not guaranteed to come back as one across ORT-web versions
+  and execution providers, and `outputs.x.data as BigInt64Array` is a cast that
+  asserts rather than checks — so a wrong type survives until that value is fed
+  back in as an input, which surfaces during `warmup()` at load time. Every int64
+  input goes through `toBigInt64` / `i64` for that reason.
 - **One RNG across segments.** Sampling draws are graph *inputs*, so a fresh
   `Rng(seed)` per segment replays the identical draw sequence for every segment.
 

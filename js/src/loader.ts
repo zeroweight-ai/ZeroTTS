@@ -199,5 +199,10 @@ function parseNpyFloat32(buffer: ArrayBuffer): Float32Array {
 
 function parseNpyInt64(buffer: ArrayBuffer): BigInt64Array {
   const [offset] = npyPayload(buffer, /'descr':\s*'[<|]i8'/, 'silence_frame.npy');
-  return new BigInt64Array(buffer, offset);
+  // A BigInt64Array view requires an 8-byte-aligned offset. NumPy pads its
+  // header to a 64-byte boundary so this normally holds, but a hand-written or
+  // re-saved file need not — copy rather than throw a RangeError nobody can act
+  // on.
+  if (offset % 8 === 0) return new BigInt64Array(buffer, offset);
+  return new BigInt64Array(buffer.slice(offset));
 }

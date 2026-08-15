@@ -19,8 +19,38 @@ import { Rng } from './rng';
 import { BpeTokenizer } from './tokenizer';
 import { DEFAULT_SAMPLING, SamplingOptions, ZeroTTSConfig } from './types';
 
-const big = (values: ArrayLike<number>) =>
-  BigInt64Array.from(Array.from(values, (v) => BigInt(v)));
+/**
+ * Coerce anything integer-ish into a real BigInt64Array.
+ *
+ * ONNX Runtime rejects an int64 tensor whose data is not literally a
+ * `BigInt64Array` ("A int64 tensor's data must be type of function
+ * BigInt64Array()"). Two things make that easy to hit:
+ *
+ *  - a graph's int64 OUTPUT is not guaranteed to come back as a BigInt64Array
+ *    across ORT-web versions and execution providers (WebGPU in particular has
+ *    no native int64), and `outputs.x.data as BigInt64Array` is a TypeScript
+ *    cast that asserts rather than checks — so a wrong type survives until the
+ *    value is fed back in as an input;
+ *  - a typed array from another realm fails `instanceof`.
+ *
+ * Going through this helper on every int64 input makes the runtime behaviour
+ * match the type annotations instead of merely claiming to.
+ */
+function toBigInt64(values: ArrayLike<number | bigint>): BigInt64Array {
+  if (values instanceof BigInt64Array) return values;
+  const out = new BigInt64Array(values.length);
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    out[i] = typeof v === 'bigint' ? v : BigInt(Math.trunc(v as number));
+  }
+  return out;
+}
+
+/** An int64 tensor, from any integer-ish source. */
+const i64 = (values: ArrayLike<number | bigint>, dims: number[]) =>
+  new ort.Tensor('int64', toBigInt64(values), dims);
+
+const big = (values: ArrayLike<number>) => toBigInt64(values);
 
 /** Frames of codec silence decoded between text segments. */
 const SILENCE_FRAMES_PER_SEGMENT = 4;
@@ -96,8 +126,8 @@ export class ZeroTTSBrowser {
     })();
 
     const encoded = await this.sessions.textEncoder.run({
-      text_ids: new ort.Tensor('int64', idsBatched, [B, textLen]),
-      txt_lengths: new ort.Tensor('int64', big(new Array(B).fill(textLen)), [B]),
+      text_ids: i64(idsBatched, [B, textLen]),
+      txt_lengths: i64(new Array(B).fill(textLen), [B]),
     });
     const textStates = encoded.text_states as ort.Tensor;
     const textValid = encoded.text_valid as ort.Tensor;
@@ -121,9 +151,9 @@ export class ZeroTTSBrowser {
     const outputs = await this.sessions.prefixStep.run({
       external_embed: new ort.Tensor('float32', external, [B, T, D]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B * T).fill(1), [B, T]),
-      frame_codes: new ort.Tensor('int64', new BigInt64Array(B * T * this.numCodebooks),
+      frame_codes: i64(new BigInt64Array(B * T * this.numCodebooks),
         [B, T, this.numCodebooks]),
-      new_pos: new ort.Tensor('int64', newPos, [B, T]),
+      new_pos: i64(newPos, [B, T]),
       new_valid: new ort.Tensor('bool', new Uint8Array(B * T).fill(1), [B, T]),
       packed_kv: new ort.Tensor('float32', new Float32Array(0),
         [this.nLayers, 2, B, this.nHeads, 0, this.dHead]),
@@ -160,8 +190,8 @@ export class ZeroTTSBrowser {
       external_embed: new ort.Tensor('float32', new Float32Array(B * this.dModel),
         [B, 1, this.dModel]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B), [B, 1]),
-      frame_codes: new ort.Tensor('int64', tiled, [B, 1, K]),
-      new_pos: new ort.Tensor('int64', pos, [B, 1]),
+      frame_codes: i64(tiled, [B, 1, K]),
+      new_pos: i64(pos, [B, 1]),
       new_valid: new ort.Tensor('bool', new Uint8Array(B).fill(1), [B, 1]),
       packed_kv: state.packedKv,
       past_valid: state.fullValid,
@@ -188,9 +218,9 @@ export class ZeroTTSBrowser {
       global_hidden: hidden,
       forbid_eoa: new ort.Tensor('bool', Uint8Array.from([forbidEoa ? 1 : 0]), [1]),
       text_temperature: new ort.Tensor('float32', Float32Array.from([opts.textTemperature]), [1]),
-      text_topk: new ort.Tensor('int64', big([opts.textTopK > 0 ? opts.textTopK : this.codebookSize]), [1]),
+      text_topk: i64([opts.textTopK > 0 ? opts.textTopK : this.codebookSize], [1]),
       audio_temperature: new ort.Tensor('float32', Float32Array.from([opts.audioTemperature]), [1]),
-      audio_topk: new ort.Tensor('int64', big([opts.audioTopK > 0 ? opts.audioTopK : this.codebookSize]), [1]),
+      audio_topk: i64([opts.audioTopK > 0 ? opts.audioTopK : this.codebookSize], [1]),
       audio_topp: new ort.Tensor('float32', Float32Array.from([opts.audioTopP]), [1]),
       audio_repetition_penalty: new ort.Tensor('float32',
         Float32Array.from([opts.audioRepetitionPenalty]), [1]),
@@ -200,7 +230,8 @@ export class ZeroTTSBrowser {
       cfg_scale: new ort.Tensor('float32', Float32Array.from([opts.cfgScale]), [1]),
     });
 
-    const codes = outputs.codes.data as BigInt64Array;
+    // Coerced, not cast: this value is fed straight back in as frame_codes.
+    const codes = toBigInt64(outputs.codes.data as ArrayLike<number | bigint>);
     // The graph cannot carry a variable-length history, so the caller maintains
     // the repetition-penalty mask.
     for (let c = 0; c < K; c++) {
