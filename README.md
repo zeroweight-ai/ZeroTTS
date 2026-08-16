@@ -4,7 +4,7 @@
 
 # ZeroTTS
 
-### Ultra-natural Vietnamese speech, cloned from seconds of audio — streaming, real-time on a CPU
+### Vietnamese Zero-Shot Text-to-Speech (TTS) with real-time streaming and voice cloning from seconds of audio. Fast, natural, and optimised for CPU inference.
 
 [![PyPI](https://img.shields.io/pypi/v/zerotts?color=3775AB)](https://pypi.org/project/zerotts/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -170,8 +170,11 @@ audio = tts.synthesize("…", voice=my_latents)
 ## Benchmarks
 
 Measured on **[ZeroBench-TTS](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)** —
-137 items, 59 held-out reference voices × 4 subsets — against the two public
-Vietnamese XTTS-v2 finetunes. 137/137 scored, 0 empty generations.
+137 items, 59 held-out reference voices × 4 subsets — against
+[OmniVoice](https://huggingface.co/k2-fsa/OmniVoice) and the two public
+Vietnamese XTTS-v2 finetunes. 137/137 scored for every system, 0 empty
+generations. OmniVoice is given its optional `language="vi"` hint, which its
+model card recommends and which measurably helps it.
 
 **Scored by the benchmark, not by us.** ZeroTTS synthesizes the clips and hands
 them to `zerobench_eval`, the official scorer published inside the benchmark
@@ -190,31 +193,32 @@ reading on 34 of the 35 items that need normalization. Neither baseline ships a
 Vietnamese frontend at all, which is why the raw-text table below is so much
 harsher on them.
 
-| | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
-|---|:-:|:-:|:-:|
-| **WER** ↓ | **0.56 %** | 7.27 % | 8.61 % |
-| **Naturalness** (UTMOS) ↑ | **2.91** | 2.49 | 2.34 |
-| **Voice similarity** (SSIM) ↑ | 0.938 | **0.941** | 0.935 |
-| **Dead air** (excess silence) ↓ | **0.029 s** | 0.568 s | 0.215 s |
+| | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
+|---|:-:|:-:|:-:|:-:|
+| **WER** ↓ | **0.56 %** | 2.12 % | 7.27 % | 8.61 % |
+| **Naturalness** (UTMOS) ↑ | **2.91** | 2.75 | 2.49 | 2.34 |
+| **Voice similarity** (SSIM) ↑ | 0.938 | **0.951** | 0.941 | 0.935 |
+| **Dead air** (excess silence) ↓ | **0.029 s** | 0.386 s | 0.568 s | 0.215 s |
+| Size | **81 M**, CPU | 3.1 GB, GPU | 1.9 GB, GPU | 1.9 GB, GPU |
 
-**13× fewer word errors**, ~0.4 MOS more natural, an order of magnitude less
-dead air. Median WER is **0.00 %** on all four subsets — the typical generation
-is transcribed exactly. (Every figure in this table is from the same
-normalized-text runs, so the rows are mutually consistent; the raw-text runs
-move UTMOS/SSIM/silence by less than the noise floor.)
+**4× fewer word errors than the next-best system**, ~0.2 MOS more natural, an
+order of magnitude less dead air — from a model small enough to run real-time
+on a laptop CPU. Median WER is **0.00 %** on all four subsets: the typical
+generation is transcribed exactly. (Every figure is from the same
+normalized-text runs, so the rows are mutually consistent.)
 
 ### WER — normalized text
 
 The headline condition: numbers and dates already spoken out, as the shipped
 normalizer produces.
 
-| Subset | what it tests | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
-|---|---|:-:|:-:|:-:|
-| `vietnamese` | monolingual Vietnamese | **0.21 %** | 7.21 % | 7.54 % |
-| `code_switch` | Vietnamese + embedded English | **0.95 %** | 10.14 % | 5.86 % |
-| `cross_lingual` | foreign voice prompt → Vietnamese | **0.38 %** | 4.94 % | 6.61 % |
-| `challenging` | acronyms, dates, %, currency | **0.61 %** | 5.63 % | 13.44 % |
-| **overall** | | **0.56 %** | **7.27 %** | **8.61 %** |
+| Subset | what it tests | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
+|---|---|:-:|:-:|:-:|:-:|
+| `vietnamese` | monolingual Vietnamese | **0.21 %** | 0.50 % | 7.21 % | 7.54 % |
+| `code_switch` | Vietnamese + embedded English | 0.95 % | **0.46 %** | 10.14 % | 5.86 % |
+| `cross_lingual` | foreign voice prompt → Vietnamese | **0.38 %** | 9.60 % | 4.94 % | 6.61 % |
+| `challenging` | acronyms, dates, %, currency | **0.61 %** | 1.56 % | 5.63 % | 13.44 % |
+| **overall** | | **0.56 %** | **2.12 %** | **7.27 %** | **8.61 %** |
 
 ### WER — raw text
 
@@ -222,37 +226,50 @@ The harder condition: the model is handed `31/12/2025` and `ChatGPT` verbatim
 and has to read them itself, with no normalizer in front. This is what a system
 with no Vietnamese text frontend faces.
 
-| Subset | what it tests | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
-|---|---|:-:|:-:|:-:|
-| `vietnamese` | monolingual Vietnamese | **0.16 %** | 7.92 % | 9.56 % |
-| `code_switch` | Vietnamese + embedded English | **0.97 %** | 10.94 % | 9.25 % |
-| `cross_lingual` | foreign voice prompt → Vietnamese | **1.42 %** | 21.37 % | 27.27 % |
-| `challenging` | acronyms, dates, %, currency | **1.75 %** | 27.86 % | 31.85 % |
-| **overall** | | **1.03 %** | **16.42 %** | **18.40 %** |
+| Subset | what it tests | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
+|---|---|:-:|:-:|:-:|:-:|
+| `vietnamese` | monolingual Vietnamese | **0.16 %** | 0.50 % | 7.92 % | 9.56 % |
+| `code_switch` | Vietnamese + embedded English | 0.97 % | **0.46 %** | 10.94 % | 9.25 % |
+| `cross_lingual` | foreign voice prompt → Vietnamese | **1.42 %** | 17.71 % | 21.37 % | 27.27 % |
+| `challenging` | acronyms, dates, %, currency | **1.75 %** | 4.46 % | 27.86 % | 31.85 % |
+| **overall** | | **1.03 %** | **4.13 %** | **16.42 %** | **18.40 %** |
 
 **Reading these fairly:**
 
-* **Normalization is where the baselines gain most, and we still win.** Their
-  tokenizers genuinely have no Vietnamese number expansion, so raw text punishes
-  them hard (`challenging` 27.86 %) and the normalized column is the fairest
-  comparison available — it improves XTTS 2.3× and viXTTS 2.1×, against 1.8× for
-  us. The gap narrows from 16× to 13× and stops there, because what remains is
-  the acoustic model.
+* **OmniVoice beats us on two things, and they are worth naming.** Its speaker
+  similarity is the best of the four (0.951 vs our 0.938), and on `code_switch`
+  it is roughly half our error rate (0.46 % vs 0.95 %). If cloning fidelity or
+  English-in-Vietnamese is your priority, it is a genuinely strong option — at
+  3.1 GB on a GPU.
+* **OmniVoice's overall figure is dominated by one subset.** `cross_lingual`
+  (foreign voice prompt, Vietnamese text) costs it 17.71 % raw against our
+  1.42 %, and it is language-dependent — German 0.00 %, Korean 0.13 %, Japanese
+  0.41 %. Excluding that subset it lands near 1.7 % raw. Both ASRs agree the
+  audio genuinely degrades there, so it is the model, not the scorer.
+* **Normalization is where the weakest systems gain most, and the order does not
+  change.** The XTTS tokenizers have no Vietnamese number expansion, so raw text
+  punishes them hard (`challenging` 27.86 %) and the normalized column is the
+  fairest comparison available — it improves XTTS 2.3× and viXTTS 2.1×, against
+  1.8× for us. What remains is the acoustic model.
 * **`vietnamese` barely moves for anyone** (0.16 % → 0.21 % for ZeroTTS). It has
   no digits or acronyms, so there is nothing to normalize — which is the control
   showing the other subsets' gains are real and not a scoring artifact.
-* **Voice similarity is a tie, not a win.** 0.936 / 0.940 / 0.935 is within
-  noise. On `cross_lingual` ZeroTTS is genuinely behind (0.911 vs ~0.935): it
-  carries a foreign speaker's timbre into Vietnamese slightly less faithfully,
-  while winning that subset's WER by 15×.
+* **On `cross_lingual` our voice similarity is the weak spot** (0.911 vs
+  ~0.935 for the others): ZeroTTS carries a foreign speaker's timbre into
+  Vietnamese slightly less faithfully, while winning that subset's WER by 12×.
 * **The WER definition matters more than the WER.** ZeroBench scores every clip
   with **two ASRs** (`whisper-large-v3` + `PhoWhisper-large`, min taken — neither
   can judge Vietnamese code-switch TTS alone) against **every acceptable
-  reading** of the target text. Its test suite pins the policy in both
-  directions: format artifacts must score 0, real defects must still cost.
+  reading** of the target text, so a system is never charged for an ASR's
+  choice between "31/12/2025" and "ba mươi mốt tháng mười hai". Its test suite
+  pins that in both directions: format differences must score 0, real
+  mispronunciations must still cost.
 * **Our remaining errors are published, not hidden.** Every item scoring above
-  0.00 is audited in [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — mostly voiced
-  leading zeros in dates and `W`/`H` acronym letter names.
+  0.00 is audited in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). The two recurring
+  ones: a leading zero read aloud (`18/04` → "tháng **không** tư"), and the
+  letters `W` and `H` coming out wrong when an acronym has to be spelled —
+  `WHO` should be spelled out letter by letter, and instead comes out as
+  something like "Hall".
 
 Reproduce, or score your own system:
 
