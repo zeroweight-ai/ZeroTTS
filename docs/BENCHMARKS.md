@@ -1,141 +1,181 @@
 # Benchmarks
 
-Full results behind the summary table in the [README](../README.md).
+Full results for ZeroTTS on
+**[ZeroBench-TTS](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)** —
+137 items, 59 held-out reference voices × 4 subsets. Headline tables are in the
+[README](../README.md#benchmarks); this page is the detail.
 
-## Setup
+## How scoring works
 
-| | |
+**Nothing in this repo computes a metric.** `evaluation/run_benchmark.py`
+synthesizes the 137 clips and hands them to `zerobench_eval`, the official
+scorer published inside the benchmark dataset repo and fetched automatically by
+`evaluation/zerobench.py`.
+
+That split is the point: a scorer vendored into the repo of the model being
+scored can drift from the benchmark's — silently, and always in the flattering
+direction. The same code scores ZeroTTS and everything it is compared against,
+and you can run it on any system without touching this repo.
+
+The scorer's definition, in brief:
+
+* **WER** — the minimum over **two ASRs**
+  ([`whisper-large-v3`](https://huggingface.co/openai/whisper-large-v3) and
+  [`PhoWhisper-large`](https://huggingface.co/vinai/PhoWhisper-large)) and over
+  **every acceptable reading** of the target text. Neither ASR can judge
+  Vietnamese TTS alone: PhoWhisper cannot emit Latin script and re-spells
+  embedded English phonetically ("Slack" → "sờ lếch"), while whisper-large-v3 is
+  weaker on Vietnamese tone. References are expanded per surface span, so
+  `31/12/2025` / "ba mốt tháng mười hai" / "31 tháng 12, 2025" all score 0 —
+  but tone-only differences (`sảnh` → `sành`) stay errors, because Vietnamese
+  tone is phonemic.
+* **SSIM** — WavLM-base-plus-sv x-vector cosine vs. the reference clip.
+* **UTMOS** — UTMOSv2 naturalness MOS (seeded, so it is reproducible).
+* **Excess silence** — unwanted lead-in / tail / mid-utterance pause, in seconds.
+  Nothing else catches dead air: an ASR happily transcribes a clip that opens
+  with 1.5 s of nothing.
+
+Three reference policies are reported on every run, so you can see how much of a
+number is scoring policy rather than synthesis:
+
+| policy | references |
 |---|---|
-| Benchmark | [`zeroweight-ai/ZeroBench-TTS`](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS) — 137 items, 59 held-out reference voices × 4 subsets |
-| WER | [`vinai/PhoWhisper-large`](https://huggingface.co/vinai/PhoWhisper-large) — a Vietnamese-specialized Whisper finetune |
-| SSIM | `microsoft/wavlm-base-plus-sv` x-vector cosine, generated vs. reference clip |
-| UTMOS | UTMOSv2 naturalness MOS |
-| Excess silence | leading + trailing + long mid-utterance pauses, in seconds |
-| Coverage | 137/137 scored, 0 empty generations, for every model |
+| `strict` | the written text, verbatim |
+| `norm` | + the benchmark's curated spoken-out form |
+| `robust` | + every acceptable reading — **the headline** |
 
-**Why PhoWhisper and not `whisper-large-v3`.** Raw Whisper is noticeably weaker on
-Vietnamese, so scoring with it measures the ASR as much as the TTS system, and it
-compresses the differences between models. Numbers here are therefore *not*
-comparable to any published with `whisper-large-v3`.
-
-**The two WER columns.** Every model is scored twice:
-
-* **as-is** — WER is the minimum over the written `text` and the benchmark's
-  hand-curated `text_normalized`, where one exists. Whisper is free to emit
-  either "3,2%" or "ba phẩy hai phần trăm", and that choice is the ASR's, not the
-  TTS model's; penalizing one would measure the ASR's formatting policy.
-* **+vinorm** — adds a third accepted reference:
-  [`soe-vinorm`](https://pypi.org/project/soe-vinorm/)'s automatic spoken-out
-  normalization of the written text.
-
-The `+vinorm` column exists to test a specific objection to this comparison —
-that XTTS's stock tokenizer has no Vietnamese number/symbol expansion, so the
-`challenging` gap reflects a missing frontend rather than the model. See
-[Interpretation](#interpretation).
-
-**ZeroTTS sampling** — the package defaults, so out-of-the-box output matches
-these scores: `cfg_scale=1.0`, `audio_temperature=0.8`, `audio_topk=25`,
-`audio_topp=0.95`, `audio_repetition_penalty=1.2`, `eoa_extra_frames=1`.
+Full rationale, and the test suite that pins the policy in both directions, are
+in the [benchmark README](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS).
 
 ## Overall (n = 137)
 
-| Model | WER as-is | WER +vinorm | WER median | SSIM | UTMOS | Excess silence (s) |
-|---|---|---|---|---|---|---|
-| **ZeroTTS** | **5.09%** | **4.51%** | **0.00%** | 0.936 | **2.95** | **0.029** |
-| XTTS-v2-vietnamse | 21.49% | 21.16% | 5.56% | **0.940** | 2.36 | 0.532 |
-| viXTTS | 25.13% | 24.92% | 13.51% | 0.935 | 2.35 | 0.233 |
+| Model | WER strict | WER norm | **WER robust** | median | SSIM | UTMOS | Excess silence |
+|---|---|---|---|---|---|---|---|
+| **ZeroTTS** | **5.26 %** | **2.96 %** | **1.03 %** | **0.00 %** | 0.936 | **2.91** | **0.029 s** |
+| XTTS-v2-vietnamse | 18.83 % | 17.82 % | 16.42 % | 2.13 % | **0.940** | 2.43 | 0.532 s |
+| viXTTS | 20.22 % | 19.47 % | 18.40 % | 6.38 % | 0.935 | 2.35 | 0.233 s |
+
+Note the asymmetry between policies: ZeroTTS drops 5.1× from `strict` to
+`robust`, the baselines only 1.15×. Most of ZeroTTS's residual was formatting;
+theirs is hallucinated and garbled speech, which no reference policy can excuse.
 
 ## Per subset
 
-## ZeroTTS breakdowns
+WER, `robust` policy:
 
-By text length (as-is):
+| Subset | n | ZeroTTS | XTTS-v2-vietnamse | viXTTS |
+|---|---|---|---|---|
+| `vietnamese` — monolingual | 39 | **0.16 %** | 7.92 % | 9.56 % |
+| `code_switch` — vi + English | 39 | **0.97 %** | 10.94 % | 9.25 % |
+| `cross_lingual` — foreign voice, vi text | 20 | **1.42 %** | 21.37 % | 27.27 % |
+| `challenging` — acronyms, dates, % | 39 | **1.75 %** | 27.86 % | 31.85 % |
 
-| Bucket | n | WER |
-|---|---|---|
-| short | 46 | 7.79% |
-| medium | 46 | 3.24% |
-| long | 45 | 4.21% |
+Other metrics:
 
-Short texts score worst for every system in the comparison. A single misheard
-word is a larger fraction of a short reference, so this is partly a property of
-the metric rather than of the model.
+| Subset | n | ZeroTTS SSIM / UTMOS / silence | XTTS-v2-vietnamse | viXTTS |
+|---|---|---|---|---|
+| `vietnamese` | 39 | 0.936 / 2.84 / 0.027 s | 0.935 / 2.46 / 0.580 s | 0.933 / 2.30 / 0.218 s |
+| `code_switch` | 39 | 0.945 / 2.95 / 0.030 s | 0.946 / 2.44 / 0.448 s | 0.939 / 2.42 / 0.221 s |
+| `cross_lingual` | 20 | 0.911 / 3.02 / 0.014 s | 0.936 / 2.38 / 0.457 s | 0.935 / 2.45 / 0.207 s |
+| `challenging` | 39 | 0.941 / 2.90 / 0.037 s | 0.939 / 2.43 / 0.606 s | 0.933 / 2.28 / 0.272 s |
 
-By reference-voice source (as-is):
+## Text-normalization ablation
 
-| Source | n | WER | SSIM |
+Feed every model the spoken-out `text_normalized` instead of raw orthography
+(`SYNTH_FROM=text_normalized`). This simulates a perfect Vietnamese
+text-normalization frontend and separates grapheme-to-spoken-form errors from
+acoustic ones. Scoring references are unchanged, so the two columns are
+directly comparable.
+
+| Model | raw text | pre-normalized | change |
 |---|---|---|---|
-| VIVOS | 57 | 3.65% | 0.929 |
-| viVoice | 30 | 5.23% | 0.939 |
-| phoaudiobook | 30 | 7.03% | 0.962 |
-| Emilia (non-Vietnamese) | 20 | 6.05% | 0.911 |
+| **ZeroTTS** | **1.03 %** | **0.56 %** | −46 % |
+| XTTS-v2-vietnamse | 16.42 % | 7.27 % | −56 % |
+| viXTTS | 18.40 % | 8.61 % | −53 % |
 
-## Repetition-penalty ablation
+Per subset, `robust` WER, raw → pre-normalized:
 
-Why `audio_repetition_penalty` defaults to 1.2 (ZeroTTS, n=137):
+| Subset | ZeroTTS | XTTS-v2-vietnamse | viXTTS |
+|---|---|---|---|
+| `vietnamese` | 0.16 % → 0.21 % | 7.92 % → 7.21 % | 9.56 % → 7.54 % |
+| `code_switch` | 0.97 % → 0.95 % | 10.94 % → 10.14 % | 9.25 % → 5.86 % |
+| `cross_lingual` | 1.42 % → 0.38 % | 21.37 % → 4.94 % | 27.27 % → 6.61 % |
+| `challenging` | 1.75 % → 0.61 % | 27.86 % → 5.63 % | 31.85 % → 13.44 % |
 
-| rp | WER as-is | WER +vinorm | SSIM | UTMOS | Excess silence (s) |
-|---|---|---|---|---|---|
-| **1.2** (default) | **5.09%** | **4.51%** | 0.936 | 2.95 | **0.029** |
-| 1.0 | 5.90% | 5.33% | 0.936 | 2.94 | 0.040 |
+`vietnamese` is the control — no digits, acronyms or English, so normalization
+has nothing to do, and nothing moves. The gains land exactly where the text
+needs expanding.
 
-About 0.8 pp of WER and a third less dead air, at no cost to voice similarity or
-naturalness.
+This is the strongest form of the objection "the baselines just lack a
+Vietnamese text frontend", and it does not hold: they gain the most and still
+lose by 13–15×, so the remaining gap is the acoustic model.
+
+## ZeroTTS's remaining errors
+
+110 of 137 items are transcribed exactly; median WER is 0.00 % on all four
+subsets and the worst single item is 0.143. Every item above 0.00 was audited by
+transcribing it with both ASRs and asking whether they agree:
+
+| Verdict | Items |
+|---|---|
+| Real synthesis defect (both ASRs converge on the same wrong output) | 20 |
+| ASR spelling disagreement (audio intelligible, no two transcripts agree) | 7 |
+| Benchmark artifact | 0 |
+
+Three failure families account for nearly all of it:
+
+1. **Voiced leading zeros in dates** — `18/04` → "tháng **không** tư",
+   `01/07` → "ngày **không** một". Five items across four voices, so it is the
+   text frontend, not sampling. The largest remaining family.
+2. **Latin acronyms containing W or H** — `WHO` → "Hall"/"Hồ"/"BTHO",
+   `WTO` → "NETW". `VN`, `GDP`, `UNESCO`, `UNICEF`, `ASEAN` are all fine; the
+   failure is specific to the Vietnamese letter names for `W` and `H`.
+3. **Tone errors on low-frequency syllables** — `sảnh` → `sành`,
+   `bỏ dở` → `bỏ giờ`, `nhàu` → `nhau`. The part a native listener notices
+   first, and the only family that is genuinely acoustic.
+
+Families 1 and 2 are grapheme-to-spoken-form bugs, which is why the ablation
+above halves the total. Notably absent: no hallucinated tails, loops, drift, or
+truncation — the failure modes that dominate both XTTS baselines' worst cases.
 
 ## Interpretation
 
-**Intelligibility.** ZeroTTS leads on every subset, by 4–7× on `vietnamese`,
-`cross_lingual` and `challenging`. Its median WER is 0.00% on three of four
-subsets — the typical generation is transcribed exactly.
-
-**The text-normalization objection, tested.** XTTS's stock tokenizer genuinely has
-no Vietnamese number/symbol expansion. If that were the explanation for the
-`challenging` gap, supplying the expansion on the scoring side should close it.
-It does not: XTTS-v2-vietnamse moves 35.50% → 34.43%, viXTTS 41.68% → 40.93% —
-roughly a point each, both still above 34% against ZeroTTS's 6.90%. The gap is
-the model, not the frontend.
-
-As a sanity check on the `+vinorm` reference itself: ZeroTTS gains where it
-should (`challenging`, 8.86% → 6.90%) and is unchanged where there is nothing to
-normalize (`vietnamese`, 0.16% → 0.16%). It is not simply loosening the metric
-everywhere.
-
-**Voice similarity is a tie, and one subset is a loss.** Overall SSIM is
-0.936 / 0.940 / 0.935 — within noise. On `cross_lingual` ZeroTTS is genuinely
-behind (0.911 vs ~0.935): it carries a foreign speaker's timbre into Vietnamese
-less faithfully than the XTTS backbone, while still winning that subset's WER by
-5×.
-
-**Silence hygiene.** Both XTTS finetunes carry 0.21–0.61 s of excess silence per
-clip against ZeroTTS's 0.014–0.037 s — lead-in and tail padding from the XTTS
-decoder, which neither Vietnamese finetune addressed.
-
-**Baseline caveat.** Both XTTS models ran through `coqui-tts` 0.27.5 (the
-maintained fork of the abandoned `TTS` package) and needed two runtime patches to
-work at all under a modern torch/transformers stack. Those patches are in the
-eval harness and touch only the baselines.
+* **Voice similarity is a tie, not a win.** 0.936 / 0.940 / 0.935 is within
+  noise. On `cross_lingual` ZeroTTS is genuinely behind (0.911 vs ~0.935): it
+  carries a foreign speaker's timbre into Vietnamese slightly less faithfully,
+  while winning that subset's WER by 15×.
+* **Both XTTS finetunes carry far more dead air** (0.23–0.53 s vs 0.029 s) —
+  lead-in/tail padding from XTTS's decoder.
+* **Reproducibility.** ZeroTTS inference is seeded; re-running the whole
+  benchmark from scratch reproduced these WER figures exactly at every policy.
 
 ## Reproducing
 
 ```bash
 pip install "zerotts[eval]"
 
-# generate + score, as-is
-BENCHMARK=zeroweight-ai/ZeroBench-TTS \
-MODEL=zerotts:zeroweight-ai/ZeroTTS \
-OUT_DIR=./eval/zerotts_asis \
+# synthesize + score (the scorer is fetched from the benchmark repo)
 ./evaluation/run_benchmark.sh
 
-# re-score the SAME wavs with the vinorm reference — no re-synthesis
-USE_VINORM=1 SKIP_EXISTING=1 \
-BENCHMARK=zeroweight-ai/ZeroBench-TTS \
-MODEL=zerotts:zeroweight-ai/ZeroTTS \
-OUT_DIR=./eval/zerotts_vinorm \
-./evaluation/run_benchmark.sh
+# or explicitly
+python evaluation/run_benchmark.py \
+    --benchmark zeroweight-ai/ZeroBench-TTS \
+    --model zerotts:zeroweight-ai/ZeroTTS \
+    --out_dir ./eval/zerotts
+
+# the text-normalization ablation
+SYNTH_FROM=text_normalized OUT_DIR=./eval/zerotts_norm ./evaluation/run_benchmark.sh
+
+# baselines (needs `pip install coqui-tts`)
+MODEL=xtts:thivux/XTTS-v2-vietnamse OUT_DIR=./eval/xtts_vi ./evaluation/run_benchmark.sh
+MODEL=xtts:capleaf/viXTTS           OUT_DIR=./eval/vixtts  ./evaluation/run_benchmark.sh
 ```
 
-Swap `MODEL=xtts:thivux/XTTS-v2-vietnamse` or `MODEL=xtts:capleaf/viXTTS` for the
-baselines (needs `pip install coqui-tts`).
+Already have wavs from some other system? Skip this repo entirely:
 
-The `eval` extra installs PyTorch — the scorers are torch models. ZeroTTS
-inference itself never needs it.
+```bash
+huggingface-cli download zeroweight-ai/ZeroBench-TTS --repo-type dataset --local-dir ZeroBench-TTS
+cd ZeroBench-TTS && pip install -r zerobench_eval/requirements.txt
+python -m zerobench_eval manifest --out manifest.jsonl    # what to synthesize
+python -m zerobench_eval score --wav_dir my_wavs/ --name MyModel
+```
