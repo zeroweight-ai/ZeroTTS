@@ -5085,11 +5085,11 @@
 },
 {
 "in": "Mã đơn hàng là AB-1234.",
-"expected": "Mã đơn hàng là AB 1234."
+"expected": "Mã đơn hàng là AB 1 2 3 4."
 },
 {
 "in": "Chuyến bay VN-215.",
-"expected": "Chuyến bay VN 215."
+"expected": "Chuyến bay VN 2 1 5."
 },
 {
 "in": "TTSModel mới.",

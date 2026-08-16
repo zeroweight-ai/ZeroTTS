@@ -162,14 +162,13 @@ def test_date_survives_sentence_final_period(text, expected):
 
 
 @pytest.mark.parametrize("text,expected", [
-    # Alphanumeric identifiers: the letters split off as their own word so the
-    # model spells them, and the digits are not read as a quantity ("AB-1234"
-    # was becoming "AB-một nghìn hai trăm ba mươi tư"). No spacing between
-    # letters — a capitalised run is already enough.
-    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là AB 1234."),
+    # Alphanumeric identifiers: letters joined (a capitalised run is enough for
+    # the model to spell), digits spaced so they are read one at a time.
+    # "AB-1234" was becoming the quantity "AB-một nghìn hai trăm ba mươi tư".
+    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là AB 1 2 3 4."),
     # ... and the letter half must not go through the abbreviation table, which
     # turned the flight code VN-215 into "Việt Nam-hai trăm mười lăm".
-    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay VN 215 khởi hành."),
+    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay VN 2 1 5 khởi hành."),
 ])
 def test_alphanumeric_codes_are_spelled_not_counted(text, expected):
     assert N(text) == expected

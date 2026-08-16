@@ -542,10 +542,11 @@ def _expand_match(match: re.Match) -> str:
         return g["ap"]
 
     if g["code_a"] is not None:
-        # An identifier, not a quantity. Split the letters off as their own
-        # word so the model spells them; the digits stay a single run.
-        # "AB-1234" -> "AB 1234", "VN-215" -> "VN 215".
-        return f"{spell_letters(g['code_a'])} {g['code_n']}"
+        # An identifier, not a quantity. The letters stay joined — a capitalised
+        # run is enough for the model to spell them — but the digits are spaced
+        # so they are read one at a time: "AB-1234" -> "AB 1 2 3 4", never the
+        # quantity "một nghìn hai trăm ba mươi tư".
+        return f"{spell_letters(g['code_a'])} {' '.join(g['code_n'])}"
 
     if g["deg_n"] is not None:
         unit = {"C": " xê", "F": " ép"}.get(g["deg_u"] or "", "")

@@ -353,9 +353,10 @@ function expandMatch(m: RegExpExecArray): string {
   if (g.pfx !== undefined) return expandAbbreviation(g.pfx) ?? g.pfx;
   if (g.ap !== undefined) return g.ap;
   if (g.code_a !== undefined) {
-    // Split the letters off as their own word so the model spells them; the
-    // digits stay a single run. "AB-1234" -> "AB 1234".
-    return `${spellLetters(g.code_a)} ${g.code_n!}`;
+    // The letters stay joined — a capitalised run is enough for the model to
+    // spell them — but the digits are spaced so they are read one at a time:
+    // "AB-1234" -> "AB 1 2 3 4", never "một nghìn hai trăm ba mươi tư".
+    return `${spellLetters(g.code_a)} ${g.code_n!.split('').join(' ')}`;
   }
   if (g.deg_n !== undefined) {
     const unit = g.deg_u === 'C' ? ' xê' : g.deg_u === 'F' ? ' ép' : '';
