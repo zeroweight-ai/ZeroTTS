@@ -180,9 +180,15 @@ dataset repo. Nothing in this repo computes a metric.
 ### Headline
 
 Every system reads **normalized text** — dates, numbers and acronyms already
-spoken out. That is how ZeroTTS actually runs: `normalize_vi_text` ships in the
-package and is applied by default (see [Usage](#usage)), so this is deployed
-performance, and every baseline is handed exactly the same input.
+spoken out, from the benchmark's own curated reading. Every system gets exactly
+the same input, so the comparison is like-for-like.
+
+This is the condition a Vietnamese TTS system meets in production, where a text
+frontend runs ahead of the model. ZeroTTS ships one — `normalize_vi_text`,
+applied by default (see [Usage](#usage)) — which reaches the benchmark's reading
+on 27 of the 35 items that need normalization; the remaining gaps are date
+separators and alphanumeric codes. Neither baseline ships a Vietnamese frontend
+at all, which is why the raw-text table below is so much harsher on them.
 
 | | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
 |---|:-:|:-:|:-:|
