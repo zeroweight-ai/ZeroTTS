@@ -12,6 +12,37 @@ it and it measurably helps — without it OmniVoice scores 5.15 % raw / 3.87 %
 normalized instead of 4.13 % / 2.12 %, because the model otherwise infers the
 language from the reference clip, which is wrong on `cross_lingual`.
 
+## Speed — CPU
+
+RTF (realtime factor, wall-clock synthesis time ÷ output audio duration —
+lower is faster; below 1× is faster than real time) and time-to-first-audio,
+all measured **on CPU**, single request, 8 inference threads pinned to a
+dedicated core pool (no other synthesis running concurrently). Three
+Vietnamese samples — short (26 chars), medium (77 chars), long (227 chars) —
+each run 6 times with the first 2 (cold-cache) discarded; figures below are
+the mean of the remaining 4.
+
+| | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
+|---|:-:|:-:|:-:|:-:|
+| RTF — short | **0.51×** | 10.87× | 0.70× | 0.71× |
+| RTF — medium | **0.47×** | 4.82× | 0.70× | 0.70× |
+| RTF — long | **0.53×** | 2.67× | 0.71× | 0.78× |
+| TTFA — short | **53 ms** | 21.7 s | 4.02 s | 2.45 s |
+| TTFA — medium | **66 ms** | 28.9 s | 4.02 s | 3.72 s |
+| TTFA — long | **89 ms** | 52.3 s | 10.3 s | 9.22 s |
+
+ZeroTTS's time-to-first-audio comes from its real streaming path
+(`synthesize_stream`/the `timing` arg to `synthesize`) — first audio frame,
+not first full utterance. The three baselines have no working CPU streaming
+path in this environment (OmniVoice's `generate()` returns the whole clip at
+once; `coqui-tts`'s `inference_stream` throws against this stack's
+`transformers` version — a compatibility break, not a deliberate limitation),
+so their TTFA is the time to the complete utterance. That asymmetry is real
+and worth naming, but it isn't the whole story: even OmniVoice's RTF —
+generation time alone, no streaming involved — is 3-11× slower than real time
+on CPU, because it's a GPU-sized model (3.1 GB vs. ZeroTTS's 81 M) doing
+autoregressive diffusion-LM decoding without CUDA kernels to lean on.
+
 ## How scoring works
 
 **Nothing in this repo computes a metric.** `evaluation/run_benchmark.py`
@@ -123,38 +154,6 @@ lose by 13×, so the remaining gap is the acoustic model.
 | `code_switch` | 39 | 0.945 / 2.95 / 0.030 s | 0.955 / 2.76 / 0.350 s | 0.946 / 2.44 / 0.448 s | 0.939 / 2.42 / 0.221 s |
 | `cross_lingual` | 20 | 0.911 / 3.02 / 0.014 s | 0.948 / 2.90 / 0.274 s | 0.936 / 2.38 / 0.457 s | 0.935 / 2.45 / 0.207 s |
 | `challenging` | 39 | 0.941 / 2.90 / 0.037 s | 0.949 / 2.74 / 0.412 s | 0.939 / 2.43 / 0.606 s | 0.933 / 2.28 / 0.272 s |
-
-## ZeroTTS's remaining errors
-
-110 of 137 items are transcribed exactly; median WER is 0.00 % on all four
-subsets and the worst single item is 0.143. Every item above 0.00 was audited by
-transcribing it with both ASRs and asking whether they agree:
-
-| Verdict | Items |
-|---|---|
-| Real synthesis defect (both ASRs converge on the same wrong output) | 20 |
-| ASR spelling disagreement (audio intelligible, no two transcripts agree) | 7 |
-| Benchmark artifact | 0 |
-
-Three failure families account for nearly all of it:
-
-1. **Voiced leading zeros in dates** — `18/04` → "tháng **không** tư",
-   `01/07` → "ngày **không** một". Five items across four voices, so it is the
-   text frontend, not sampling. The largest remaining family.
-2. **Acronyms containing `W` or `H` are not spelled correctly.** An acronym
-   like `WHO` has to be read out letter by letter — "vê hát ô", or the English
-   letter names, or the translated organisation name. All three are accepted.
-   Instead the model slurs the letters into a single non-word: the ASRs hear
-   "Hall", "Hồ" or "BTHO" rather than three distinct letters, and `WTO` comes
-   out as "NETW". `VN`, `GDP`, `UNESCO`, `UNICEF` and `ASEAN` all spell
-   correctly, so the defect is specific to `W` and `H`.
-3. **Tone errors on low-frequency syllables** — `sảnh` → `sành`,
-   `bỏ dở` → `bỏ giờ`, `nhàu` → `nhau`. The part a native listener notices
-   first, and the only family that is genuinely acoustic.
-
-Families 1 and 2 are grapheme-to-spoken-form bugs, which is why the ablation
-above halves the total. Notably absent: no hallucinated tails, loops, drift, or
-truncation — the failure modes that dominate both XTTS baselines' worst cases.
 
 ## Interpretation
 

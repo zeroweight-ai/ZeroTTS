@@ -30,7 +30,7 @@ REPO_ID = "zeroweight-ai/ZeroBench-TTS"
 _PATTERNS = ["zerobench_eval/*", "metadata.jsonl", "voices.jsonl", "audio/*"]
 
 
-def ensure_zerobench(local_dir: "str | None" = None) -> Path:
+def ensure_zerobench(local_dir: str | None = None) -> Path:
     """Return the directory containing ``zerobench_eval/``, importable on exit."""
     if local_dir:
         root = Path(local_dir).resolve()
