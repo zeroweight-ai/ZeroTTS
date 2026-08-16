@@ -162,12 +162,14 @@ def test_date_survives_sentence_final_period(text, expected):
 
 
 @pytest.mark.parametrize("text,expected", [
-    # Alphanumeric identifiers are spelled, not read as quantities: "AB-1234"
-    # was becoming "AB-một nghìn hai trăm ba mươi tư".
-    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là a bê một hai ba bốn."),
+    # Alphanumeric identifiers are spaced out, not read as quantities:
+    # "AB-1234" was becoming "AB-một nghìn hai trăm ba mươi tư". Letters stay
+    # capitals — the model spells them; a Vietnamese letter-name table would be
+    # a second thing to get wrong.
+    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là A B 1 2 3 4."),
     # ... and the letter half must not go through the abbreviation table, which
     # turned the flight code VN-215 into "Việt Nam-hai trăm mười lăm".
-    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay vê en hai một năm khởi hành."),
+    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay V N 2 1 5 khởi hành."),
 ])
 def test_alphanumeric_codes_are_spelled_not_counted(text, expected):
     assert N(text) == expected
@@ -185,9 +187,14 @@ def test_roman_numeral_after_ordinal_cue():
     assert "ba" not in N("Nhóm III họp.").split()[1]
 
 
-def test_acronym_pair_over_slash():
-    # Two abbreviations matched separately and left the '/' to be read aloud.
-    assert N("Tỷ giá USD/VND cao.") == "Tỷ giá đô la mỹ trên đồng Việt Nam cao."
+def test_acronym_pair_over_slash_is_left_verbatim():
+    # Each side used to expand separately ("đô la mỹ/việt nam đồng"), inventing
+    # a reading worse than the source. The model says "USD/VND" fine as written.
+    assert N("Tỷ giá USD/VND cao.") == "Tỷ giá USD/VND cao."
+    # A one-letter side counts too, or "KM" expands to "khuyến mại".
+    assert N("Tốc độ 60 KM/H.") == "Tốc độ sáu mươi KM/H."
+    # A lone acronym still expands — only the paired form is held back.
+    assert N("Giá 100 USD.") == "Giá một trăm đô la mỹ."
 
 
 def test_prefix_abbreviation_keeps_its_dot_out_of_the_sentence():
@@ -204,4 +211,4 @@ def test_coordinated_day_shares_the_month():
 
 def test_parenthesized_acronym_after_its_own_expansion_is_spelled():
     assert N("Tổ chức Thương mại Thế giới (WTO) dự báo.") == (
-        "Tổ chức Thương mại Thế giới (vê kép tê ô) dự báo.")
+        "Tổ chức Thương mại Thế giới (W T O) dự báo.")

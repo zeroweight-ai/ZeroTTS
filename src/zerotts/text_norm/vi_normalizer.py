@@ -220,16 +220,6 @@ def _num(value: str) -> str:
     return expand_number(value)
 
 
-#: Vietnamese names of the Latin letters, for reading identifiers aloud
-#: ("AB-1234" -> "a bê một hai ba bốn"). Kept close to how a Vietnamese speaker
-#: actually spells a code out, not to the English alphabet.
-_LETTER_NAME = {
-    "A": "a", "B": "bê", "C": "xê", "D": "đê", "E": "e", "F": "ép", "G": "giê",
-    "H": "hát", "I": "i", "J": "gi", "K": "ca", "L": "lờ", "M": "em", "N": "en",
-    "O": "ô", "P": "pê", "Q": "quy", "R": "rờ", "S": "ét", "T": "tê", "U": "u",
-    "V": "vê", "W": "vê kép", "X": "ích", "Y": "i dài", "Z": "dét",
-}
-
 #: Roman numerals as Vietnamese ordinals, for "quý III" / "lần thứ IV". Only the
 #: small values that actually occur in running text; anything larger is far more
 #: likely to be an acronym than a numeral.
@@ -248,8 +238,13 @@ _PREFIX_ABBR = ("TP", "Q", "P", "H", "TX", "TT", "KP")
 
 
 def spell_letters(letters: str) -> str:
-    """Read a run of Latin letters out one at a time, Vietnamese-style."""
-    return " ".join(_LETTER_NAME.get(c, c.lower()) for c in letters)
+    """Space out a run of letters so the model spells it: "AB" -> "A B".
+
+    Deliberately NOT a Vietnamese letter-name table. The model already spells
+    Latin letters correctly, and a table is a second thing to get wrong — "W"
+    alone is "vê kép", "đắp liu" or "vê đúp" depending on the speaker.
+    """
+    return " ".join(letters.upper())
 
 
 def _month(value: str) -> str:
@@ -355,10 +350,11 @@ _SCANNER = re.compile(
     # ── prefix abbreviation + proper noun: "TP. HCM" — the dot belongs to the
     #    abbreviation, so it is consumed here rather than left mid-sentence ────
     | (?<![\w.])(?P<pfx>TP|TX|TT|KP|[QPH])\.(?=\s+[{_VN_UPPER}])
-    # ── acronym pair over a slash: USD/VND, KM/H — spoken "trên". Must precede
-    #    the abbreviation branch, which would match only one side and leave the
-    #    slash to be read aloud as a character ──────────────────────────────────
-    | (?<![\w/])(?P<ap_a>[{_VN_UPPER}]{{2,6}})/(?P<ap_b>[{_VN_UPPER}]{{2,6}})(?![\w/])
+    # ── acronym pair over a slash: USD/VND, KM/H. Left verbatim — expanding
+    #    each side invents a reading ("đô la mỹ/việt nam đồng") worse than the
+    #    source, and the model says "USD/VND" correctly as written. Matched
+    #    only so the abbreviation branch below cannot claim one half. ─────────
+    | (?<![\w/])(?P<ap>[{_VN_UPPER}]{{1,6}}/[{_VN_UPPER}]{{1,6}})(?![\w/])
     # ── alphanumeric code: AB-1234, VN-215, SE1 — an identifier, so letters
     #    are spelled and digits read one by one, never as a quantity ──────────
     | (?<![\w-])(?P<code_a>[{_VN_UPPER}]{{1,4}})-?(?P<code_n>\d{{1,6}})(?![\w-])
@@ -487,16 +483,14 @@ def _expand_match(match: re.Match) -> str:
     if g["pfx"] is not None:
         return _expand_abbreviation(g["pfx"]) or g["pfx"]
 
-    if g["ap_a"] is not None:
-        left, right = (_expand_abbreviation(x) for x in (g["ap_a"], g["ap_b"]))
-        return (f"{left or spell_letters(g['ap_a'])} trên "
-                f"{right or spell_letters(g['ap_b'])}")
+    if g["ap"] is not None:
+        return g["ap"]
 
     if g["code_a"] is not None:
-        # An identifier: spell the letters, then read the digits one by one.
-        # "AB-1234" is "a bê một hai ba bốn" — reading the tail as a cardinal
-        # ("một nghìn hai trăm ba mươi tư") is how you say a quantity, not a code.
-        return f"{spell_letters(g['code_a'])} {expand_digit(g['code_n'])}"
+        # An identifier, not a quantity: space out both halves so the model
+        # spells the letters and reads the digits one at a time. "AB-1234"
+        # becomes "A B 1 2 3 4", never "một nghìn hai trăm ba mươi tư".
+        return f"{spell_letters(g['code_a'])} {' '.join(g['code_n'])}"
 
     if g["deg_n"] is not None:
         unit = {"C": " xê", "F": " ép"}.get(g["deg_u"] or "", "")

@@ -209,7 +209,27 @@ function expandAbbreviation(token: string): string | null {
 
 const VN_UPPER = 'A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝĂĐĨŨƠƯẠ-Ỹ';
 const VN_LOWER = 'a-zàáâãèéêìíòóôõùúýăđĩũơưạ-ỹ';
-const DATE_CUES = 'ngày|mùng|mồng|hôm|sáng|trưa|chiều|tối|đêm|từ|đến';
+const DATE_CUES = 'ngày|mùng|mồng|hôm|sáng|trưa|chiều|tối|đêm|từ|đến|và|hoặc';
+
+/** Abbreviations that qualify a following proper noun, so "TP. HCM" is one
+ *  unit and the dot abbreviates rather than ends a sentence. A closed set on
+ *  purpose: a general rule would eat the break in "làm ở FPT. Sau đó ...". */
+const PREFIX_ABBR = 'TP|TX|TT|KP|[QPH]';
+
+/** Roman numerals as Vietnamese ordinals, for "quý III" / "lần thứ IV". */
+const ROMAN: Record<string, string> = {
+  I: 'một', II: 'hai', III: 'ba', IV: 'bốn', V: 'năm',
+  VI: 'sáu', VII: 'bảy', VIII: 'tám', IX: 'chín', X: 'mười',
+};
+
+/** Words marking the next token as an ordinal, so a roman numeral after one
+ *  is a number rather than an acronym. */
+const ROMAN_CUES = ['quý', 'thứ', 'khóa', 'kỳ', 'đợt', 'loại', 'chương', 'phần', 'thế kỷ'];
+
+/** Space out a run of letters so the model spells it: "AB" -> "A B".
+ *  Deliberately not a Vietnamese letter-name table — the model already
+ *  spells Latin letters, and "W" alone is vê kép / đắp liu / vê đúp. */
+const spellLetters = (letters: string) => letters.toUpperCase().split('').join(' ');
 
 /** URLs and emails are matched and skipped wholesale — normalizing inside one
  *  produces nonsense, and this module has no URL reader. */
@@ -230,11 +250,11 @@ const SCANNER = new RegExp([
   // time: HH:MM:SS / HHhMMmSS
   String.raw`(?<![\d:])(?<t_h>[01]?\d|2[0-3])[:hg](?<t_m>[0-5]?\d)[:mp](?<t_s>[0-5]?\d)(?![\d:])`,
   // date: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
-  String.raw`(?<![\d/.\-])(?<d_d>0?[1-9]|[12]\d|3[01])(?<d_sep>[/.\-])(?<d_m>0?[1-9]|1[0-2])\k<d_sep>(?<d_y>[12]\d{3})(?![\d/.\-])`,
+  String.raw`(?<![\d/.\-])(?<d_d>0?[1-9]|[12]\d|3[01])(?<d_sep>[/.\-])(?<d_m>0?[1-9]|1[0-2])\k<d_sep>(?<d_y>[12]\d{3})(?![\d/-])(?!\.\d)`,
   // month-year: MM/YYYY, MM-YYYY
-  String.raw`(?<![\d/.\-])(?<my_m>0?[1-9]|1[0-2])[/\-](?<my_y>1\d{3}|20\d{2}|21\d{2})(?![\d/.\-])`,
+  String.raw`(?<![\d/.\-])(?<my_m>0?[1-9]|1[0-2])[/\-](?<my_y>1\d{3}|20\d{2}|21\d{2})(?![\d/-])(?!\.\d)`,
   // day-month: DD/MM after a date cue word only (else it is a fraction)
-  String.raw`(?<=\b)(?<dm_cue>${DATE_CUES})(?<dm_gap>\s+)(?<dm_d>0?[1-9]|[12]\d|3[01])[/\-](?<dm_m>0?[1-9]|1[0-2])(?![\d/.\-])`,
+  String.raw`(?<=\b)(?<dm_cue>${DATE_CUES})(?<dm_gap>\s+)(?<dm_d>0?[1-9]|[12]\d|3[01])[/\-](?<dm_m>0?[1-9]|1[0-2])(?![\d/-])(?!\.\d)`,
   // time: HH:MM (2-digit minutes), HHhMM, HHgMM
   String.raw`(?<![\d:])(?<hm_h>[01]?\d|2[0-3]):(?<hm_m>[0-5]\d)(?![\d:])`,
   String.raw`(?<![\d:])(?<hg_h>[01]?\d|2[0-3])[hg](?<hg_m>[0-5]\d)(?![\dhg])`,
@@ -244,12 +264,21 @@ const SCANNER = new RegExp([
   String.raw`(?<![\w.])(?<vp>[vV])(?<v_num>\d+(?:\.\d+)+)(?!\w|\.\d|,\d)`,
   String.raw`(?<![\w.,])(?<v_bare>\d+(?:\.\d+){2,})(?!\w|\.\d|,\d)`,
   // fraction: a/b (dates already claimed above)
-  String.raw`(?<![\w/.,])(?<f_a>\d+)\s*/\s*(?<f_b>\d+)(?![\w/.,])`,
+  String.raw`(?<![\w/.,])(?<f_a>\d+)\s*/\s*(?<f_b>\d+)(?![\w/,])(?!\.\d)`,
+  // degree: 38°C / 38 °C — before the number branch, same reason as percent
+  String.raw`(?<![\w.,])(?<deg_n>-?\d[\d.,]*)\s*°\s*(?<deg_u>[CF])?(?![${VN_LOWER}])`,
   // percent — BEFORE the number branch, or that claims the digits and leaves
   // a bare '%' behind
   String.raw`(?<![\w.,])(?<pct_num>[-+]?\d[\d.,]*?)\s*%(?!\w)`,
   // number: integer / decimal / thousand-separated / signed / arithmetic
   String.raw`(?<![\w.,])(?<n_num>[-+]?\d[\d.,]*(?:\s*[*^+]\s*[-+]?\d[\d.,]*|\s+[-/]\s+[-+]?\d[\d.,]*|[*^]\s*[-+]?\d[\d.,]*)*)(?![.,]?\d)`,
+  // prefix abbreviation + proper noun: "TP. HCM" — the dot abbreviates
+  String.raw`(?<![\w.])(?<pfx>${PREFIX_ABBR})\.(?=\s+[${VN_UPPER}])`,
+  // acronym pair over a slash: USD/VND, KM/H — left verbatim, matched only so
+  // the abbreviation branch cannot claim one half
+  String.raw`(?<![\w/])(?<ap>[${VN_UPPER}]{1,6}/[${VN_UPPER}]{1,6})(?![\w/])`,
+  // alphanumeric code: AB-1234, VN-215, SE1 — an identifier, not a quantity
+  String.raw`(?<![\w-])(?<code_a>[${VN_UPPER}]{1,4})-?(?<code_n>\d{1,6})(?![\w-])`,
   // abbreviation: uppercase acronym, optionally dotted
   String.raw`(?<![\w.])(?<abbr>[${VN_UPPER}][${VN_UPPER}\d]+(?:\.[${VN_UPPER}][${VN_UPPER}\d]*)*)(?![${VN_LOWER}\d])`,
   // at sign — emails never reach here, PROTECTED claims them first
@@ -285,7 +314,25 @@ function expandMatch(m: RegExpExecArray): string {
     const lead = /tháng\s*$/.test(before) ? '' : 'tháng ';
     return `${lead}${month(g.my_m)} năm ${num(g.my_y!)}`;
   }
+  if (g.pfx !== undefined) return expandAbbreviation(g.pfx) ?? g.pfx;
+  if (g.ap !== undefined) return g.ap;
+  if (g.code_a !== undefined) {
+    // Space out both halves so the model spells the letters and reads the
+    // digits one at a time — never "một nghìn hai trăm ba mươi tư".
+    return `${spellLetters(g.code_a)} ${g.code_n!.split('').join(' ')}`;
+  }
+  if (g.deg_n !== undefined) {
+    const unit = g.deg_u === 'C' ? ' xê' : g.deg_u === 'F' ? ' ép' : '';
+    return `${expandNumber(g.deg_n)} độ${unit}`;
+  }
   if (g.dm_d !== undefined) {
+    const cue = g.dm_cue!.toLowerCase();
+    if (cue === 'và' || cue === 'hoặc') {
+      // Only a coordinating cue: require a genuine date cue nearby, else
+      // "3 và 4/5" is arithmetic, not the 4th of May.
+      const before = m.input.slice(Math.max(0, m.index - 40), m.index).toLowerCase();
+      if (!new RegExp(`\\b(?:${DATE_CUES})\\b`, 'u').test(before)) return whole;
+    }
     return `${g.dm_cue}${g.dm_gap}${num(g.dm_d)} tháng ${month(g.dm_m!)}`;
   }
   if (g.hm_h !== undefined) return speakTime(g.hm_h, g.hm_m);
@@ -324,7 +371,22 @@ function expandMatch(m: RegExpExecArray): string {
     }
     return expandNumber(raw) + suffix;
   }
-  if (g.abbr !== undefined) return expandAbbreviation(g.abbr) ?? g.abbr;
+  if (g.abbr !== undefined) {
+    const token = g.abbr;
+    if (token in ROMAN) {
+      const before = m.input.slice(Math.max(0, m.index - 12), m.index).toLowerCase();
+      if (ROMAN_CUES.some((cue) => new RegExp(`${cue}\\s*$`).test(before))) return ROMAN[token];
+    }
+    const expansion = expandAbbreviation(token);
+    if (expansion !== null) {
+      // A parenthesized acronym right after its own expansion is a gloss.
+      const back = m.input.slice(Math.max(0, m.index - expansion.length - 4), m.index);
+      if (back.trimEnd().endsWith('(') && back.toLowerCase().includes(expansion.toLowerCase())) {
+        return spellLetters(token);
+      }
+    }
+    return expansion ?? token;
+  }
   if (g.at !== undefined) return 'a còng';
   return whole;
 }
