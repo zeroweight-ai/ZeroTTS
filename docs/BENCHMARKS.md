@@ -167,29 +167,6 @@ lose by 13×, so the remaining gap is the acoustic model.
 * **Reproducibility.** ZeroTTS inference is seeded; re-running the whole
   benchmark from scratch reproduced these WER figures exactly.
 
-### Speed — CPU
-
-RTF (realtime factor, wall-clock synthesis time ÷ output audio duration — lower
-is faster; below 1× is faster than real time) and time-to-first-audio, all
-measured **on CPU**, single request, 8 inference threads pinned to a dedicated
-core pool (no other synthesis running concurrently). Three Vietnamese samples —
-short (26 chars), medium (77 chars), long (227 chars) — each run 6 times with
-the first 2 (cold-cache) discarded; figures below are the mean of the
-remaining 4.
-
-| | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
-|---|:-:|:-:|:-:|:-:|
-| RTF — short | **0.51×** | 10.87× | 0.70× | 0.71× |
-| RTF — medium | **0.47×** | 4.82× | 0.70× | 0.70× |
-| RTF — long | **0.53×** | 2.67× | 0.71× | 0.78× |
-| TTFA — short | **53 ms** | 21.7 s | 4.02 s | 2.45 s |
-| TTFA — medium | **66 ms** | 28.9 s | 4.02 s | 3.72 s |
-| TTFA — long | **89 ms** | 52.3 s | 10.3 s | 9.22 s |
-
-ZeroTTS's time-to-first-audio comes from its real streaming path — first audio frame,
-not first full utterance. The three baselines have no working CPU streaming
-path, so their TTFA is the time to the complete utterance. 
-
 ## Reproducing
 
 ```bash
