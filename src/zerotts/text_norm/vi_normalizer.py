@@ -220,6 +220,33 @@ def _num(value: str) -> str:
     return expand_number(value)
 
 
+#: Roman numerals as Vietnamese ordinals, for "quý III" / "lần thứ IV". Only the
+#: small values that actually occur in running text; anything larger is far more
+#: likely to be an acronym than a numeral.
+_ROMAN = {"I": "một", "II": "hai", "III": "ba", "IV": "bốn", "V": "năm",
+          "VI": "sáu", "VII": "bảy", "VIII": "tám", "IX": "chín", "X": "mười"}
+
+#: Words that mark the next token as an ordinal, so a following roman numeral is
+#: a number rather than an acronym ("quý III" vs. the country code "III").
+_ROMAN_CUES = ("quý", "thứ", "khóa", "kỳ", "đợt", "loại", "chương", "phần", "thế kỷ")
+
+#: Abbreviations that qualify a following proper noun, so "TP. HCM" is one unit
+#: and the dot abbreviates rather than ends a sentence. Deliberately a closed
+#: set: a general "dot before a capital is abbreviating" rule would eat the
+#: sentence break in "làm ở FPT. Sau đó ...".
+_PREFIX_ABBR = ("TP", "Q", "P", "H", "TX", "TT", "KP")
+
+
+def spell_letters(letters: str) -> str:
+    """Space out a run of letters so the model spells it: "AB" -> "A B".
+
+    Deliberately NOT a Vietnamese letter-name table. The model already spells
+    Latin letters correctly, and a table is a second thing to get wrong — "W"
+    alone is "vê kép", "đắp liu" or "vê đúp" depending on the speaker.
+    """
+    return " ".join(letters.upper())
+
+
 def _month(value: str) -> str:
     """Month name. The fourth month is "tháng tư", never "tháng bốn" — the one
     place this module knowingly departs from soe-vinorm, which runs months
@@ -280,7 +307,7 @@ _VN_LOWER = "a-zàáâãèéêìíòóôõùúýăđĩũơưạ-ỹ"
 
 # Cue words that force "D/M" to be read as a day-and-month rather than a
 # fraction. Matched case-insensitively, immediately before the number.
-_DATE_CUES = r"ngày|mùng|mồng|hôm|sáng|trưa|chiều|tối|đêm|từ|đến"
+_DATE_CUES = r"ngày|mùng|mồng|hôm|sáng|trưa|chiều|tối|đêm|từ|đến|và|hoặc"
 
 # Anything inside a URL or an email address is left untouched — normalizing
 # there produces nonsense, and this module has no URL reader.
@@ -298,11 +325,11 @@ _SCANNER = re.compile(
     # ── time: HH:MM:SS / HHhMMmSS ────────────────────────────────────────────
       (?<![\d:])(?P<t_h>[01]?\d|2[0-3])[:hg](?P<t_m>[0-5]?\d)[:mp](?P<t_s>[0-5]?\d)(?![\d:])
     # ── date: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY ─────────────────────────────
-    | (?<![\d/.\-])(?P<d_d>0?[1-9]|[12]\d|3[01])(?P<d_sep>[/.\-])(?P<d_m>0?[1-9]|1[0-2])(?P=d_sep)(?P<d_y>[12]\d{{3}})(?![\d/.\-])
+    | (?<![\d/.\-])(?P<d_d>0?[1-9]|[12]\d|3[01])(?P<d_sep>[/.\-])(?P<d_m>0?[1-9]|1[0-2])(?P=d_sep)(?P<d_y>[12]\d{{3}})(?![\d/-])(?!\.\d)
     # ── month-year: MM/YYYY, MM-YYYY ─────────────────────────────────────────
-    | (?<![\d/.\-])(?P<my_m>0?[1-9]|1[0-2])[/\-](?P<my_y>1\d{{3}}|20\d{{2}}|21\d{{2}})(?![\d/.\-])
+    | (?<![\d/.\-])(?P<my_m>0?[1-9]|1[0-2])[/\-](?P<my_y>1\d{{3}}|20\d{{2}}|21\d{{2}})(?![\d/-])(?!\.\d)
     # ── day-month: DD/MM after a date cue word only (else it's a fraction) ───
-    | (?<=\b)(?P<dm_cue>(?i:{_DATE_CUES}))(?P<dm_gap>\s+)(?P<dm_d>0?[1-9]|[12]\d|3[01])[/\-](?P<dm_m>0?[1-9]|1[0-2])(?![\d/.\-])
+    | (?<=\b)(?P<dm_cue>(?i:{_DATE_CUES}))(?P<dm_gap>\s+)(?P<dm_d>0?[1-9]|[12]\d|3[01])[/\-](?P<dm_m>0?[1-9]|1[0-2])(?![\d/-])(?!\.\d)
     # ── time: HH:MM (2-digit minutes), HHhMM, HHgMM ──────────────────────────
     | (?<![\d:])(?P<hm_h>[01]?\d|2[0-3]):(?P<hm_m>[0-5]\d)(?![\d:])
     | (?<![\d:])(?P<hg_h>[01]?\d|2[0-3])[hg](?P<hg_m>[0-5]\d)(?![\dhg])
@@ -312,12 +339,25 @@ _SCANNER = re.compile(
     | (?<![\w.])(?P<vp>[vV])(?P<v_num>\d+(?:\.\d+)+)(?!\w|\.\d|,\d)
     | (?<![\w.,])(?P<v_bare>\d+(?:\.\d+){{2,}})(?!\w|\.\d|,\d)
     # ── fraction: a/b (dates already claimed above) ──────────────────────────
-    | (?<![\w/.,])(?P<f_a>\d+)\s*/\s*(?P<f_b>\d+)(?![\w/.,])
+    | (?<![\w/.,])(?P<f_a>\d+)\s*/\s*(?P<f_b>\d+)(?![\w/,])(?!\.\d)
+    # ── degree: 38°C / 38 °C ─────────────────────────────────────────────────
+    | (?<![\w.,])(?P<deg_n>-?\d[\d.,]*)\s*°\s*(?P<deg_u>[CF])?(?![{_VN_LOWER}])
     # ── percent: 25%, 12,5 % — BEFORE the number branch, or that claims the
     #    digits and leaves a bare '%' behind ───────────────────────────────────
     | (?<![\w.,])(?P<pct_num>[-+]?\d[\d.,]*?)\s*%(?!\w)
     # ── number: integer / decimal / thousand-separated / signed / arithmetic ─
     | (?<![\w.,])(?P<n_num>[-+]?\d[\d.,]*(?:\s*[*^+]\s*[-+]?\d[\d.,]*|\s+[-/]\s+[-+]?\d[\d.,]*|[*^]\s*[-+]?\d[\d.,]*)*)(?![.,]?\d)
+    # ── prefix abbreviation + proper noun: "TP. HCM" — the dot belongs to the
+    #    abbreviation, so it is consumed here rather than left mid-sentence ────
+    | (?<![\w.])(?P<pfx>TP|TX|TT|KP|[QPH])\.(?=\s+[{_VN_UPPER}])
+    # ── acronym pair over a slash: USD/VND, KM/H. Left verbatim — expanding
+    #    each side invents a reading ("đô la mỹ/việt nam đồng") worse than the
+    #    source, and the model says "USD/VND" correctly as written. Matched
+    #    only so the abbreviation branch below cannot claim one half. ─────────
+    | (?<![\w/])(?P<ap>[{_VN_UPPER}]{{1,6}}/[{_VN_UPPER}]{{1,6}})(?![\w/])
+    # ── alphanumeric code: AB-1234, VN-215, SE1 — an identifier, so letters
+    #    are spelled and digits read one by one, never as a quantity ──────────
+    | (?<![\w-])(?P<code_a>[{_VN_UPPER}]{{1,4}})-?(?P<code_n>\d{{1,6}})(?![\w-])
     # ── abbreviation: uppercase acronym, optionally dotted ───────────────────
     | (?<![\w.])(?P<abbr>[{_VN_UPPER}][{_VN_UPPER}\d]+(?:\.[{_VN_UPPER}][{_VN_UPPER}\d]*)*)(?![{_VN_LOWER}\d])
     # ── at sign: read as a word. Email addresses never reach here — they are
@@ -384,6 +424,12 @@ def _expand_match(match: re.Match) -> str:
         return f"{lead}{_month(g['my_m'])} năm {_num(g['my_y'])}"
 
     if g["dm_d"] is not None:
+        if g["dm_cue"].lower() in ("và", "hoặc"):
+            # Only a coordinating cue: require a genuine date cue nearby, else
+            # "3 và 4/5" is arithmetic, not the 4th of May.
+            before = match.string[max(0, match.start() - 40):match.start()].lower()
+            if not re.search(rf"\b(?:{_DATE_CUES})\b", before):
+                return match.group(0)
         return f"{g['dm_cue']}{g['dm_gap']}{_num(g['dm_d'])} tháng {_month(g['dm_m'])}"
 
     if g["hm_h"] is not None:
@@ -434,8 +480,37 @@ def _expand_match(match: re.Match) -> str:
             return match.group(0)
         return expand_number(raw) + suffix
 
+    if g["pfx"] is not None:
+        return _expand_abbreviation(g["pfx"]) or g["pfx"]
+
+    if g["ap"] is not None:
+        return g["ap"]
+
+    if g["code_a"] is not None:
+        # An identifier, not a quantity: space out both halves so the model
+        # spells the letters and reads the digits one at a time. "AB-1234"
+        # becomes "A B 1 2 3 4", never "một nghìn hai trăm ba mươi tư".
+        return f"{spell_letters(g['code_a'])} {' '.join(g['code_n'])}"
+
+    if g["deg_n"] is not None:
+        unit = {"C": " xê", "F": " ép"}.get(g["deg_u"] or "", "")
+        return f"{expand_number(g['deg_n'])} độ{unit}"
+
     if g["abbr"] is not None:
-        return _expand_abbreviation(g["abbr"]) or g["abbr"]
+        token = g["abbr"]
+        # A roman numeral after an ordinal cue is a number, not an acronym.
+        if token in _ROMAN:
+            before = match.string[max(0, match.start() - 12):match.start()].lower()
+            if any(re.search(rf"{cue}\s*$", before) for cue in _ROMAN_CUES):
+                return _ROMAN[token]
+        expansion = _expand_abbreviation(token)
+        if expansion is not None:
+            # If the sentence just said the expansion in full and the acronym is
+            # parenthesized right after it, the acronym is a gloss — spell it.
+            before = match.string[max(0, match.start() - len(expansion) - 4):match.start()]
+            if before.rstrip().endswith("(") and expansion.lower() in before.lower():
+                return spell_letters(token)
+        return expansion or token
 
     if g["at"] is not None:
         return "a còng"
