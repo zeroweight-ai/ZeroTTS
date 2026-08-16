@@ -47,7 +47,52 @@ number is scoring policy rather than synthesis:
 Full rationale, and the test suite that pins the policy in both directions, are
 in the [benchmark README](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS).
 
-## Overall (n = 137)
+## Headline — normalized text (n = 137)
+
+Every system reads the benchmark's curated spoken-out form: dates, numbers and
+acronyms already expanded. This matches the [README](../README.md#benchmarks)
+table, and is the condition a Vietnamese TTS system meets in production, where
+a text frontend runs ahead of the model. ZeroTTS ships one
+(`normalize_vi_text`, applied by default) which reproduces the benchmark's
+reading on 34 of the 35 items that need normalization; neither baseline ships a
+Vietnamese frontend at all.
+
+| Model | WER strict | WER norm | **WER robust** | median | SSIM | UTMOS | Excess silence |
+|---|---|---|---|---|---|---|---|
+| **ZeroTTS** | **8.66 %** | **1.64 %** | **0.56 %** | **0.00 %** | 0.938 | **2.91** | **0.029 s** |
+| XTTS-v2-vietnamse | 15.37 % | 8.54 % | 7.27 % | 0.00 % | **0.941** | 2.49 | 0.568 s |
+| viXTTS | 17.44 % | 9.32 % | 8.61 % | 2.08 % | 0.935 | 2.34 | 0.215 s |
+
+`strict` is high for everyone here and that is expected: the model now says
+"ba mươi mốt tháng mười hai" while `strict` compares against the written
+`31/12/2025`. It is the reference policy behaving correctly, and it is why
+`robust` is the headline.
+
+### WER — normalized text, per subset
+
+| Subset | n | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
+|---|---|---|---|---|
+| `vietnamese` — monolingual | 39 | **0.21 %** | 7.21 % | 7.54 % |
+| `code_switch` — vi + English | 39 | **0.95 %** | 10.14 % | 5.86 % |
+| `cross_lingual` — foreign voice, vi text | 20 | **0.38 %** | 4.94 % | 6.61 % |
+| `challenging` — acronyms, dates, % | 39 | **0.61 %** | 5.63 % | 13.44 % |
+| **overall** | 137 | **0.56 %** | **7.27 %** | **8.61 %** |
+
+### WER — raw text, per subset
+
+The harder condition: the model is handed `31/12/2025` and `ChatGPT` verbatim
+and has to read them itself, with no normalizer in front. This measures the
+model's own grapheme-to-speech ability.
+
+| Subset | n | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
+|---|---|---|---|---|
+| `vietnamese` — monolingual | 39 | **0.16 %** | 7.92 % | 9.56 % |
+| `code_switch` — vi + English | 39 | **0.97 %** | 10.94 % | 9.25 % |
+| `cross_lingual` — foreign voice, vi text | 20 | **1.42 %** | 21.37 % | 27.27 % |
+| `challenging` — acronyms, dates, % | 39 | **1.75 %** | 27.86 % | 31.85 % |
+| **overall** | 137 | **1.03 %** | **16.42 %** | **18.40 %** |
+
+Raw-text overall, all three policies:
 
 | Model | WER strict | WER norm | **WER robust** | median | SSIM | UTMOS | Excess silence |
 |---|---|---|---|---|---|---|---|
@@ -55,22 +100,28 @@ in the [benchmark README](https://huggingface.co/datasets/zeroweight-ai/ZeroBenc
 | XTTS-v2-vietnamse | 18.83 % | 17.82 % | 16.42 % | 2.13 % | **0.940** | 2.43 | 0.532 s |
 | viXTTS | 20.22 % | 19.47 % | 18.40 % | 6.38 % | 0.935 | 2.35 | 0.233 s |
 
-Note the asymmetry between policies: ZeroTTS drops 5.1× from `strict` to
+Note the asymmetry between policies here: ZeroTTS drops 5.1× from `strict` to
 `robust`, the baselines only 1.15×. Most of ZeroTTS's residual was formatting;
 theirs is hallucinated and garbled speech, which no reference policy can excuse.
 
-## Per subset
+### What normalization buys each system
 
-WER, `robust` policy:
+| Model | raw text | normalized | change |
+|---|---|---|---|
+| **ZeroTTS** | **1.03 %** | **0.56 %** | −46 % |
+| XTTS-v2-vietnamse | 16.42 % | 7.27 % | −56 % |
+| viXTTS | 18.40 % | 8.61 % | −53 % |
 
-| Subset | n | ZeroTTS | XTTS-v2-vietnamse | viXTTS |
-|---|---|---|---|---|
-| `vietnamese` — monolingual | 39 | **0.16 %** | 7.92 % | 9.56 % |
-| `code_switch` — vi + English | 39 | **0.97 %** | 10.94 % | 9.25 % |
-| `cross_lingual` — foreign voice, vi text | 20 | **1.42 %** | 21.37 % | 27.27 % |
-| `challenging` — acronyms, dates, % | 39 | **1.75 %** | 27.86 % | 31.85 % |
+`vietnamese` is the control: no digits, acronyms or English, so normalization
+has nothing to do — and nothing moves (ZeroTTS 0.16 % → 0.21 %, one item of
+sampling noise). The gains land exactly where the text needs expanding, which
+is what makes the ablation meaningful rather than a free pass.
 
-Other metrics:
+This is the strongest form of the objection "the baselines just lack a
+Vietnamese text frontend", and it does not hold: they gain the most and still
+lose by 13×, so the remaining gap is the acoustic model.
+
+### Other metrics, per subset (raw-text runs)
 
 | Subset | n | ZeroTTS SSIM / UTMOS / silence | XTTS-v2-vietnamse | viXTTS |
 |---|---|---|---|---|
@@ -78,37 +129,6 @@ Other metrics:
 | `code_switch` | 39 | 0.945 / 2.95 / 0.030 s | 0.946 / 2.44 / 0.448 s | 0.939 / 2.42 / 0.221 s |
 | `cross_lingual` | 20 | 0.911 / 3.02 / 0.014 s | 0.936 / 2.38 / 0.457 s | 0.935 / 2.45 / 0.207 s |
 | `challenging` | 39 | 0.941 / 2.90 / 0.037 s | 0.939 / 2.43 / 0.606 s | 0.933 / 2.28 / 0.272 s |
-
-## Text-normalization ablation
-
-Feed every model the spoken-out `text_normalized` instead of raw orthography
-(`SYNTH_FROM=text_normalized`). This simulates a perfect Vietnamese
-text-normalization frontend and separates grapheme-to-spoken-form errors from
-acoustic ones. Scoring references are unchanged, so the two columns are
-directly comparable.
-
-| Model | raw text | pre-normalized | change |
-|---|---|---|---|
-| **ZeroTTS** | **1.03 %** | **0.56 %** | −46 % |
-| XTTS-v2-vietnamse | 16.42 % | 7.27 % | −56 % |
-| viXTTS | 18.40 % | 8.61 % | −53 % |
-
-Per subset, `robust` WER, raw → pre-normalized:
-
-| Subset | ZeroTTS | XTTS-v2-vietnamse | viXTTS |
-|---|---|---|---|
-| `vietnamese` | 0.16 % → 0.21 % | 7.92 % → 7.21 % | 9.56 % → 7.54 % |
-| `code_switch` | 0.97 % → 0.95 % | 10.94 % → 10.14 % | 9.25 % → 5.86 % |
-| `cross_lingual` | 1.42 % → 0.38 % | 21.37 % → 4.94 % | 27.27 % → 6.61 % |
-| `challenging` | 1.75 % → 0.61 % | 27.86 % → 5.63 % | 31.85 % → 13.44 % |
-
-`vietnamese` is the control — no digits, acronyms or English, so normalization
-has nothing to do, and nothing moves. The gains land exactly where the text
-needs expanding.
-
-This is the strongest form of the objection "the baselines just lack a
-Vietnamese text frontend", and it does not hold: they gain the most and still
-lose by 13–15×, so the remaining gap is the acoustic model.
 
 ## ZeroTTS's remaining errors
 
@@ -140,12 +160,13 @@ truncation — the failure modes that dominate both XTTS baselines' worst cases.
 
 ## Interpretation
 
-* **Voice similarity is a tie, not a win.** 0.936 / 0.940 / 0.935 is within
-  noise. On `cross_lingual` ZeroTTS is genuinely behind (0.911 vs ~0.935): it
-  carries a foreign speaker's timbre into Vietnamese slightly less faithfully,
-  while winning that subset's WER by 15×.
-* **Both XTTS finetunes carry far more dead air** (0.23–0.53 s vs 0.029 s) —
-  lead-in/tail padding from XTTS's decoder.
+* **Voice similarity is a tie, not a win.** 0.938 / 0.941 / 0.935 normalized
+  (0.936 / 0.940 / 0.935 raw) is within noise either way. On `cross_lingual`
+  ZeroTTS is behind on the raw runs (0.911 vs ~0.935): it carries a foreign
+  speaker's timbre into Vietnamese slightly less faithfully, while winning that
+  subset's WER by 15×.
+* **Both XTTS finetunes carry far more dead air** (0.22–0.57 s vs 0.029 s) —
+  lead-in/tail padding from XTTS's decoder, in both input modes.
 * **Reproducibility.** ZeroTTS inference is seeded; re-running the whole
   benchmark from scratch reproduced these WER figures exactly at every policy.
 
