@@ -17,15 +17,12 @@
 **The most accurate open Vietnamese TTS we know of — 4× fewer word errors than
 the next open model**, and it runs faster than real time on a laptop CPU.
 
-* 🗣️ **Zero-shot voice cloning** — a voice is a small latent array; drop it in
-  and the model speaks in it. No fine-tuning, no per-speaker training.
-* ⚡ **Real-time on CPU, streaming** — first audio chunk in ~100 ms, then chunks
-  ramp up. No GPU required.
+* 🗣️ **Zero-shot voice cloning** — cloned from as little as 3 seconds of reference
+  audio (up to 30 seconds). No fine-tuning, no per-speaker training.
+* ⚡ **Real-time on CPU, streaming** — ~2× faster than real time (RTF 0.5×),
+  first audio chunk in ~70 ms. No GPU required.
 * 🇻🇳 **Built for Vietnamese** — tones, code-switched English, and a built-in
-  normalizer that reads `31/12/2025` and `1.250 tỷ` the way a person would.
-* 📊 **Measured, not asserted** — every number below comes from
-  [ZeroBench-TTS](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)'s
-  own public scorer, on 59 held-out voices.
+  normalizer that reads `31/12/2025` and `ChatGPT` the way a person would.
 
 ```python
 from zerotts import ZeroTTS
@@ -103,7 +100,7 @@ print(tts.list_voices())
 audio = tts.synthesize("Hôm nay trời đẹp quá.", voice="maichi")
 tts.save_audio(audio, "out.wav")
 
-# Streaming — first chunk arrives in ~100 ms, then chunks ramp up in size
+# Streaming — first chunk arrives in ~70 ms, then chunks ramp up in size
 for chunk in tts.synthesize_stream("Một đoạn văn bản dài hơn…", voice="maichi"):
     play(chunk)   # (1, n) float32 at 48 kHz
 ```
@@ -238,7 +235,6 @@ ZeroTTS's time-to-first-audio comes from its real streaming path — first audio
 not first full utterance. The three baselines have no working CPU streaming
 path, so their TTFA is the time to the complete utterance. 
 
-ZeroTTS is designed for streaming TTS and real-time voice agents, achieving sub-100 ms time-to-first-audio (TTFA) and ~0.5× RTF on CPU. TTFA measures the first audio frame from the actual streaming path; since the baselines have no working CPU streaming path, their TTFA represents full-utterance generation time. This combination of low latency and faster-than-real-time CPU inference makes ZeroTTS well suited for responsive conversational applications.
 ### WER — normalized text
 
 The headline condition: numbers and dates already spoken out, as the shipped
