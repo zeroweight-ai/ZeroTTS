@@ -193,13 +193,15 @@ harsher on them.
 | | **ZeroTTS** | XTTS-v2-vietnamse | viXTTS |
 |---|:-:|:-:|:-:|
 | **WER** ↓ | **0.56 %** | 7.27 % | 8.61 % |
-| **Naturalness** (UTMOS) ↑ | **2.91** | 2.43 | 2.35 |
-| **Voice similarity** (SSIM) ↑ | 0.936 | **0.940** | 0.935 |
-| **Dead air** (excess silence) ↓ | **0.029 s** | 0.532 s | 0.233 s |
+| **Naturalness** (UTMOS) ↑ | **2.91** | 2.49 | 2.34 |
+| **Voice similarity** (SSIM) ↑ | 0.938 | **0.941** | 0.935 |
+| **Dead air** (excess silence) ↓ | **0.029 s** | 0.568 s | 0.215 s |
 
-**13× fewer word errors**, ~0.5 MOS more natural, an order of magnitude less
+**13× fewer word errors**, ~0.4 MOS more natural, an order of magnitude less
 dead air. Median WER is **0.00 %** on all four subsets — the typical generation
-is transcribed exactly.
+is transcribed exactly. (Every figure in this table is from the same
+normalized-text runs, so the rows are mutually consistent; the raw-text runs
+move UTMOS/SSIM/silence by less than the noise floor.)
 
 ### WER — normalized text
 
