@@ -209,6 +209,9 @@ spoken out, from the benchmark's own curated reading.
 that's actually fast on CPU — the others are sized and tuned for a GPU, and it
 shows.
 
+Full comparison tables, per-subset breakdowns, and CPU speed methodology:
+**[docs/BENCHMARKS.md](https://github.com/zeroweight-ai/ZeroTTS/blob/main/docs/BENCHMARKS.md)**
+
 ### Speed — CPU
 
 RTF (realtime factor, wall-clock synthesis time ÷ output audio duration — lower
@@ -231,41 +234,6 @@ remaining 4.
 ZeroTTS's time-to-first-audio comes from its real streaming path — first audio frame,
 not first full utterance. The three baselines have no working CPU streaming
 path, so their TTFA is the time to the complete utterance. 
-
-### WER — normalized text
-
-The headline condition: numbers and dates already spoken out, as the shipped
-normalizer produces.
-
-| Subset | what it tests | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
-|---|---|:-:|:-:|:-:|:-:|
-| `vietnamese` | monolingual Vietnamese | **0.21 %** | 0.50 % | 7.21 % | 7.54 % |
-| `code_switch` | Vietnamese + embedded English | 0.95 % | **0.46 %** | 10.14 % | 5.86 % |
-| `cross_lingual` | foreign voice prompt → Vietnamese | **0.38 %** | 9.60 % | 4.94 % | 6.61 % |
-| `challenging` | acronyms, dates, %, currency | **0.61 %** | 1.56 % | 5.63 % | 13.44 % |
-| **overall** | | **0.56 %** | **2.12 %** | **7.27 %** | **8.61 %** |
-
-### WER — raw text
-
-The harder condition: the model is handed raw text like `31/12/2025` and `ChatGPT` verbatim
-and has to read them itself, with no normalizer in front. This is what a system
-with no Vietnamese text frontend faces.
-
-| Subset | what it tests | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
-|---|---|:-:|:-:|:-:|:-:|
-| `vietnamese` | monolingual Vietnamese | **0.16 %** | 0.50 % | 7.92 % | 9.56 % |
-| `code_switch` | Vietnamese + embedded English | 0.97 % | **0.46 %** | 10.94 % | 9.25 % |
-| `cross_lingual` | foreign voice prompt → Vietnamese | **1.42 %** | 17.71 % | 21.37 % | 27.27 % |
-| `challenging` | acronyms, dates, %, currency | **1.75 %** | 4.46 % | 27.86 % | 31.85 % |
-| **overall** | | **1.03 %** | **4.13 %** | **16.42 %** | **18.40 %** |
-
-Reproduce, or score your own system:
-
-```bash
-pip install "zerotts[eval]"
-SYNTH_FROM=text_normalized OUT_DIR=./eval/norm ./evaluation/run_benchmark.sh
-./evaluation/run_benchmark.sh                                   # raw text
-```
 
 ## Credits
 
