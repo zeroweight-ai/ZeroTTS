@@ -30,7 +30,7 @@ print(f"{len(segments)} segment(s)")
 audio_chunks = []
 for i, seg in enumerate(segments, 1):
     print(f"  [{i}/{len(segments)}] {seg}")
-    audio_chunks.append(tts.synthesize(seg, voice="arya"))
+    audio_chunks.append(tts.synthesize(seg, voice="maichi"))
 
 audio = concat_with_silence(audio_chunks, silence_sec=0.15, sample_rate=tts.sample_rate)
 tts.save_audio(audio, "long_form.wav")

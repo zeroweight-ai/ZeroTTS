@@ -3,7 +3,7 @@
     from zerotts import ZeroTTS
 
     tts = ZeroTTS.from_pretrained("zeroweight-ai/ZeroTTS")
-    audio = tts.synthesize("Xin chào các bạn.", voice="arya")
+    audio = tts.synthesize("Xin chào các bạn.", voice="maichi")
     tts.save_audio(audio, "out.wav")
 """
 

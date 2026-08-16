@@ -93,6 +93,44 @@ def list_voices() -> list:
         return []
 
 
+def _load_voices() -> list:
+    """Every voice pack, loaded once, silently dropping ones that fail — a
+    single bad pack must not take the whole picker down."""
+    tts = get_tts()
+    out = []
+    for name in list_voices():
+        try:
+            out.append(tts.load_voice(name))
+        except Exception:
+            continue
+    return out
+
+
+def all_tags() -> list:
+    """Every tag used by any shipped voice, sorted — the filter's checkbox
+    list. Vietnamese collation via locale is overkill for ~9 packs' worth of
+    tags, so plain sort is fine."""
+    tags = {t for v in _load_voices() for t in v.tags}
+    return sorted(tags)
+
+
+def voice_choices(selected_tags=None) -> list:
+    """(label, name) pairs for the dropdown, optionally filtered to voices that
+    carry at least one of ``selected_tags``. Label leads with the human name
+    and lists the tags, so the picker itself doubles as the tag legend —
+    `docs/VOICES.md#built-in-voices` has the same table for reference."""
+    selected = set(selected_tags or [])
+    choices = []
+    for v in _load_voices():
+        if selected and not (selected & set(v.tags)):
+            continue
+        label = v.display_name or v.name
+        if v.tags:
+            label = f"{label} — {', '.join(v.tags)}"
+        choices.append((label, v.name))
+    return choices
+
+
 def voice_preview_path(name: str) -> str | None:
     """Path to a voice's preview wav, or None. Never raises — the UI calls this
     on every dropdown change, and a missing preview is not an error."""
@@ -113,10 +151,16 @@ def voice_info(name: str) -> str:
         v = get_tts().load_voice(name)
     except Exception as exc:
         return f"Could not load voice: {exc}"
-    bits = [f"`{v.name}`", v.language]
-    if v.description:
+    # description is just ", ".join(tags) for the shipped presets (see
+    # scripts/build_voice_packs.py), so showing it AND the tag chips below
+    # would repeat the same words twice — the chips are the tag display here.
+    bits = [f"**{v.display_name or v.name}**", f"`{v.name}`", v.language]
+    if v.description and v.description != ", ".join(v.tags):
         bits.append(v.description)
-    return " · ".join(bits)
+    line = " · ".join(bits)
+    if v.tags:
+        line += "\n\n" + " ".join(f"`{t}`" for t in v.tags)
+    return line
 
 
 # ── history ──────────────────────────────────────────────────────────────────

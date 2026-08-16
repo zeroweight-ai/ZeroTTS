@@ -18,7 +18,7 @@ from zerotts import ZeroTTS  # noqa: E402
 
 model_dir = sys.argv[1] if len(sys.argv) > 1 else "zeroweight-ai/ZeroTTS"
 text = sys.argv[2] if len(sys.argv) > 2 else "Xin chào các bạn."
-voice = sys.argv[3] if len(sys.argv) > 3 else "arya"
+voice = sys.argv[3] if len(sys.argv) > 3 else "maichi"
 
 draws = json.load(open("js_draws.json"))
 cursor = {"i": 0}

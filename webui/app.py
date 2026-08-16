@@ -41,9 +41,14 @@ def _ensure_stream_route(app) -> None:
     audio_stream.mount(app)
 
 
-def refresh_voices():
-    voices = engine.list_voices()
-    return gr.update(choices=voices, value=voices[0] if voices else None)
+def refresh_voices(selected_tags=None):
+    """Dropdown choices, optionally narrowed by the tag filter. Prefers
+    `maichi` as the default so a fresh page load always starts on the same
+    voice the README and samples use."""
+    choices = engine.voice_choices(selected_tags)
+    names = [v for _, v in choices]
+    default = "maichi" if "maichi" in names else (names[0] if names else None)
+    return gr.update(choices=choices, value=default)
 
 
 def on_voice_change(name):
@@ -165,6 +170,11 @@ with gr.Blocks(title="ZeroTTS") as demo:
 
     with gr.Row():
         with gr.Column(scale=2):
+            tag_filter = gr.CheckboxGroup(
+                choices=[], value=[], label="Lọc giọng theo tag",
+                info="Chọn một hoặc nhiều tag (giới tính, độ tuổi, phong cách…) để "
+                     "thu hẹp danh sách giọng bên dưới. Bỏ trống để xem tất cả.",
+            )
             with gr.Row():
                 voice_dropdown = gr.Dropdown(choices=[], label="Voice", value=None)
                 refresh_voices_btn = gr.Button("Refresh", scale=0)
@@ -261,7 +271,13 @@ with gr.Blocks(title="ZeroTTS") as demo:
                 "speaker, see [zeroweight.ai](https://zeroweight.ai)."
             )
 
-    refresh_voices_btn.click(fn=refresh_voices, outputs=[voice_dropdown]).then(
+    refresh_voices_btn.click(fn=refresh_voices, inputs=[tag_filter],
+                             outputs=[voice_dropdown]).then(
+        fn=on_voice_change, inputs=[voice_dropdown],
+        outputs=[voice_preview, voice_meta],
+    )
+    tag_filter.change(fn=refresh_voices, inputs=[tag_filter],
+                      outputs=[voice_dropdown]).then(
         fn=on_voice_change, inputs=[voice_dropdown],
         outputs=[voice_preview, voice_meta],
     )
@@ -293,13 +309,14 @@ with gr.Blocks(title="ZeroTTS") as demo:
         # app.py`, an external mount) — the live-audio route has to exist on
         # whatever FastAPI app is actually serving us, or the player 404s.
         _ensure_stream_route(getattr(demo, "app", None))
-        voices = engine.list_voices()
-        first = voices[0] if voices else None
+        voice_update = refresh_voices(None)
+        default = voice_update["value"]
         files = engine.list_generated()
         sample_names = list(engine.get_sample_texts())
-        preview, meta = on_voice_change(first)
+        preview, meta = on_voice_change(default)
         return (
-            gr.update(choices=voices, value=first),
+            gr.update(choices=engine.all_tags(), value=[]),
+            voice_update,
             preview, meta,
             gr.update(samples=[[os.path.basename(f)] for f in files]), files,
             gr.update(samples=[[n] for n in sample_names]), sample_names,
@@ -307,7 +324,7 @@ with gr.Blocks(title="ZeroTTS") as demo:
 
     demo.load(
         fn=_on_load,
-        outputs=[voice_dropdown, voice_preview, voice_meta,
+        outputs=[tag_filter, voice_dropdown, voice_preview, voice_meta,
                  history_dataset, history_state,
                  sample_texts_dataset, sample_names_state],
     )

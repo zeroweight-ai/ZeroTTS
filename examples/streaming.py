@@ -19,7 +19,7 @@ tts = ZeroTTS.from_pretrained("zeroweight-ai/ZeroTTS")
 t0 = time.perf_counter()
 first = None
 chunks = []
-for chunk in tts.synthesize_stream(TEXT, voice="arya"):
+for chunk in tts.synthesize_stream(TEXT, voice="maichi"):
     if first is None:
         first = time.perf_counter() - t0
         print(f"time to first audio: {first * 1000:.0f} ms")
