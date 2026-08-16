@@ -17,12 +17,12 @@ no code change.
 Layout of a voice pack directory:
 
     voices/
-      index.json                 # optional manifest: name, language, description...
+      index.json                 # optional manifest: name, display_name, tags...
       <name>/
         voice.npz                # required: {n_voice_queries: int64, voice_emb: (1,Q,D) f32}
         voice.bin                # optional: raw f32 of voice_emb, for the JS demo
         preview.wav              # optional
-        meta.json                # optional
+        meta.json                # optional: display_name, gender, tags, description...
 """
 
 from __future__ import annotations
@@ -54,6 +54,21 @@ class Voice:
     @property
     def description(self) -> str:
         return str(self.meta.get("description", ""))
+
+    @property
+    def display_name(self) -> str:
+        """Human-readable name, e.g. "Mai Chi" for the pack directory "maichi"."""
+        return str(self.meta.get("display_name", self.name))
+
+    @property
+    def gender(self) -> str:
+        return str(self.meta.get("gender", ""))
+
+    @property
+    def tags(self) -> list[str]:
+        """Free-form labels — gender, age, register, tone ("nữ", "trẻ", "kể
+        chuyện", "ấm áp"...) — for filtering or displaying a voice picker."""
+        return list(self.meta.get("tags", []))
 
 
 def _voice_dirs(voices_root: Path):

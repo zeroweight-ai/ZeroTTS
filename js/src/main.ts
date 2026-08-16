@@ -35,6 +35,7 @@ const els = {
   sample: $<HTMLSelectElement>('sample'),
   preview: $<HTMLAudioElement>('preview'),
   voiceMeta: $<HTMLDivElement>('voice-meta'),
+  tagFilter: $<HTMLDivElement>('tag-filter'),
   segments: $<HTMLPreElement>('segments'),
 };
 
@@ -45,6 +46,7 @@ let voices: VoiceIndex = { voices: [] };
 let base = '';
 let player: StreamPlayer | null = null;
 let abort: AbortController | null = null;
+let activeTags = new Set<string>();
 
 const mb = (bytes: number) => `${(bytes / 1e6).toFixed(0)} MB`;
 
@@ -88,14 +90,14 @@ els.load.addEventListener('click', async () => {
     voices = loaded.voices;
     base = loaded.base;
 
-    els.voice.innerHTML = '<option value="">(unconditional voice)</option>';
-    for (const v of voices.voices) {
-      const option = document.createElement('option');
-      option.value = v.name;
-      option.textContent = v.description ? `${v.name} — ${v.description}` : v.name;
-      els.voice.append(option);
-    }
-    if (voices.voices.length) els.voice.value = voices.voices[0].name;
+    activeTags = new Set();
+    renderTagFilter();
+    renderVoiceOptions();
+    // Prefer "maichi" (Mai Chi) as the default, same as the README/webui — its
+    // dropdown position is not guaranteed to be first once a repo ships more
+    // presets than the shipped index happens to list it first.
+    if (voices.voices.some((v) => v.name === 'maichi')) els.voice.value = 'maichi';
+    else if (voices.voices.length) els.voice.value = voices.voices[0].name;
     updateVoiceUi();
 
     player = new StreamPlayer(tts.sampleRate);
@@ -198,6 +200,46 @@ els.clear.addEventListener('click', async () => {
   status('Cache cleared. The next load will re-download the model.');
 });
 
+/** Every tag used by any shipped voice, as toggle chips. Selecting one or more
+ *  narrows the voice dropdown to packs carrying at least one of them — see
+ *  docs/VOICES.md#built-in-voices for the same table in prose. */
+function renderTagFilter(): void {
+  const allTags = [...new Set(voices.voices.flatMap((v) => v.tags ?? []))].sort();
+  els.tagFilter.innerHTML = '';
+  for (const tag of allTags) {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.textContent = tag;
+    chip.addEventListener('click', () => {
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      chip.classList.toggle('active');
+      renderVoiceOptions();
+      updateVoiceUi();
+    });
+    els.tagFilter.append(chip);
+  }
+}
+
+/** Populate the voice <select> from `voices.voices`, filtered to packs that
+ *  carry at least one of `activeTags` (all of them, if none are selected). */
+function renderVoiceOptions(): void {
+  const previous = els.voice.value;
+  els.voice.innerHTML = '<option value="">(unconditional voice)</option>';
+  for (const v of voices.voices) {
+    if (activeTags.size && !(v.tags ?? []).some((t) => activeTags.has(t))) continue;
+    const option = document.createElement('option');
+    option.value = v.name;
+    const label = v.display_name || v.name;
+    option.textContent = (v.tags && v.tags.length) ? `${label} — ${v.tags.join(', ')}` : label;
+    els.voice.append(option);
+  }
+  // Keep the previous selection if the new filter still offers it, else fall
+  // back to whatever is first (including "unconditional" if the filter
+  // matched nothing).
+  const stillThere = [...els.voice.options].some((o) => o.value === previous);
+  els.voice.value = stillThere ? previous : (els.voice.options[1]?.value ?? '');
+}
+
 function updateVoiceUi(): void {
   const name = els.voice.value;
   if (!name || !base) {
@@ -209,7 +251,8 @@ function updateVoiceUi(): void {
   }
   const info = voices.voices.find((v) => v.name === name);
   els.voiceMeta.textContent = info
-    ? [info.name, info.language, info.description].filter(Boolean).join(' · ')
+    ? [info.display_name || info.name, info.language, ...(info.tags ?? [])]
+        .filter(Boolean).join(' · ')
     : name;
   // A 404 here should leave an empty player, not a broken one.
   els.preview.onerror = () => { els.preview.style.display = 'none'; };

@@ -16,8 +16,13 @@ export interface ZeroTTSConfig {
 
 export interface VoiceInfo {
   name: string;
+  display_name?: string;
   language: string;
+  gender?: string;
   description: string;
+  /** Free-form labels ("nữ", "trẻ", "kể chuyện", "ấm áp"...) for the picker
+   *  and its tag filter — see docs/VOICES.md#built-in-voices. */
+  tags?: string[];
   n_voice_queries: number;
   shape: number[];
 }
