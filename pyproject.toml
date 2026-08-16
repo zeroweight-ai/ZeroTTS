@@ -35,11 +35,18 @@ dependencies = [
 # rather than relied on as transitive Gradio dependencies.
 webui = ["gradio>=4.44.0", "fastapi>=0.110", "uvicorn>=0.27", "requests>=2.31"]
 # Metrics only — the scorers are torch models. Inference stays torch-free.
+# Benchmarking. The metrics themselves live in the ZeroBench-TTS dataset repo
+# (fetched at runtime by evaluation/zerobench.py); these are the libraries its
+# scorer needs. UTMOSv2 is optional — pass --skip_utmos without it.
 eval = [
     "torch>=2.4.0",
     "torchaudio>=2.4.0",
     "transformers>=4.44.0",
-    "soe-vinorm>=0.1.0",
+    "huggingface_hub>=0.23",
+    "datasets>=2.19",
+    "librosa>=0.10",
+    "pandas>=2.0",
+    "jiwer>=3.0",
 ]
 dev = ["pytest>=7.4", "ruff>=0.5"]
 
