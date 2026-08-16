@@ -226,10 +226,46 @@ const ROMAN: Record<string, string> = {
  *  is a number rather than an acronym. */
 const ROMAN_CUES = ['quý', 'thứ', 'khóa', 'kỳ', 'đợt', 'loại', 'chương', 'phần', 'thế kỷ'];
 
-/** Space out a run of letters so the model spells it: "AB" -> "A B".
- *  Deliberately not a Vietnamese letter-name table — the model already
- *  spells Latin letters, and "W" alone is vê kép / đắp liu / vê đúp. */
-const spellLetters = (letters: string) => letters.toUpperCase().split('').join(' ');
+/** A letter run as capitals, unchanged: "ab" -> "AB". Deliberately not spaced
+ *  into single letters and deliberately not a Vietnamese letter-name table —
+ *  a capitalised run is already enough for the model to spell it. */
+const spellLetters = (letters: string) => letters.toUpperCase();
+
+/** Insert a space at every internal case boundary of a mixed-case token.
+ *
+ *  Case is tested with toUpperCase()/toLowerCase() comparisons, NOT a regex
+ *  letter class: the precomposed Vietnamese letters live in Latin Extended
+ *  Additional where upper and lower case interleave, so a range like `Ạ-Ỹ`
+ *  also matches "ế" and would split "Chiếc" into "Chi ếc".
+ *
+ *  Only an ACRONYM is split off — an uppercase run of two or more. That is the
+ *  difference between "Chat|GPT" and "MacBook": the second is an ordinary
+ *  CamelCase brand read as one word ("YouTube", "TikTok"). A single leading
+ *  lowercase letter does not open a boundary either, so "iPhone" survives. */
+const isUp = (c: string) => !!c && c !== c.toLowerCase() && c === c.toUpperCase();
+const isLow = (c: string) => !!c && c !== c.toUpperCase() && c === c.toLowerCase();
+
+export function splitCamelCase(text: string): string {
+  return text.split(/(\s+)/).map((token) => {
+    if (!token || /^\s+$/.test(token)) return token;
+    const chars = [...token];
+    if (!(chars.some(isUp) && chars.some(isLow))) return token;
+    const out: string[] = [];
+    let lowerRun = 0;
+    for (let i = 0; i < chars.length; i++) {
+      const c = chars[i];
+      if (isUp(c) && i > 0) {
+        let run = 0;
+        while (i + run < chars.length && isUp(chars[i + run])) run++;
+        if (lowerRun >= 2 && run >= 2) out.push(' ');
+        else if (isUp(chars[i - 1]) && isLow(chars[i + 1] ?? '')) out.push(' ');
+      }
+      lowerRun = isLow(c) ? lowerRun + 1 : 0;
+      out.push(c);
+    }
+    return out.join('');
+  }).join('');
+}
 
 /** URLs and emails are matched and skipped wholesale — normalizing inside one
  *  produces nonsense, and this module has no URL reader. */
@@ -317,9 +353,9 @@ function expandMatch(m: RegExpExecArray): string {
   if (g.pfx !== undefined) return expandAbbreviation(g.pfx) ?? g.pfx;
   if (g.ap !== undefined) return g.ap;
   if (g.code_a !== undefined) {
-    // Space out both halves so the model spells the letters and reads the
-    // digits one at a time — never "một nghìn hai trăm ba mươi tư".
-    return `${spellLetters(g.code_a)} ${g.code_n!.split('').join(' ')}`;
+    // Split the letters off as their own word so the model spells them; the
+    // digits stay a single run. "AB-1234" -> "AB 1234".
+    return `${spellLetters(g.code_a)} ${g.code_n!}`;
   }
   if (g.deg_n !== undefined) {
     const unit = g.deg_u === 'C' ? ' xê' : g.deg_u === 'F' ? ' ép' : '';
@@ -435,11 +471,11 @@ export function normalizeViText(text: string): string {
   PROTECTED.lastIndex = 0;
   let p: RegExpExecArray | null;
   while ((p = PROTECTED.exec(text)) !== null) {
-    out.push(scan(text.slice(last, p.index)));
+    out.push(scan(splitCamelCase(text.slice(last, p.index))));
     out.push(p[0]);
     last = p.index + p[0].length;
   }
-  out.push(scan(text.slice(last)));
+  out.push(scan(splitCamelCase(text.slice(last))));
 
   // Expansions leave double spaces where a compact form used to be.
   return out.join('').replace(/[ \t]{2,}/g, ' ');

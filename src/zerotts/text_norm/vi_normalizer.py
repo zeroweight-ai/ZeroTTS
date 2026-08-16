@@ -238,13 +238,15 @@ _PREFIX_ABBR = ("TP", "Q", "P", "H", "TX", "TT", "KP")
 
 
 def spell_letters(letters: str) -> str:
-    """Space out a run of letters so the model spells it: "AB" -> "A B".
+    """Return a letter run as capitals, unchanged: "ab" -> "AB".
 
-    Deliberately NOT a Vietnamese letter-name table. The model already spells
-    Latin letters correctly, and a table is a second thing to get wrong — "W"
-    alone is "vê kép", "đắp liu" or "vê đúp" depending on the speaker.
+    Deliberately NOT spaced into single letters, and deliberately NOT a
+    Vietnamese letter-name table. A capitalised run is already enough for the
+    model to spell it; "A B" adds nothing, and a letter-name table is a second
+    thing to get wrong — "W" alone is "vê kép", "đắp liu" or "vê đúp"
+    depending on the speaker.
     """
-    return " ".join(letters.upper())
+    return letters.upper()
 
 
 def _month(value: str) -> str:
@@ -304,6 +306,59 @@ def _expand_abbreviation(token: str) -> str | None:
 
 _VN_UPPER = "A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝĂĐĨŨƠƯẠ-Ỹ"
 _VN_LOWER = "a-zàáâãèéêìíòóôõùúýăđĩũơưạ-ỹ"
+
+# ── CamelCase splitting ──────────────────────────────────────────────────────
+# "ChatGPT" and "ZeroTTS" are a word glued to an acronym, and read as one token
+# they come out slurred. Splitting at the case boundary is all the model needs —
+# it spells a capitalised run correctly on its own, so no letter spacing and no
+# letter-name table:
+#
+#     OpenAI  -> Open AI        ChatGPT -> Chat GPT
+#     ZeroTTS -> Zero TTS       TTSModel -> TTS Model
+#
+# A pure acronym has no case boundary and is left exactly as it is ("ABC",
+# "WHO", "VN"), which is the point: capitalised is already enough.
+
+def split_camel_case(text: str) -> str:
+    """Insert a space at every internal case boundary of a mixed-case token.
+
+    Case is tested with ``str.isupper()``/``str.islower()``, NOT a regex letter
+    class: the precomposed Vietnamese letters live in Latin Extended Additional,
+    where upper and lower case interleave, so a range like ``Ạ-Ỹ`` also matches
+    "ế" and would split "Chiếc" into "Chi ếc".
+
+    Only an ACRONYM is split off — an uppercase run of two or more. That is the
+    difference between "Chat|GPT" and "MacBook": the first is a word glued to an
+    acronym, the second is an ordinary CamelCase brand that is read as one word
+    ("YouTube", "TikTok"), and splitting those makes the reading worse.
+
+    A single leading lowercase letter does not open a boundary either, so
+    "iPhone" and "eBay" survive intact.
+    """
+    out = []
+    for token in re.split(r"(\s+)", text):
+        if not token or token.isspace():
+            out.append(token)
+            continue
+        if not (any(c.isupper() for c in token) and any(c.islower() for c in token)):
+            out.append(token)          # all-lower or all-upper: nothing to split
+            continue
+        chars, lower_run = [], 0
+        for i, c in enumerate(token):
+            if c.isupper() and i > 0:
+                nxt = token[i + 1] if i + 1 < len(token) else ""
+                run = 0                                # length of this uppercase run
+                while i + run < len(token) and token[i + run].isupper():
+                    run += 1
+                if lower_run >= 2 and run >= 2:                   # openAI -> open AI
+                    chars.append(" ")
+                elif token[i - 1].isupper() and nxt.islower():    # TTSModel -> TTS Model
+                    chars.append(" ")
+            lower_run = lower_run + 1 if c.islower() else 0
+            chars.append(c)
+        out.append("".join(chars))
+    return "".join(out)
+
 
 # Cue words that force "D/M" to be read as a day-and-month rather than a
 # fraction. Matched case-insensitively, immediately before the number.
@@ -487,10 +542,10 @@ def _expand_match(match: re.Match) -> str:
         return g["ap"]
 
     if g["code_a"] is not None:
-        # An identifier, not a quantity: space out both halves so the model
-        # spells the letters and reads the digits one at a time. "AB-1234"
-        # becomes "A B 1 2 3 4", never "một nghìn hai trăm ba mươi tư".
-        return f"{spell_letters(g['code_a'])} {' '.join(g['code_n'])}"
+        # An identifier, not a quantity. Split the letters off as their own
+        # word so the model spells them; the digits stay a single run.
+        # "AB-1234" -> "AB 1234", "VN-215" -> "VN 215".
+        return f"{spell_letters(g['code_a'])} {g['code_n']}"
 
     if g["deg_n"] is not None:
         unit = {"C": " xê", "F": " ép"}.get(g["deg_u"] or "", "")
@@ -534,13 +589,16 @@ def normalize_vi_text(text: str) -> str:
     # precomposed, so decomposed input ("Ð" + combining marks) would miss.
     text = unicodedata.normalize("NFC", text)
 
+    # CamelCase runs first: the scanner's abbreviation branch needs "ChatGPT"
+    # already split into "Chat GPT" to see "GPT" as an acronym at all. URLs and
+    # emails are excluded here too — splitting inside one breaks it.
     out: list[str] = []
     last = 0
     for protected in _PROTECTED_RE.finditer(text):
-        out.append(_SCANNER.sub(_replace, text[last:protected.start()]))
+        out.append(_SCANNER.sub(_replace, split_camel_case(text[last:protected.start()])))
         out.append(protected.group(0))
         last = protected.end()
-    out.append(_SCANNER.sub(_replace, text[last:]))
+    out.append(_SCANNER.sub(_replace, split_camel_case(text[last:])))
 
     # Expansions leave double spaces where a compact form used to be.
     return re.sub(r"[ \t]{2,}", " ", "".join(out))

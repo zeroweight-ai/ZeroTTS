@@ -162,14 +162,14 @@ def test_date_survives_sentence_final_period(text, expected):
 
 
 @pytest.mark.parametrize("text,expected", [
-    # Alphanumeric identifiers are spaced out, not read as quantities:
-    # "AB-1234" was becoming "AB-một nghìn hai trăm ba mươi tư". Letters stay
-    # capitals — the model spells them; a Vietnamese letter-name table would be
-    # a second thing to get wrong.
-    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là A B 1 2 3 4."),
+    # Alphanumeric identifiers: the letters split off as their own word so the
+    # model spells them, and the digits are not read as a quantity ("AB-1234"
+    # was becoming "AB-một nghìn hai trăm ba mươi tư"). No spacing between
+    # letters — a capitalised run is already enough.
+    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là AB 1234."),
     # ... and the letter half must not go through the abbreviation table, which
     # turned the flight code VN-215 into "Việt Nam-hai trăm mười lăm".
-    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay V N 2 1 5 khởi hành."),
+    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay VN 215 khởi hành."),
 ])
 def test_alphanumeric_codes_are_spelled_not_counted(text, expected):
     assert N(text) == expected
@@ -211,4 +211,29 @@ def test_coordinated_day_shares_the_month():
 
 def test_parenthesized_acronym_after_its_own_expansion_is_spelled():
     assert N("Tổ chức Thương mại Thế giới (WTO) dự báo.") == (
-        "Tổ chức Thương mại Thế giới (W T O) dự báo.")
+        "Tổ chức Thương mại Thế giới (WTO) dự báo.")
+
+
+@pytest.mark.parametrize("text,expected", [
+    # A word glued to an acronym reads as one slurred token. Splitting at the
+    # case boundary is all the model needs — it spells a capitalised run by
+    # itself, so no letter spacing and no letter-name table.
+    ("Tôi dùng ChatGPT mỗi ngày.", "Tôi dùng Chat GPT mỗi ngày."),
+    ("OpenAI vừa ra mắt.", "Open AI vừa ra mắt."),
+    ("ZeroTTS chạy trên CPU.", "Zero TTS chạy trên CPU."),
+    # Only an ACRONYM splits off. An ordinary CamelCase brand is read as one
+    # word, and splitting it makes the reading worse.
+    ("Chiếc MacBook này.", "Chiếc MacBook này."),
+    ("qua Facebook và TikTok", "qua Facebook và TikTok"),
+    ("mê xem YouTube hơn", "mê xem YouTube hơn"),
+    # A pure acronym has no case boundary and is left exactly as written.
+    ("Các tổ chức như ABC.", "Các tổ chức như ABC."),
+    # A single leading lowercase letter is a brand convention, not a boundary.
+    ("một chiếc iPhone mới", "một chiếc iPhone mới"),
+    # Vietnamese words must survive: the precomposed letters interleave case in
+    # Unicode, so a regex letter range would split "Chiếc" into "Chi ếc".
+    ("Chiếc xe ở Hà Nội và Đà Nẵng.", "Chiếc xe ở Hà Nội và Đà Nẵng."),
+    ("Chuyến tàu đi Đà Lạt.", "Chuyến tàu đi Đà Lạt."),
+])
+def test_camel_case_split(text, expected):
+    assert N(text) == expected
