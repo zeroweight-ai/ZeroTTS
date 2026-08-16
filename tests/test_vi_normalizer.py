@@ -139,3 +139,69 @@ def test_every_supported_form_is_covered():
         "number", "date", "time", "version", "fraction", "abbrev", "untouched",
         "percent", "at",
     }, f"missing coverage for {covered}"
+
+
+# ── regressions ───────────────────────────────────────────────────────────────
+# Each case below was a real bug found by scoring the normalizer's output
+# against ZeroBench-TTS's curated readings. They are grouped here so a future
+# scanner edit that reintroduces one fails loudly.
+
+@pytest.mark.parametrize("text,expected", [
+    # A sentence-final period made the trailing guard `(?![\d/.\-])` reject the
+    # date, so it fell through to the bare-number branch and kept its slashes:
+    # "ngày ba mươi mốt/mười hai/hai nghìn...". The guard must exclude a LONGER
+    # number, not any dot.
+    ("Hạn cuối là ngày 31/12/2025.",
+     "Hạn cuối là ngày ba mươi mốt tháng mười hai năm hai nghìn không trăm hai mươi lăm."),
+    ("ngày 15/8.", "ngày mười lăm tháng tám."),
+    ("Ngày 2/9/1945, Chủ tịch",
+     "Ngày hai tháng chín năm một nghìn chín trăm bốn mươi lăm, Chủ tịch"),
+])
+def test_date_survives_sentence_final_period(text, expected):
+    assert N(text) == expected
+
+
+@pytest.mark.parametrize("text,expected", [
+    # Alphanumeric identifiers are spelled, not read as quantities: "AB-1234"
+    # was becoming "AB-một nghìn hai trăm ba mươi tư".
+    ("Mã đơn hàng là AB-1234.", "Mã đơn hàng là a bê một hai ba bốn."),
+    # ... and the letter half must not go through the abbreviation table, which
+    # turned the flight code VN-215 into "Việt Nam-hai trăm mười lăm".
+    ("Chuyến bay VN-215 khởi hành.", "Chuyến bay vê en hai một năm khởi hành."),
+])
+def test_alphanumeric_codes_are_spelled_not_counted(text, expected):
+    assert N(text) == expected
+
+
+def test_degree_sign_is_spoken():
+    # The bare-number branch claimed the digits and stranded "°C".
+    assert N("Hôm nay 38°C.") == "Hôm nay ba mươi tám độ xê."
+
+
+def test_roman_numeral_after_ordinal_cue():
+    # "quý III" is a quarter, not the acronym III.
+    assert N("GDP quý III tăng.") == "GDP quý ba tăng."
+    # Without a cue it stays an acronym.
+    assert "ba" not in N("Nhóm III họp.").split()[1]
+
+
+def test_acronym_pair_over_slash():
+    # Two abbreviations matched separately and left the '/' to be read aloud.
+    assert N("Tỷ giá USD/VND cao.") == "Tỷ giá đô la mỹ trên đồng Việt Nam cao."
+
+
+def test_prefix_abbreviation_keeps_its_dot_out_of_the_sentence():
+    assert N("Hà Nội, TP. HCM và Đà Nẵng.") == "Hà Nội, thành phố Hồ Chí Minh và Đà Nẵng."
+    # ... but a genuine sentence break must survive.
+    assert N("Anh ấy làm ở FPT. Sau đó nghỉ.") == "Anh ấy làm ở FPT. Sau đó nghỉ."
+
+
+def test_coordinated_day_shares_the_month():
+    assert N("hai ngày 26 và 27/6") == "hai ngày hai mươi sáu và hai mươi bảy tháng sáu"
+    # "và" is only a date cue near a real one — this stays arithmetic.
+    assert N("Kết quả là 3 và 4/5 của tổng.") == "Kết quả là ba và 4/5 của tổng."
+
+
+def test_parenthesized_acronym_after_its_own_expansion_is_spelled():
+    assert N("Tổ chức Thương mại Thế giới (WTO) dự báo.") == (
+        "Tổ chức Thương mại Thế giới (vê kép tê ô) dự báo.")

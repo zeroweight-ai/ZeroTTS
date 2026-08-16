@@ -1858,7 +1858,7 @@ v.v:vân vân
 v/v:về việc
 cty:công ty
 ngta:người ta
-VNĐ:việt nam đồng
+VNĐ:đồng Việt Nam
 vnđ:việt nam đồng
 USD:đô la mỹ
 usd:đô la mỹ
@@ -2182,7 +2182,7 @@ VBQPPL:văn bản quy phạm pháp luật
 vbqppl:văn bản quy phạm pháp luật
 VHTTDL:Văn hóa thể thao du lịch
 vhttdl:Văn hóa thể thao du lịch
-VND:việt nam đồng
+VND:đồng Việt Nam
 vnd:việt nam đồng
 VPQH:Văn phòng Quốc hội
 vpqh:Văn phòng Quốc hội
