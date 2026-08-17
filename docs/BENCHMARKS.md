@@ -40,7 +40,7 @@ once; `coqui-tts`'s `inference_stream` throws against this stack's
 so their TTFA is the time to the complete utterance. That asymmetry is real
 and worth naming, but it isn't the whole story: even OmniVoice's RTF —
 generation time alone, no streaming involved — is 3-11× slower than real time
-on CPU, because it's a GPU-sized model (3.1 GB vs. ZeroTTS's 81 M) doing
+on CPU, because it's a GPU-sized model (3.1 GB vs. ZeroTTS's 0.86 GB) doing
 autoregressive diffusion-LM decoding without CUDA kernels to lean on.
 
 ## How scoring works

@@ -228,11 +228,13 @@ spoken out, from the benchmark's own curated reading.
 | **Dead air** (excess silence) ↓ | **0.029 s** | 0.386 s | 0.568 s | 0.215 s |
 | **RTF, CPU** ↓ | **0.50×** | 6.12× | 0.71× | 0.73× |
 | **Time to first audio, CPU** ↓ | **~70 ms** | ~34 s | ~6.1 s | ~5.1 s |
-| Size | **81 M**, CPU | 3.1 GB, GPU | 1.9 GB, GPU | 1.9 GB, GPU |
+| Size | **202 M** params, 0.86 GB fp32, CPU | 3.1 GB, GPU | 1.9 GB, GPU | 1.9 GB, GPU |
 
-**4× fewer word errors than the next-best system**, and the only one of the four
-that's actually fast on CPU — the others are sized and tuned for a GPU, and it
-shows.
+**4× fewer word errors than the next-best system**, and the fastest of the four
+on CPU. The gap is much wider in latency than in throughput: the two XTTS
+fine-tunes also beat real time (0.71×) but need seconds to emit their first
+sample, while OmniVoice is 6× *slower* than real time. All three are sized and
+tuned for a GPU, and it shows.
 
 Full comparison tables, per-subset breakdowns, and CPU speed methodology:
 **[docs/BENCHMARKS.md](https://github.com/zeroweight-ai/ZeroTTS/blob/main/docs/BENCHMARKS.md)**
