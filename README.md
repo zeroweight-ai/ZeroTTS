@@ -22,7 +22,7 @@ the next open model**, and it runs faster than real time on a laptop CPU.
 * ⚡ **Real-time on CPU, streaming** — ~2× faster than real time (RTF 0.5×),
   first audio chunk in ~70 ms. No GPU required.
 * 🇻🇳 **Built for Vietnamese** — tones, code-switched English, and a built-in
-  normalizer that reads `31/12/2025` and `ChatGPT` the way a person would.
+  normalizer that reads `31/12/2025` and `ZeroTTS` the way a person would.
 
 ```python
 from zerotts import ZeroTTS
@@ -100,9 +100,34 @@ print(tts.list_voices())
 audio = tts.synthesize("Hôm nay trời đẹp quá.", voice="maichi")
 tts.save_audio(audio, "out.wav")
 
-# Streaming — first chunk arrives in ~70 ms, then chunks ramp up in size
-for chunk in tts.synthesize_stream("Một đoạn văn bản dài hơn…", voice="maichi"):
-    play(chunk)   # (1, n) float32 at 48 kHz
+# Streaming — first chunk arrives in ~70 ms
+import queue
+
+import numpy as np
+import sounddevice as sd   # pip install sounddevice
+
+TEXT = ("Đây là chế độ phát trực tuyến. Âm thanh được tạo ra và phát ngay lập tức, "
+        "không cần chờ toàn bộ đoạn văn hoàn thành. Nhờ vậy, người nghe chỉ mất "
+        "khoảng 70 mili giây là đã nghe thấy câu đầu tiên, ngay cả khi mô "
+        "hình đang chạy trên CPU của một chiếc laptop bình thường.")
+
+pending, tail = queue.Queue(), np.zeros(0, dtype="float32")
+
+def feed(outdata, frames, _time, _status):
+    global tail
+    while len(tail) < frames and not pending.empty():
+        tail = np.concatenate([tail, pending.get_nowait()])
+    n = min(frames, len(tail))
+    outdata[:n, 0] = tail[:n]
+    outdata[n:] = 0
+    tail = tail[n:]
+
+with sd.OutputStream(samplerate=tts.sample_rate, channels=1,
+                     dtype="float32", callback=feed):
+    for chunk in tts.synthesize_stream(TEXT, voice="maichi"):
+        pending.put(chunk.reshape(-1))   # chunk is (1, n) float32 at 48 kHz
+    while not pending.empty() or len(tail):
+        sd.sleep(50)                     # let the buffer drain before closing
 ```
 
 Dates, clock times, fractions and acronyms are expanded to spoken Vietnamese
