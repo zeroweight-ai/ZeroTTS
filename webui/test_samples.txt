@@ -3,31 +3,32 @@
 # Format: a line starting with "### " begins a new named sample; everything
 # until the next "### " (or EOF) is that sample's raw text, exactly as it would
 # be pasted into the input box. Lines starting with "#" outside a sample body
-# are comments. Edit or add samples freely.
+# are comments. The name is what both demos show in their template picker, so
+# write it for a reader, not as an identifier. Edit or add samples freely.
 #
-# ZeroTTS is a Vietnamese model; the "mixed" samples exercise English words and
-# product names embedded in Vietnamese sentences, which is what real Vietnamese
-# text tends to contain.
+# ZeroTTS is a Vietnamese model; the "Việt – Anh" samples exercise English words
+# and product names embedded in Vietnamese sentences, which is what real
+# Vietnamese text tends to contain.
 
-### vietnamese_short
+### Chào hỏi ngắn
 Chào bạn! Hôm nay bạn khỏe không?
 
-### vietnamese_long
+### Kể chuyện dài
 Ngày xưa, ở một ngôi làng nhỏ ven sông, có một ông lão đánh cá sống một mình trong túp lều tranh. Mỗi sáng, khi sương còn giăng kín mặt nước, ông lại chèo thuyền ra khơi, thả lưới rồi kiên nhẫn chờ đợi. Có những hôm ông về tay không, nhưng cũng có những hôm cá đầy khoang; dù thế nào, ông vẫn mỉm cười, vì với ông, biển cả không chỉ cho cá mà còn cho cả sự bình yên trong tâm hồn. Dân làng ai cũng quý mến ông, thường gọi ông là "ông lão của biển", và trẻ con trong làng lớn lên cùng những câu chuyện ông kể về sóng, về gió, và về những con tàu đã đi qua không bao giờ trở lại.
 
-### vietnamese_punctuation_edge_cases
+### Khuyến mãi — số, %, giờ
 Giảm giá 25% — nhưng chỉ khi bạn đặt 3/4 số lượng trước 17:00 hôm nay. Cô ấy nói, "để tôi suy nghĩ đã," rồi bỏ đi; anh không chắc điều đó có nghĩa là gì. Đây là chương trình "mua một tặng một" (có giới hạn), 100% thật, không phát sinh chi phí — xem thêm tại vidu.com/khuyenmai.
 
-### mixed_short
+### Việt – Anh, ngắn
 Chào John, anh khỏe không? Long time no see!
 
-### mixed_long
+### Việt – Anh, dài
 Sáng nay Mary gọi điện cho tôi và nói rằng cô ấy vừa mới ký hợp đồng với công ty Google, một tin vui không thể tin được. Tôi hỏi cô ấy, "Vậy bao giờ thì em bắt đầu đi làm?", và cô ấy trả lời rằng phải đợi đến khi HR gửi offer letter chính thức, dự kiến khoảng 2/3 tuần nữa. Cả nhà ai cũng mừng cho cô, đặc biệt là bố cô, ông Tuấn, người vẫn hay đùa rằng con gái ông sẽ "conquer Silicon Valley" một ngày nào đó. Trong bữa tối, David, bạn trai của Mary, cũng ghé qua chúc mừng; anh mang theo một chai rượu vang Pháp và nói, "Congratulations, this calls for a celebration!" — cả nhà cười vang, không khí ấm áp như chưa từng có khoảng cách văn hóa nào giữa họ.
 
-### mixed_punctuation_edge_cases
+### Việt – Anh, có số liệu
 Anh Peter nói giảm 25% cho đơn hàng trên 3/4 triệu, xong deadline là 5:00 p.m. hôm nay — deal này "hot" lắm đó, check it out ở link facebook.com/peter_shop nhé!
 
-### news
+### Bản tin công nghệ
 Theo thông báo của OpenAI, từ tuần tới, người dùng miễn phí và gói Go có thể trò chuyện văn bản thoải mái với ChatGPT. Tuy nhiên, việc tạo hình ảnh, tải lên tệp và sử dụng công cụ giọng nói trong chatbot vẫn sẽ bị hạn chế.
 
 Theo Cnet, người dùng miễn phí và trả phí cũng sẽ sử dụng mô hình mặc định mới Luna - bản gọn nhẹ giá rẻ của GPT-5.6. OpenAI cho biết, Luna hoạt động tốt hơn mô hình mặc định hiện tại GPT-5.5 Instant, giảm 62% khả năng mắc lỗi sai thông tin. Ngoài ra, người dùng miễn phí và gói Go sẽ có nút "Suy nghĩ" mới, cho phép chatbot trả lời câu hỏi khó hơn bằng cách dành nhiều thời gian hơn để xử lý câu trả lời.

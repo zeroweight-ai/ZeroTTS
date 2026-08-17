@@ -52,10 +52,6 @@ export interface LoadOptions {
   repo?: string;
   revision?: string;
   onProgress?: ProgressFn;
-  /** 'wasm' works everywhere. 'webgpu' is faster but its kernels are not
-   *  bit-identical to CPU, and this model samples inside the graph, so small
-   *  numeric differences change which token is drawn. */
-  executionProvider?: 'wasm' | 'webgpu';
   threads?: number;
 }
 
@@ -67,13 +63,16 @@ export interface LoadedModel {
 
 export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel> {
   const base = repoBaseUrl(options.repo ?? DEFAULT_REPO, options.revision);
-  const ep = options.executionProvider ?? 'wasm';
 
   ort.env.wasm.numThreads = options.threads ?? Math.min(4, navigator.hardwareConcurrency || 4);
   ort.env.wasm.simd = true;
 
+  // WASM only. WebGPU's kernels are not bit-identical to the CPU path, and this
+  // model samples INSIDE the graph — small numeric differences change which
+  // token is drawn, so the provider is not a free speed knob but a change in
+  // output quality. It is deliberately not offered.
   const sessionOptions: ort.InferenceSession.SessionOptions = {
-    executionProviders: [ep],
+    executionProviders: ['wasm'],
     graphOptimizationLevel: 'all',
   };
 

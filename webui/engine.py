@@ -106,14 +106,6 @@ def _load_voices() -> list:
     return out
 
 
-def all_tags() -> list:
-    """Every tag used by any shipped voice, sorted — the filter's checkbox
-    list. Vietnamese collation via locale is overkill for ~9 packs' worth of
-    tags, so plain sort is fine."""
-    tags = {t for v in _load_voices() for t in v.tags}
-    return sorted(tags)
-
-
 def voice_choices(selected_tags=None) -> list:
     """(label, name) pairs for the dropdown, optionally filtered to voices that
     carry at least one of ``selected_tags``. Label leads with the human name
@@ -142,6 +134,18 @@ def voice_preview_path(name: str) -> str | None:
         return None
     path = voice.preview_path
     return path if path and os.path.isfile(path) else None
+
+
+def voice_display_name(name: str) -> str:
+    """Human label for a voice id, falling back to the id itself. Used by the
+    history list, whose rows carry the id from the sidecar json."""
+    if not name:
+        return ""
+    try:
+        v = get_tts().load_voice(name)
+    except Exception:
+        return name
+    return v.display_name or v.name
 
 
 def voice_info(name: str) -> str:
@@ -173,6 +177,42 @@ def list_generated() -> list:
              for f in os.listdir(GENERATED_DIR) if f.endswith(".wav")]
     files.sort(key=os.path.getmtime, reverse=True)
     return files
+
+
+def generated_meta(path: str) -> dict:
+    """What the history list shows for one saved file: voice, spoken text and
+    duration, from the sidecar .json generate_stream writes next to the wav.
+
+    Every field degrades to something displayable — a history entry whose
+    sidecar is missing, truncated or hand-deleted must still render as a row,
+    not take the whole panel down.
+    """
+    meta = {}
+    try:
+        with open(path + ".json", encoding="utf-8") as f:
+            meta = json.load(f)
+    except Exception:
+        pass
+
+    when = str(meta.get("created_at") or "")
+    if len(when) == 15 and when[8] == "_":  # 20260817_143002
+        when = f"{when[9:11]}:{when[11:13]}:{when[13:15]} · {when[6:8]}/{when[4:6]}"
+    else:
+        when = time.strftime("%H:%M:%S · %d/%m", time.localtime(os.path.getmtime(path)))
+
+    try:
+        info = sf.info(path)
+        seconds = info.frames / float(info.samplerate or 1)
+    except Exception:
+        seconds = 0.0
+
+    return {
+        "path": path,
+        "voice": meta.get("voice") or "không giọng",
+        "text": (meta.get("text") or os.path.basename(path)).strip(),
+        "when": when,
+        "seconds": seconds,
+    }
 
 
 # ── text ─────────────────────────────────────────────────────────────────────

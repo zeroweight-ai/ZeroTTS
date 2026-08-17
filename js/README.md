@@ -119,6 +119,7 @@ because each one fails *quietly*.
 - Generation runs on the main thread. It should move into a Web Worker
   (`worker.ts`) — the per-frame loop otherwise competes with rendering and can
   stutter playback under load.
-- WebGPU is selectable but unvalidated. Its kernels are not bit-identical to the
+- WASM only — there is no WebGPU path. Its kernels are not bit-identical to the
   CPU path, and since this model samples *inside* the graph, small numeric
-  differences change which token is drawn. Compare against WASM before using it.
+  differences change which token is drawn, which showed up as degraded output
+  rather than as an error.

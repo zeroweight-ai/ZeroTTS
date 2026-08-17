@@ -83,7 +83,8 @@ specifically bite in JavaScript.
 
 ## Execution providers
 
-WASM works everywhere and is the default. WebGPU is substantially faster where
-available, but check numerics before trusting it — WebGPU kernels are not
-bit-identical to the CPU path, and this model's sampling happens inside the
-graph, so small differences change which token is drawn.
+WASM, and only WASM. WebGPU is nominally faster, but its kernels are not
+bit-identical to the CPU path, and this model's sampling happens *inside* the
+graph — small numeric differences change which token is drawn, so the provider
+is not a speed knob, it is a change in what the model says. The demo does not
+offer it and the loader does not accept it.

@@ -1,6 +1,14 @@
-/** Demo UI wiring. The interesting code is in synthesizer.ts / codec.ts. */
+/** Demo UI wiring. The interesting code is in synthesizer.ts / codec.ts.
+ *
+ *  The page mirrors webui/app.py: a basic view that is model → voice → text →
+ *  player and nothing else, with the run log, the segments and every sampling
+ *  knob folded into "Tuỳ chọn nâng cao". Templates and the take history are
+ *  lists of real rows with a preview, not a strip of tags.
+ */
 
-import { clearCache } from './cache';
+import bannerUrl from '../../docs/assets/banner.png';
+
+import { clearCache, fetchWithCache } from './cache';
 import { textSegments } from './chunking';
 import { normalizeViText } from './textNorm';
 import {
@@ -11,9 +19,13 @@ import { StreamPlayer, toWavBlob } from './player';
 import { ZeroTTSBrowser } from './synthesizer';
 import { VoiceIndex } from './types';
 
+/** Same first-load text as the Gradio UI. */
+const DEFAULT_TEXT = 'Xin chào tất cả mọi người. Giọng nói này được tạo ra bởi ZeroTTS.';
+
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const els = {
+  banner: $<HTMLImageElement>('banner'),
   load: $<HTMLButtonElement>('load'),
   generate: $<HTMLButtonElement>('generate'),
   stop: $<HTMLButtonElement>('stop'),
@@ -22,7 +34,6 @@ const els = {
   text: $<HTMLTextAreaElement>('text'),
   voice: $<HTMLSelectElement>('voice'),
   repo: $<HTMLInputElement>('repo'),
-  ep: $<HTMLSelectElement>('ep'),
   seed: $<HTMLInputElement>('seed'),
   cfg: $<HTMLInputElement>('cfg'),
   temperature: $<HTMLInputElement>('temperature'),
@@ -31,13 +42,17 @@ const els = {
   status: $<HTMLDivElement>('status'),
   bar: $<HTMLDivElement>('bar'),
   barWrap: $<HTMLDivElement>('bar-wrap'),
-  sizeNote: $<HTMLDivElement>('size-note'),
-  sample: $<HTMLSelectElement>('sample'),
+  sizeNote: $<HTMLParagraphElement>('size-note'),
   preview: $<HTMLAudioElement>('preview'),
-  voiceMeta: $<HTMLDivElement>('voice-meta'),
-  tagFilter: $<HTMLDivElement>('tag-filter'),
+  voiceMeta: $<HTMLParagraphElement>('voice-meta'),
   segments: $<HTMLPreElement>('segments'),
+  result: $<HTMLAudioElement>('result'),
+  livePill: $<HTMLDivElement>('live-pill'),
+  history: $<HTMLDivElement>('history'),
+  templates: $<HTMLDivElement>('templates'),
 };
+
+interface Take { url: string; title: string; text: string; }
 
 let samples: Record<string, string> = {};
 
@@ -46,7 +61,7 @@ let voices: VoiceIndex = { voices: [] };
 let base = '';
 let player: StreamPlayer | null = null;
 let abort: AbortController | null = null;
-let activeTags = new Set<string>();
+const takes: Take[] = [];
 
 const mb = (bytes: number) => `${(bytes / 1e6).toFixed(0)} MB`;
 
@@ -59,39 +74,40 @@ function progress(fraction: number | null): void {
   if (fraction !== null) els.bar.style.width = `${Math.round(fraction * 100)}%`;
 }
 
+function live(on: boolean): void {
+  els.livePill.classList.toggle('on', on);
+}
+
 async function refreshSizeNote(): Promise<void> {
   try {
     const info = await downloadInfo(repoBaseUrl(els.repo.value || DEFAULT_REPO));
     els.sizeNote.textContent = info.cached
-      ? `Model is cached locally (${mb(info.bytes)}) — loading will be fast.`
-      : `First load downloads ~${mb(info.bytes)} (fp32, not quantized). ` +
-        `It is cached afterwards. Desktop broadband recommended.`;
+      ? `Mô hình đã có sẵn trên máy (${mb(info.bytes)}) — tải sẽ rất nhanh.`
+      : `Lần đầu sẽ tải khoảng ${mb(info.bytes)} (fp32, chưa lượng tử hoá) và ` +
+        `lưu lại cho những lần sau. Nên dùng máy tính với mạng nhanh.`;
   } catch {
     els.sizeNote.textContent =
-      'First load downloads ~900 MB (fp32, not quantized) and caches it afterwards.';
+      'Lần đầu sẽ tải khoảng 900 MB (fp32, chưa lượng tử hoá) và lưu lại cho những lần sau.';
   }
 }
 
 els.load.addEventListener('click', async () => {
   els.load.disabled = true;
   try {
-    status('Downloading model…');
+    status('Đang tải mô hình…');
     progress(0);
     const loaded = await loadModel({
       repo: els.repo.value || DEFAULT_REPO,
-      executionProvider: els.ep.value as 'wasm' | 'webgpu',
       onProgress: (p) => {
         if (p.overallTotal > 0) progress(p.overallLoaded / p.overallTotal);
-        status(`Downloading ${p.file.split('/').pop()} — ` +
-               `${mb(p.overallLoaded)} / ${mb(p.overallTotal)}`);
+        els.sizeNote.textContent =
+          `Đang tải ${p.file.split('/').pop()} — ${mb(p.overallLoaded)} / ${mb(p.overallTotal)}`;
       },
     });
     tts = loaded.tts;
     voices = loaded.voices;
     base = loaded.base;
 
-    activeTags = new Set();
-    renderTagFilter();
     renderVoiceOptions();
     // Prefer "maichi" (Mai Chi) as the default, same as the README/webui — its
     // dropdown position is not guaranteed to be first once a repo ships more
@@ -102,10 +118,15 @@ els.load.addEventListener('click', async () => {
 
     player = new StreamPlayer(tts.sampleRate);
     progress(null);
+    els.sizeNote.textContent =
+      `Đã sẵn sàng — ${voices.voices.length} giọng, ${tts.sampleRate / 1000} kHz.`;
     status(`Ready — ${voices.voices.length} voice(s), ${tts.sampleRate / 1000} kHz.`);
+    els.voice.disabled = false;
     els.generate.disabled = false;
+    els.load.textContent = '✓  Đã tải mô hình';
   } catch (error) {
     progress(null);
+    els.sizeNote.textContent = `Tải mô hình thất bại: ${(error as Error).message}`;
     status(`Load failed: ${(error as Error).message}`);
     els.load.disabled = false;
   }
@@ -114,7 +135,7 @@ els.load.addEventListener('click', async () => {
 els.generate.addEventListener('click', async () => {
   if (!tts || !player) return;
   const text = els.text.value.trim();
-  if (!text) { status('Enter some text first.'); return; }
+  if (!text) { status('Hãy nhập văn bản trước.'); return; }
 
   els.generate.disabled = true;
   els.stop.disabled = false;
@@ -144,6 +165,7 @@ els.generate.addEventListener('click', async () => {
 
     await player.start();
     status('Generating…');
+    live(true);
 
     for await (const chunk of tts.synthesizeStream(
       segments, voiceEmb,
@@ -175,13 +197,20 @@ els.generate.addEventListener('click', async () => {
            `first audio ${firstChunkAt?.toFixed(0) ?? '?'} ms, ` +
            `${segments.length} segment(s)${overflow}`);
 
-    if (els.download.href) URL.revokeObjectURL(els.download.href);
-    els.download.href = URL.createObjectURL(toWavBlob(audio, tts.sampleRate));
+    // One blob per take, kept for the session: it is both the main player's
+    // source and the history entry's, so it must outlive this handler.
+    const url = URL.createObjectURL(toWavBlob(audio, tts.sampleRate));
+    els.download.href = url;
     els.download.download = 'zerotts.wav';
     els.download.style.display = 'inline-block';
+    showTake(url, false);
+    addTake({ url, text, title: takeTitle(voiceName, duration) });
   } catch (error) {
-    if (!abort.signal.aborted) status(`Generation failed: ${(error as Error).message}`);
+    if (!abort.signal.aborted) {
+      status(`Generation failed: ${(error as Error).message}`);
+    }
   } finally {
+    live(false);
     els.generate.disabled = false;
     els.stop.disabled = true;
     abort = null;
@@ -191,6 +220,7 @@ els.generate.addEventListener('click', async () => {
 els.stop.addEventListener('click', async () => {
   abort?.abort();
   await player?.stop();
+  live(false);
   status('Stopped.');
 });
 
@@ -200,53 +230,33 @@ els.clear.addEventListener('click', async () => {
   status('Cache cleared. The next load will re-download the model.');
 });
 
-/** Every tag used by any shipped voice, as toggle chips. Selecting one or more
- *  narrows the voice dropdown to packs carrying at least one of them — see
- *  docs/VOICES.md#built-in-voices for the same table in prose. */
-function renderTagFilter(): void {
-  const allTags = [...new Set(voices.voices.flatMap((v) => v.tags ?? []))].sort();
-  els.tagFilter.innerHTML = '';
-  for (const tag of allTags) {
-    const chip = document.createElement('span');
-    chip.className = 'tag-chip';
-    chip.textContent = tag;
-    chip.addEventListener('click', () => {
-      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
-      chip.classList.toggle('active');
-      renderVoiceOptions();
-      updateVoiceUi();
-    });
-    els.tagFilter.append(chip);
-  }
-}
-
-/** Populate the voice <select> from `voices.voices`, filtered to packs that
- *  carry at least one of `activeTags` (all of them, if none are selected). */
+/** Populate the voice <select> from `voices.voices`. No tag filter: with ~9
+ *  shipped packs the labels already carry the tags, and a filter above the
+ *  picker is one more thing to understand before hearing anything. */
 function renderVoiceOptions(): void {
-  const previous = els.voice.value;
-  els.voice.innerHTML = '<option value="">(unconditional voice)</option>';
+  els.voice.innerHTML = '<option value="">(không dùng giọng nào)</option>';
   for (const v of voices.voices) {
-    if (activeTags.size && !(v.tags ?? []).some((t) => activeTags.has(t))) continue;
     const option = document.createElement('option');
     option.value = v.name;
     const label = v.display_name || v.name;
     option.textContent = (v.tags && v.tags.length) ? `${label} — ${v.tags.join(', ')}` : label;
     els.voice.append(option);
   }
-  // Keep the previous selection if the new filter still offers it, else fall
-  // back to whatever is first (including "unconditional" if the filter
-  // matched nothing).
-  const stillThere = [...els.voice.options].some((o) => o.value === previous);
-  els.voice.value = stillThere ? previous : (els.voice.options[1]?.value ?? '');
 }
 
-function updateVoiceUi(): void {
+/** Preview clips already fetched, as object URLs. */
+const previewUrls = new Map<string, string>();
+/** Bumped on every voice change so a slow fetch cannot land on a newer voice. */
+let previewToken = 0;
+
+async function updateVoiceUi(): Promise<void> {
   const name = els.voice.value;
+  const token = ++previewToken;
   if (!name || !base) {
     els.preview.removeAttribute('src');
     els.preview.style.display = 'none';
-    els.voiceMeta.textContent = name ? '' : 'No voice — the model picks one itself, '
-      + 'and it is not consistent between segments.';
+    els.voiceMeta.textContent = name ? '' : 'Không chọn giọng — mô hình tự chọn một '
+      + 'giọng, và giọng đó không giống nhau giữa các đoạn.';
     return;
   }
   const info = voices.voices.find((v) => v.name === name);
@@ -254,26 +264,104 @@ function updateVoiceUi(): void {
     ? [info.display_name || info.name, info.language, ...(info.tags ?? [])]
         .filter(Boolean).join(' · ')
     : name;
-  // A 404 here should leave an empty player, not a broken one.
-  els.preview.onerror = () => { els.preview.style.display = 'none'; };
-  els.preview.src = voicePreviewUrl(base, name);
+
+  // Fetch the clip whole and hand the element a blob, rather than pointing it
+  // at the CDN and letting it stream: a progressive fetch that stalls or gets
+  // cancelled — which is easy while the model download is saturating the
+  // connection — fires `error` mid-playback, and the audio would cut out and
+  // vanish. A blob is either there or it never appears.
   els.preview.style.display = 'block';
+  try {
+    let url = previewUrls.get(name);
+    if (!url) {
+      const buf = await fetchWithCache(voicePreviewUrl(base, name));
+      url = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+      previewUrls.set(name, url);
+    }
+    if (token !== previewToken) return;  // the user moved on while we fetched
+    els.preview.src = url;
+  } catch {
+    // No preview shipped for this voice — an empty player, not a broken one.
+    if (token === previewToken) els.preview.style.display = 'none';
+  }
+}
+
+// ── the two list panels ──────────────────────────────────────────────────────
+
+/** One clickable row: a bold title over a single-line preview. */
+function listItem(title: string, preview: string, onClick: () => void): HTMLButtonElement {
+  const item = document.createElement('button');
+  item.type = 'button';
+  item.className = 'item';
+  const t = document.createElement('div');
+  t.className = 't';
+  t.textContent = title;
+  const p = document.createElement('div');
+  p.className = 'p';
+  p.textContent = preview;
+  item.append(t, p);
+  item.addEventListener('click', onClick);
+  return item;
+}
+
+/** Collapse a sample down to the one line a row shows (the CSS ellipsises it). */
+const oneLine = (text: string) => text.replace(/\s+/g, ' ').trim();
+
+function renderTemplates(): void {
+  els.templates.replaceChildren(
+    ...Object.entries(samples).map(([name, text]) =>
+      listItem(name, oneLine(text), () => {
+        els.text.value = text;
+        els.text.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      })),
+  );
+}
+
+function takeTitle(voiceName: string, seconds: number): string {
+  const voice = voices.voices.find((v) => v.name === voiceName);
+  const label = voice ? (voice.display_name || voice.name) : 'không giọng';
+  const now = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+  return `🔊  ${label}  ·  ${now}  ·  ${seconds.toFixed(0)}s`;
+}
+
+/**
+ * Load a take into the main player — the one place audio comes from on this
+ * page, so a history row never spawns a second player of its own.
+ *
+ * `autoplay` is false for a take that was just generated. Generation runs
+ * faster than real time, so when the last chunk is produced the live ring
+ * buffer still has seconds of audio left to play; starting the finished WAV
+ * from zero at that moment plays the take on top of itself.
+ */
+function showTake(url: string, autoplay: boolean): void {
+  els.result.src = url;
+  if (autoplay) {
+    els.result.play().catch(() => { /* autoplay may be blocked; controls still work */ });
+  }
+}
+
+function addTake(take: Take): void {
+  takes.unshift(take);
+  renderHistory();
+}
+
+function renderHistory(): void {
+  if (!takes.length) {
+    els.history.innerHTML = '<div class="empty">Chưa có bản nào trong phiên này.</div>';
+    return;
+  }
+  els.history.replaceChildren(
+    ...takes.map((t) => listItem(t.title, oneLine(t.text), () => showTake(t.url, true))),
+  );
 }
 
 els.voice.addEventListener('change', updateVoiceUi);
-els.sample.addEventListener('change', () => {
-  const text = samples[els.sample.value];
-  if (text) els.text.value = text;
-});
 els.repo.addEventListener('change', refreshSizeNote);
 
+els.banner.src = bannerUrl;
+els.text.value = DEFAULT_TEXT;
 refreshSizeNote();
 loadSampleTexts().then((loaded) => {
   samples = loaded;
-  for (const name of Object.keys(loaded)) {
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = name;
-    els.sample.append(option);
-  }
+  renderTemplates();
 });

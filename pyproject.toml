@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "zerotts"
 version = "0.1.0"
-description = "Vietnamese zero-shot text-to-speech — ONNX runtime, no PyTorch required"
+description = "Lightweight Vietnamese Zero-Shot Text-to-Speech (TTS) with real-time streaming and voice cloning."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "ZeroWeight AI" }]
-keywords = ["tts", "text-to-speech", "vietnamese", "onnx", "speech-synthesis"]
+keywords = ["tts", "text-to-speech", "vietnamese", "onnx", "speech-synthesis", "lightweight", "voice clone"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
