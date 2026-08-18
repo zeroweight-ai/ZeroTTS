@@ -26,17 +26,18 @@ the next open model**, and it runs faster than real time on a laptop CPU.
 
 ## Samples
 
-**Two-speaker conversation** 
-
-<video src="https://github.com/user-attachments/assets/7f97b370-4544-4df7-9165-ffad8a08eb90" controls width="100%"></video>
-
-**Long-form narration** 
-
-<video src="https://github.com/user-attachments/assets/3c80a328-11cc-4815-b3fb-97ca8d994401" controls width="100%"></video>
-
-**News read, code-switched English** 
-
-<video src="https://github.com/user-attachments/assets/9a5f6125-3ac3-4f09-81f1-986f38e18f69" controls width="100%"></video>
+<table>
+<tr>
+<td width="33%" align="center"><b>Two-speaker conversation</b></td>
+<td width="33%" align="center"><b>Long-form narration</b></td>
+<td width="33%" align="center"><b>News read, code-switched English</b></td>
+</tr>
+<tr>
+<td width="33%"><video src="https://github.com/user-attachments/assets/7f97b370-4544-4df7-9165-ffad8a08eb90" controls width="100%"></video></td>
+<td width="33%"><video src="https://github.com/user-attachments/assets/3c80a328-11cc-4815-b3fb-97ca8d994401" controls width="100%"></video></td>
+<td width="33%"><video src="https://github.com/user-attachments/assets/9a5f6125-3ac3-4f09-81f1-986f38e18f69" controls width="100%"></video></td>
+</tr>
+</table>
 
 ## Contents
 
