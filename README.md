@@ -26,23 +26,17 @@ the next open model**, and it runs faster than real time on a laptop CPU.
 
 ## Samples
 
-**Two-speaker conversation** (16s)
+**Two-speaker conversation** 
 
 <video src="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/conversation.mp4" controls width="100%"></video>
 
-**Long-form narration** (61s)
+**Long-form narration** 
 
 <video src="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/storytelling.mp4" controls width="100%"></video>
 
-**News read, code-switched English** (34s)
+**News read, code-switched English** 
 
 <video src="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/news-code-switch.mp4" controls width="100%"></video>
-
-Cross-lingual — a Vietnamese voice reading English — as audio downloads:
-[Vietnamese reference](https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/cross-lingual-reference-vi.mp3) →
-[English output](https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/cross-lingual-english.mp3).
-Every clip above is also downloadable as `.mp3` under
-[`docs/samples/`](docs/samples).
 
 ## Contents
 
