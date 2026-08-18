@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zerotts"
-version = "0.1.0"
+version = "0.1.1"
 description = "Lightweight Vietnamese Zero-Shot Text-to-Speech (TTS) with real-time streaming and voice cloning."
 readme = "README.md"
 requires-python = ">=3.9"

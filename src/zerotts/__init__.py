@@ -12,7 +12,7 @@ from .synthesizer import ZeroTTS
 from .text_norm import normalize_vi_text
 from .voices import Voice, list_voices, load_voice
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "ZeroTTS",

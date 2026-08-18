@@ -1,13 +1,13 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="ZeroTTS — Vietnamese zero-shot text-to-speech" width="100%">
+<img src="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/assets/banner.png" alt="ZeroTTS — Vietnamese zero-shot text-to-speech" width="100%">
 
 # ZeroTTS
 
 ### Vietnamese Zero-Shot Text-to-Speech (TTS) with real-time streaming and voice cloning from seconds of audio. Fast, natural, and optimised for CPU inference.
 
 [![PyPI](https://img.shields.io/pypi/v/zerotts?color=3775AB)](https://pypi.org/project/zerotts/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/zeroweight-ai/ZeroTTS/blob/main/LICENSE)
 [![ONNX](https://img.shields.io/badge/ONNX-Runtime-005CED?logo=onnx&logoColor=white)](https://onnxruntime.ai/)
 [![HuggingFace](https://img.shields.io/badge/🤗-Weights-yellow)](https://huggingface.co/zeroweight-ai/ZeroTTS)
 [![Benchmark](https://img.shields.io/badge/🤗-ZeroBench--TTS-orange)](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)
@@ -33,9 +33,9 @@ the next open model**, and it runs faster than real time on a laptop CPU.
 <td width="33%" align="center"><b>News read, code-switched English</b></td>
 </tr>
 <tr>
-<td width="33%"><video src="https://github.com/user-attachments/assets/7f97b370-4544-4df7-9165-ffad8a08eb90" controls width="100%"></video></td>
-<td width="33%"><video src="https://github.com/user-attachments/assets/3c80a328-11cc-4815-b3fb-97ca8d994401" controls width="100%"></video></td>
-<td width="33%"><video src="https://github.com/user-attachments/assets/9a5f6125-3ac3-4f09-81f1-986f38e18f69" controls width="100%"></video></td>
+<td width="33%"><video src="https://github.com/user-attachments/assets/7f97b370-4544-4df7-9165-ffad8a08eb90" controls width="100%"><a href="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/conversation.mp3">▶ Two-speaker conversation (mp3)</a></video></td>
+<td width="33%"><video src="https://github.com/user-attachments/assets/3c80a328-11cc-4815-b3fb-97ca8d994401" controls width="100%"><a href="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/storytelling.mp3">▶ Long-form narration (mp3)</a></video></td>
+<td width="33%"><video src="https://github.com/user-attachments/assets/9a5f6125-3ac3-4f09-81f1-986f38e18f69" controls width="100%"><a href="https://raw.githubusercontent.com/zeroweight-ai/ZeroTTS/main/docs/samples/news-code-switch.mp3">▶ News read, code-switched English (mp3)</a></video></td>
 </tr>
 </table>
 
@@ -88,8 +88,8 @@ settings above.
 
 ## Browser demo
 
-[`js/`](js/) runs the same model client-side with `onnxruntime-web` — no server,
-no upload. See [docs/BROWSER.md](docs/BROWSER.md).
+[`js/`](https://github.com/zeroweight-ai/ZeroTTS/blob/main/js) runs the same model client-side with `onnxruntime-web` — no server,
+no upload. See [docs/BROWSER.md](https://github.com/zeroweight-ai/ZeroTTS/blob/main/docs/BROWSER.md).
 
 Note the download: the weights are **fp32 and not quantized**, so the demo fetches
 ~900 MB once and persists it (OPFS/Cache API). That is a deliberate
@@ -209,7 +209,7 @@ The boundary is narrower than it sounds: latents obtained that way are just a
 Eight presets ship with the weights, each tagged by gender, age and register so
 you can pick one by ear or by filter — `maichi` (Mai Chi) is the default used
 throughout this README. Full list, tags, and preview clips:
-[docs/VOICES.md](docs/VOICES.md).
+[docs/VOICES.md](https://github.com/zeroweight-ai/ZeroTTS/blob/main/docs/VOICES.md).
 
 ```python
 tts.list_voices()                       # ['maichi', 'baotrang', ...]
@@ -275,7 +275,7 @@ path, so their TTFA is the time to the complete utterance.
 Speech codec: **[MOSS-Audio-Tokenizer-Nano](https://github.com/OpenMOSS/MOSS-Audio-Tokenizer)**
 by the OpenMOSS team, Apache-2.0. ZeroTTS bundles its ONNX **decoder** graphs in
 the weights repo so there is no external runtime dependency; see
-[NOTICE](NOTICE) and [LICENSES/](LICENSES/).
+[NOTICE](https://github.com/zeroweight-ai/ZeroTTS/blob/main/NOTICE) and [LICENSES/](https://github.com/zeroweight-ai/ZeroTTS/blob/main/LICENSES).
 
 ```bibtex
 @misc{gong2026mossaudiotokenizerscalingaudiotokenizers,
@@ -290,7 +290,7 @@ the weights repo so there is no external runtime dependency; see
 Vietnamese text normalization adapts the expansion rules and abbreviation table
 of **[soe-vinorm](https://github.com/vinhdq842/soe-vinorm)** (MIT), reimplemented
 as pure stdlib regex so the inference path keeps its no-torch, no-download
-guarantee. See [NOTICE](NOTICE).
+guarantee. See [NOTICE](https://github.com/zeroweight-ai/ZeroTTS/blob/main/NOTICE).
 
 Benchmark reference audio comes from
 [VIVOS](https://huggingface.co/datasets/AILAB-VNUHCM/vivos),
