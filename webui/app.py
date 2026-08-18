@@ -4,7 +4,7 @@
     python webui/app.py
     python webui/app.py --model ./local_model_dir
 
-The page is deliberately split in two. The BASIC view is voice → text → player
+The page is deliberately split in two. The BASIC view is text → voice → player
 and nothing else, so someone who just wants to hear a sentence never meets a
 sampler knob. Everything technical — sampling parameters, the run log, the
 segments actually sent to the model — lives under "Tuỳ chọn nâng cao".
@@ -107,15 +107,11 @@ footer { display: none !important; }
 }
 .zt-banner-text { font-size: 2.4rem; font-weight: 800; letter-spacing: -.02em; }
 .zt-banner-text span { color: var(--zt-brand); }
-.zt-headline { text-align: center; margin: .9rem auto .2rem !important; max-width: 62ch; }
+.zt-headline { text-align: center; margin: .9rem auto 1.1rem !important; max-width: 62ch; }
 .zt-headline h1 {
   font-size: 1.3rem !important; font-weight: 700 !important;
   line-height: 1.35 !important; letter-spacing: -.01em;
   margin: 0 !important; padding: 0 !important;
-}
-.zt-tagline {
-  text-align: center; margin: 0 0 1.1rem !important;
-  color: var(--body-text-color-subdued); font-size: .95rem;
 }
 
 /* cards */
@@ -126,15 +122,20 @@ footer { display: none !important; }
   background: var(--background-fill-primary) !important;
   box-shadow: 0 10px 30px -22px rgba(20, 20, 40, .55);
 }
+/* Section titles read as headings, not as body copy: heavier, slightly larger,
+   and led by a short brand bar so the eye finds the start of each card. */
 .zt-card-title {
-  display: flex; align-items: center; gap: .5rem;
-  font-weight: 700; font-size: 1.02rem; margin: 0 0 .15rem !important;
+  display: flex; align-items: center; gap: .55rem;
+  margin: 0 0 .35rem !important;
 }
-.zt-card-title .zt-step {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 1.55rem; height: 1.55rem; border-radius: 999px; flex: none;
-  background: linear-gradient(135deg, var(--zt-brand-2), var(--zt-brand));
-  color: #fff; font-size: .82rem; font-weight: 700;
+.zt-card-title p, .zt-card-title h1, .zt-card-title h2, .zt-card-title h3 {
+  font-weight: 800 !important; font-size: 1.14rem !important;
+  letter-spacing: -.015em; line-height: 1.3 !important;
+  margin: 0 !important; padding: 0 !important;
+}
+.zt-card-title::before {
+  content: ""; flex: none; width: .28rem; height: 1.15rem; border-radius: 999px;
+  background: linear-gradient(180deg, var(--zt-brand-2), var(--zt-brand));
 }
 .zt-hint {
   color: var(--body-text-color-subdued); font-size: .84rem;
@@ -212,8 +213,9 @@ footer { display: none !important; }
 .zt-live audio { width: 100%; }
 .dark .zt-live audio { color-scheme: dark; }
 .zt-foot {
-  text-align: center; font-size: .84rem;
-  color: var(--body-text-color-subdued); margin-top: .4rem !important;
+  text-align: center; font-size: .84rem; line-height: 1.5;
+  color: var(--body-text-color-subdued);
+  margin: .9rem 0 0 !important;
 }
 """
 
@@ -399,32 +401,15 @@ with gr.Blocks(title="ZeroTTS", **_STYLE_ON_BLOCKS) as demo:
         "nhanh và realtime trên CPU",
         elem_classes="zt-headline",
     )
-    gr.Markdown(
-        "Chạy trên ONNX Runtime — không cần PyTorch, không cần GPU.",
-        elem_classes="zt-tagline",
-    )
 
     history_state = gr.State([])
     sample_names_state = gr.State([])
 
     with gr.Row():
-        # ── basic view: voice → text → player, and nothing else ──────────────
+        # ── basic view: text → player, and nothing else ──────────────────────
         with gr.Column(scale=3):
             with gr.Column(elem_classes="zt-card"):
-                gr.Markdown("<span class='zt-step'>1</span> Chọn giọng đọc",
-                            elem_classes="zt-card-title")
-                with gr.Row():
-                    voice_dropdown = gr.Dropdown(choices=[], label=None,
-                                                 show_label=False, value=None,
-                                                 container=False, scale=5)
-                    refresh_voices_btn = gr.Button("↻", scale=0, min_width=48)
-                voice_meta = gr.Markdown("", elem_classes="zt-hint")
-                voice_preview = gr.Audio(label="Nghe thử giọng", interactive=False,
-                                         elem_classes="zt-player")
-
-            with gr.Column(elem_classes="zt-card"):
-                gr.Markdown("<span class='zt-step'>2</span> Nhập văn bản",
-                            elem_classes="zt-card-title")
+                gr.Markdown("Nhập văn bản", elem_classes="zt-card-title")
                 gr.Markdown(
                     f"Tối đa {engine.MAX_TEXT_CHARS} ký tự. Chưa biết viết gì? "
                     "Chọn một mẫu câu ở bên dưới.",
@@ -453,8 +438,7 @@ with gr.Blocks(title="ZeroTTS", **_STYLE_ON_BLOCKS) as demo:
                     )
 
             with gr.Column(elem_classes="zt-card"):
-                gr.Markdown("<span class='zt-step'>3</span> Nghe kết quả",
-                            elem_classes="zt-card-title")
+                gr.Markdown("Nghe kết quả", elem_classes="zt-card-title")
                 gr.Markdown("Phát ngay trong lúc đang tạo:", elem_classes="zt-hint")
                 # A plain <audio> fed by our own continuous-WAV route rather than
                 # gr.Audio(streaming=True) — see generate_ui's docstring and
@@ -465,13 +449,30 @@ with gr.Blocks(title="ZeroTTS", **_STYLE_ON_BLOCKS) as demo:
                     label="Bản hoàn chỉnh — tua và tải về được",
                     interactive=False, autoplay=False, elem_classes="zt-player",
                 )
+                gr.Markdown(
+                    "**Nhân bản giọng nói (voice cloning)** không có trong bản mã "
+                    "nguồn mở — bộ mã hoá giọng chưa được phát hành. Cần latents "
+                    "cho giọng của riêng bạn? Xem "
+                    "[zeroweight.ai](https://zeroweight.ai).",
+                    elem_classes="zt-foot",
+                )
 
-        # ── history: a list of takes, all playing in the main player above ───
+        # ── voice picker, then the takes it produced ─────────────────────────
         with gr.Column(scale=2):
             with gr.Column(elem_classes="zt-card"):
+                gr.Markdown("Chọn giọng đọc", elem_classes="zt-card-title")
                 with gr.Row():
-                    gr.Markdown("<span class='zt-step'>♪</span> Đã tạo gần đây",
-                                elem_classes="zt-card-title")
+                    voice_dropdown = gr.Dropdown(choices=[], label=None,
+                                                 show_label=False, value=None,
+                                                 container=False, scale=5)
+                    refresh_voices_btn = gr.Button("↻", scale=0, min_width=48)
+                voice_meta = gr.Markdown("", elem_classes="zt-hint")
+                voice_preview = gr.Audio(label="Nghe thử giọng", interactive=False,
+                                         elem_classes="zt-player")
+
+            with gr.Column(elem_classes="zt-card"):
+                with gr.Row():
+                    gr.Markdown("Đã tạo gần đây", elem_classes="zt-card-title")
                     refresh_history_btn = gr.Button("↻", scale=0, min_width=48)
                 gr.Markdown("Bấm vào một mục để nghe lại ở trình phát chính.",
                             elem_classes="zt-hint")
@@ -482,17 +483,9 @@ with gr.Blocks(title="ZeroTTS", **_STYLE_ON_BLOCKS) as demo:
                     elem_id="zt-history", elem_classes="zt-list",
                 )
 
-            gr.Markdown(
-                "**Nhân bản giọng nói (voice cloning)** không có trong bản mã "
-                "nguồn mở — bộ mã hoá giọng chưa được phát hành. Cần latents cho "
-                "giọng của riêng bạn? Xem [zeroweight.ai](https://zeroweight.ai).",
-                elem_classes="zt-foot",
-            )
-
     # ── templates, below the fold: name + a real preview of the text ─────────
     with gr.Column(elem_classes="zt-card"):
-        gr.Markdown("<span class='zt-step'>✎</span> Mẫu câu",
-                    elem_classes="zt-card-title")
+        gr.Markdown("Mẫu câu", elem_classes="zt-card-title")
         gr.Markdown("Bấm một mẫu để điền vào ô văn bản ở trên.",
                     elem_classes="zt-hint")
         sample_texts_dataset = gr.Dataset(
