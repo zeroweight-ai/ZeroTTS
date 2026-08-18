@@ -19,7 +19,7 @@ the identity is whatever the model picks and is not stable across runs.
 
 ## Built-in voices
 
-Nine presets ship with the weights repo, each tagged by gender, age and
+Eight presets ship with the weights repo, each tagged by gender, age and
 register/tone so you can pick one by ear or by filter. `maichi` (Mai Chi) is
 the default used throughout this README and the demos.
 
@@ -29,7 +29,6 @@ the default used throughout this README and the demos.
 | `baotrang` | Bảo Trang | nữ | trưởng thành · tin tức · rõ ràng · trung tính |
 | `kimoanh` | Kim Oanh | nữ | trung niên · kể chuyện · ấm áp · truyền cảm |
 | `hamy` | Hà My | nữ | trẻ · hoạt hình · cao · biểu cảm |
-| `thanhtruc` | Thanh Trúc | nữ | trẻ · dịu dàng · thủ thỉ · nhẹ |
 | `giahuy` | Gia Huy | nam | trẻ · kể chuyện · trầm ấm · tâm tình |
 | `huuduc` | Hữu Đức | nam | lớn tuổi · kể chuyện · trầm · điềm đạm |
 | `quangminh` | Quang Minh | nam | trẻ · tin tức · rõ ràng · dứt khoát |

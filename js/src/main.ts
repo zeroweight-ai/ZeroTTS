@@ -4,19 +4,22 @@
  *  player and nothing else, with the run log, the segments and every sampling
  *  knob folded into "Tuỳ chọn nâng cao". Templates and the take history are
  *  lists of real rows with a preview, not a strip of tags.
+ *
+ *  Nothing here imports onnxruntime-web, and that is load-bearing: the model
+ *  runs in a worker (worker.ts) so that a generation — minutes of blocking WASM
+ *  compute — never touches this thread. This file only ever handles text going
+ *  out and finished audio chunks coming back.
  */
 
 import bannerUrl from '../../docs/assets/banner.png';
 
-import { clearCache, fetchWithCache } from './cache';
+import { fetchWithCache } from './cache';
 import { textSegments } from './chunking';
 import { normalizeViText } from './textNorm';
-import {
-  DEFAULT_REPO, downloadInfo, loadModel, loadSampleTexts, loadVoice,
-  repoBaseUrl, voicePreviewUrl,
-} from './loader';
+import { DEFAULT_REPO, voicePreviewUrl } from './repo';
+import { loadSampleTexts } from './samples';
 import { StreamPlayer, toWavBlob } from './player';
-import { ZeroTTSBrowser } from './synthesizer';
+import { TtsWorker } from './workerClient';
 import { VoiceIndex } from './types';
 
 /** Same first-load text as the Gradio UI. */
@@ -56,11 +59,14 @@ interface Take { url: string; title: string; text: string; }
 
 let samples: Record<string, string> = {};
 
-let tts: ZeroTTSBrowser | null = null;
+const tts = new TtsWorker();
+let sampleRate = 0;
 let voices: VoiceIndex = { voices: [] };
 let base = '';
 let player: StreamPlayer | null = null;
-let abort: AbortController | null = null;
+let cancelRun: (() => void) | null = null;
+/** Set by Stop, so the run that unwinds afterwards knows not to report itself. */
+let stopped = false;
 const takes: Take[] = [];
 
 const mb = (bytes: number) => `${(bytes / 1e6).toFixed(0)} MB`;
@@ -80,7 +86,7 @@ function live(on: boolean): void {
 
 async function refreshSizeNote(): Promise<void> {
   try {
-    const info = await downloadInfo(repoBaseUrl(els.repo.value || DEFAULT_REPO));
+    const info = await tts.downloadInfo(els.repo.value || DEFAULT_REPO);
     els.sizeNote.textContent = info.cached
       ? `Mô hình đã có sẵn trên máy (${mb(info.bytes)}) — tải sẽ rất nhanh.`
       : `Lần đầu sẽ tải khoảng ${mb(info.bytes)} (fp32, chưa lượng tử hoá) và ` +
@@ -96,17 +102,14 @@ els.load.addEventListener('click', async () => {
   try {
     status('Đang tải mô hình…');
     progress(0);
-    const loaded = await loadModel({
-      repo: els.repo.value || DEFAULT_REPO,
-      onProgress: (p) => {
-        if (p.overallTotal > 0) progress(p.overallLoaded / p.overallTotal);
-        els.sizeNote.textContent =
-          `Đang tải ${p.file.split('/').pop()} — ${mb(p.overallLoaded)} / ${mb(p.overallTotal)}`;
-      },
+    const loaded = await tts.load(els.repo.value || DEFAULT_REPO, (p) => {
+      if (p.overallTotal > 0) progress(p.overallLoaded / p.overallTotal);
+      els.sizeNote.textContent =
+        `Đang tải ${p.file.split('/').pop()} — ${mb(p.overallLoaded)} / ${mb(p.overallTotal)}`;
     });
-    tts = loaded.tts;
     voices = loaded.voices;
     base = loaded.base;
+    sampleRate = loaded.sampleRate;
 
     renderVoiceOptions();
     // Prefer "maichi" (Mai Chi) as the default, same as the README/webui — its
@@ -116,11 +119,11 @@ els.load.addEventListener('click', async () => {
     else if (voices.voices.length) els.voice.value = voices.voices[0].name;
     updateVoiceUi();
 
-    player = new StreamPlayer(tts.sampleRate);
+    player = new StreamPlayer(sampleRate);
     progress(null);
     els.sizeNote.textContent =
-      `Đã sẵn sàng — ${voices.voices.length} giọng, ${tts.sampleRate / 1000} kHz.`;
-    status(`Ready — ${voices.voices.length} voice(s), ${tts.sampleRate / 1000} kHz.`);
+      `Đã sẵn sàng — ${voices.voices.length} giọng, ${sampleRate / 1000} kHz.`;
+    status(`Ready — ${voices.voices.length} voice(s), ${sampleRate / 1000} kHz.`);
     els.voice.disabled = false;
     els.generate.disabled = false;
     els.load.textContent = '✓  Đã tải mô hình';
@@ -133,14 +136,14 @@ els.load.addEventListener('click', async () => {
 });
 
 els.generate.addEventListener('click', async () => {
-  if (!tts || !player) return;
+  if (!player) return;
   const text = els.text.value.trim();
   if (!text) { status('Hãy nhập văn bản trước.'); return; }
 
   els.generate.disabled = true;
   els.stop.disabled = false;
   els.download.style.display = 'none';
-  abort = new AbortController();
+  stopped = false;
 
   const seedValue = Number(els.seed.value);
   const seed = Number.isFinite(seedValue) && seedValue >= 0 ? seedValue : undefined;
@@ -160,18 +163,22 @@ els.generate.addEventListener('click', async () => {
   els.segments.textContent = segments.map((s, i) => `[${i + 1}] ${s}`).join('\n');
 
   try {
-    status('Loading voice…');
-    const voiceEmb = voiceName ? await loadVoice(base, voiceName) : null;
-
     await player.start();
     status('Generating…');
     live(true);
 
-    for await (const chunk of tts.synthesizeStream(
-      segments, voiceEmb,
-      { cfgScale: Number(els.cfg.value), audioTemperature: Number(els.temperature.value) },
-      seed, abort.signal,
-    )) {
+    // The worker loads the voice and runs the model; this thread stays free to
+    // paint, so the buttons and the log update while generation is under way.
+    const run = tts.generate({
+      segments, voiceName,
+      options: {
+        cfgScale: Number(els.cfg.value), audioTemperature: Number(els.temperature.value),
+      },
+      seed,
+    });
+    cancelRun = run.cancel;
+
+    for await (const chunk of run.chunks) {
       if (firstChunkAt === null) {
         firstChunkAt = performance.now() - started;
         status(`Playing — first audio in ${firstChunkAt.toFixed(0)} ms`);
@@ -180,6 +187,9 @@ els.generate.addEventListener('click', async () => {
       player.push(chunk);
     }
     player.finish();
+    // Stop already reset the player and said so; a partial take is not worth
+    // overwriting that with statistics.
+    if (stopped) return;
 
     const total = chunks.reduce((n, c) => n + c.length, 0);
     const audio = new Float32Array(total);
@@ -187,7 +197,7 @@ els.generate.addEventListener('click', async () => {
     for (const c of chunks) { audio.set(c, offset); offset += c.length; }
 
     const elapsed = (performance.now() - started) / 1000;
-    const duration = total / tts.sampleRate;
+    const duration = total / sampleRate;
     const overflow = player.overflowed
       ? ' — WARNING: playback buffer overflowed, live audio is incomplete (the ' +
         'downloaded WAV is not)'
@@ -199,33 +209,32 @@ els.generate.addEventListener('click', async () => {
 
     // One blob per take, kept for the session: it is both the main player's
     // source and the history entry's, so it must outlive this handler.
-    const url = URL.createObjectURL(toWavBlob(audio, tts.sampleRate));
+    const url = URL.createObjectURL(toWavBlob(audio, sampleRate));
     els.download.href = url;
     els.download.download = 'zerotts.wav';
     els.download.style.display = 'inline-block';
     showTake(url, false);
     addTake({ url, text, title: takeTitle(voiceName, duration) });
   } catch (error) {
-    if (!abort.signal.aborted) {
-      status(`Generation failed: ${(error as Error).message}`);
-    }
+    if (!stopped) status(`Generation failed: ${(error as Error).message}`);
   } finally {
     live(false);
     els.generate.disabled = false;
     els.stop.disabled = true;
-    abort = null;
+    cancelRun = null;
   }
 });
 
 els.stop.addEventListener('click', async () => {
-  abort?.abort();
+  stopped = true;
+  cancelRun?.();
   await player?.stop();
   live(false);
   status('Stopped.');
 });
 
 els.clear.addEventListener('click', async () => {
-  await clearCache();
+  await tts.clearCache();
   await refreshSizeNote();
   status('Cache cleared. The next load will re-download the model.');
 });

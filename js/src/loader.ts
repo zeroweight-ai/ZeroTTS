@@ -8,45 +8,18 @@
 
 import * as ort from 'onnxruntime-web';
 
-import { fetchWithCache, isCached, ProgressFn, totalBytes } from './cache';
+import { fetchWithCache, ProgressFn, totalBytes } from './cache';
 import { CodecMeta, MossCodecDecoder } from './codec';
+import { DEFAULT_REPO, modelUrls, repoBaseUrl } from './repo';
 import { BpeTokenizer } from './tokenizer';
 import { ZeroTTSBrowser } from './synthesizer';
 import { VoiceIndex, ZeroTTSConfig } from './types';
 
-export const DEFAULT_REPO = 'zeroweight-ai/ZeroTTS';
-
-export function repoBaseUrl(repo: string, revision = 'main'): string {
-  if (repo.startsWith('http://') || repo.startsWith('https://') || repo.startsWith('/')) {
-    return repo.replace(/\/$/, '');
-  }
-  return `https://huggingface.co/${repo}/resolve/${revision}`;
-}
-
-const GRAPHS = [
-  'onnx/prefix_step.onnx',
-  'onnx/local_frame_decode.onnx',
-  'onnx/text_encoder.onnx',
-  'onnx/codec/moss_audio_tokenizer_decode_full.onnx',
-  'onnx/codec/moss_audio_tokenizer_decode_step.onnx',
-  'onnx/codec/moss_audio_tokenizer_decode_shared.data',
-];
-
-/** A voice's preview clip, for the picker. */
-export function voicePreviewUrl(base: string, name: string): string {
-  return `${base}/voices/${name}/preview.wav`;
-}
-
-export function modelUrls(base: string): string[] {
-  return GRAPHS.map((g) => `${base}/${g}`);
-}
-
-/** Total download size, and whether it is already cached — for the size warning. */
-export async function downloadInfo(base: string): Promise<{ bytes: number; cached: boolean }> {
-  const urls = modelUrls(base);
-  const [bytes, cached] = await Promise.all([totalBytes(urls), isCached(urls)]);
-  return { bytes, cached };
-}
+// Re-exported so the runtime side keeps one import site; the definitions live in
+// repo.ts because the page needs them without the runtime.
+export {
+  DEFAULT_REPO, downloadInfo, loadVoice, modelUrls, repoBaseUrl, voicePreviewUrl,
+} from './repo';
 
 export interface LoadOptions {
   repo?: string;
@@ -64,7 +37,17 @@ export interface LoadedModel {
 export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel> {
   const base = repoBaseUrl(options.repo ?? DEFAULT_REPO, options.revision);
 
-  ort.env.wasm.numThreads = options.threads ?? Math.min(4, navigator.hardwareConcurrency || 4);
+  // Multi-threaded WASM needs SharedArrayBuffer, which needs the page to be
+  // cross-origin isolated (the COOP/COEP headers in vite.config.ts). Asking for
+  // threads without it is not an error, just a silent fallback — say so instead,
+  // because the difference is several times the generation time.
+  const isolated = typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated;
+  if (!isolated) {
+    console.warn('not cross-origin isolated — running single-threaded WASM (slower); '
+      + 'serve with COOP: same-origin and COEP: require-corp for threads');
+  }
+  ort.env.wasm.numThreads =
+    options.threads ?? (isolated ? Math.min(4, navigator.hardwareConcurrency || 4) : 1);
   ort.env.wasm.simd = true;
 
   // WASM only. WebGPU's kernels are not bit-identical to the CPU path, and this
@@ -80,7 +63,10 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
   const get = (path: string) =>
     fetchWithCache(`${base}/${path}`, options.onProgress, overall);
   const getJson = async (path: string) => {
-    const buf = await fetch(`${base}/${path}`).then((r) => {
+    // `no-cache` = revalidate, not "don't cache": these are small, and one of
+    // them is the voice manifest. Served from the HTTP cache without asking, a
+    // voice removed on the Hub would keep showing up in the picker.
+    const buf = await fetch(`${base}/${path}`, { cache: 'no-cache' }).then((r) => {
       if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
       return r.arrayBuffer();
     });
@@ -139,33 +125,6 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
 
   await tts.warmup();
   return { tts, voices, base };
-}
-
-/**
- * Sample texts for the demo's picker.
- *
- * Imported as a raw string from the same webui/test_samples.txt the Python UI
- * reads, so the two demos stay in step and the file has one home. Vite inlines
- * it at build time (see vite.config.ts's `server.fs.allow`, which lets the
- * import reach outside js/).
- */
-export async function loadSampleTexts(): Promise<Record<string, string>> {
-  try {
-    const [{ parseSamples }, raw] = await Promise.all([
-      import('./chunking'),
-      import('../../webui/test_samples.txt?raw'),
-    ]);
-    return parseSamples((raw as { default: string }).default);
-  } catch {
-    return {};
-  }
-}
-
-/** Load a voice's latents. `voice.bin` is raw little-endian float32 — the repo
- *  ships it precisely so the browser needs no zip/npy parser. */
-export async function loadVoice(base: string, name: string): Promise<Float32Array> {
-  const buf = await fetchWithCache(`${base}/voices/${name}/voice.bin`);
-  return new Float32Array(buf);
 }
 
 /**

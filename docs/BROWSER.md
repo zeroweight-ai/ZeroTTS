@@ -25,6 +25,14 @@ npm run build      # static bundle in js/dist/, deployable anywhere
 
 once, then persists it (Cache API / OPFS) so later visits are instant.
 
+Cached copies are keyed by the file's **ETag**, not by its URL. Everything is
+fetched from `.../resolve/main/...`, which is a moving target: publishing a new
+revision on the Hub leaves the URL identical and the bytes different, so a
+URL-keyed cache would serve the old file forever — and silently, since a stale
+voice still decodes, it just isn't the voice you shipped. A HEAD per file (six
+of them, already needed to size the progress bar) turns a re-published voice
+into a 30 KB re-download and leaves the ~900 MB of graphs alone.
+
 This is a deliberate quality-over-size choice, not an oversight. It targets
 desktop broadband; it is not suitable for mobile data, and the demo says so
 before it starts downloading. If you need a smaller build, quantizing to int8
@@ -44,19 +52,37 @@ js/src/
   codec.ts         MOSS decoder: batch + KV-cached streaming
   tokenizer.ts     BPE over tokenizer.json
   chunking.ts      long-form segmentation (port of zerotts.chunking)
-  loader.ts        resolve repo URLs, create sessions, load voices
+  loader.ts        create sessions from the downloaded graphs
+  repo.ts          resolve repo URLs, size the download, load voices
+  worker.ts        the Web Worker the model runs in
+  workerClient.ts  main-thread handle on that worker
   cache.ts         Cache API persistence, download progress
   rng.ts           seedable PRNG — the sampler's draws are graph inputs
   player.ts        AudioWorklet ring buffer for streaming playback
-  main.ts          demo UI wiring
+  samples.ts       sample texts, shared with the Python UI
+  main.ts          demo UI wiring (imports no runtime code)
 ```
 
 Audio is pushed into an `AudioWorklet` ring buffer rather than scheduled as
 individual `AudioBufferSourceNode`s, so chunk boundaries don't click.
 
-Generation currently runs on the **main thread**; moving it into a Web Worker is
-a known gap (see [js/README.md](../js/README.md)) — the per-frame loop competes
-with rendering and can stutter playback under load.
+Generation runs in a **Web Worker** (`js/src/worker.ts`). ORT-web's WASM backend
+computes on whatever thread calls it, and this model does two graph calls per
+80 ms frame for up to 1500 frames — on the UI thread that blocks painting, input
+and even the AudioWorklet's message port for the whole take, so the tab appears
+frozen. The page therefore imports no runtime code at all: it sends text and
+receives decoded `Float32Array` chunks.
+
+Two consequences worth knowing:
+
+- Cancellation must be a *macrotask* away. `await session.run()` resolves in a
+  microtask after synchronous compute, so a generation loop that only awaits ORT
+  never drains the worker's message queue and a `cancel` message would sit unread
+  until the take finished. The worker yields the event loop once per decoded
+  chunk (via a `MessageChannel`, since timers in a hidden tab's worker are
+  clamped), which puts Stop's latency at well under a second.
+- Chunks are *transferred*, not copied — the codec allocates a fresh array per
+  chunk and never reads it again.
 
 ## Porting notes
 

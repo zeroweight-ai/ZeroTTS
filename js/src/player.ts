@@ -106,9 +106,25 @@ class RingBufferProcessor extends AudioWorkletProcessor {
 registerProcessor('ring-buffer', RingBufferProcessor);
 `;
 
+/** How long to wait on `resume()` before deciding the autoplay policy is not
+ *  going to let it through. Long enough for a genuine resume (single-digit ms),
+ *  short enough that a wedged one is not felt. */
+const RESUME_TIMEOUT_MS = 1000;
+
+/** Interactions that count as a gesture, for a second attempt at resuming. */
+const GESTURES = ['pointerdown', 'keydown', 'touchend'] as const;
+
+/** A function, not an inline `context.state === 'running'`: the state changes
+ *  behind our back (that is the whole point of awaiting a resume), and reading
+ *  it through a call keeps the compiler from narrowing an earlier check onto a
+ *  later one. */
+const running = (context: AudioContext) => context.state === 'running';
+
 export class StreamPlayer {
   private context: AudioContext | null = null;
   private node: AudioWorkletNode | null = null;
+  /** Whether a gesture retry is already pending, so listeners don't stack up. */
+  private gestureArmed = false;
 
   /** Set if the producer outran the buffer — the output is then incomplete. */
   overflowed = false;
@@ -119,7 +135,7 @@ export class StreamPlayer {
     this.overflowed = false;
     if (this.node) {
       this.node.port.postMessage({ type: 'reset' });
-      await this.context?.resume();
+      await this.resume();
       return;
     }
     this.context = new AudioContext({ sampleRate: this.sampleRate });
@@ -138,9 +154,53 @@ export class StreamPlayer {
       if (event.data?.type === 'overflow') this.overflowed = true;
     };
     this.node.connect(this.context.destination);
-    // Autoplay policy: a context created outside a user gesture starts
-    // suspended, and then nothing is ever heard.
-    await this.context.resume();
+    await this.resume();
+  }
+
+  /**
+   * Bring the context out of `suspended`, WITHOUT letting the caller hang on it.
+   *
+   * Autoplay policy: a context created outside a user gesture starts suspended,
+   * and then nothing is ever heard — hence the resume. The trap is what happens
+   * when the policy is not satisfied: `resume()` returns a promise that is not
+   * rejected and not resolved, it simply stays pending until a gesture arrives,
+   * possibly forever. Awaited directly, that pending promise wedges the whole
+   * generation before the first frame — the run never starts, never fails, and
+   * the button stays disabled with no way out but a reload.
+   *
+   * Two paths reach it in practice: a click synthesized by script (no gesture at
+   * all), and iOS Safari, where the gesture is consumed by the `await` on
+   * `addModule` above and is no longer "recent" by the time resume is called.
+   *
+   * So: give it a moment, then continue regardless. Generation proceeds, the WAV
+   * comes out complete either way, and a listener picks the audio back up on the
+   * next thing the user touches.
+   */
+  private async resume(): Promise<void> {
+    const context = this.context;
+    if (!context || running(context)) return;
+
+    let timer = 0;
+    await Promise.race([
+      context.resume(),
+      new Promise<void>((r) => { timer = self.setTimeout(r, RESUME_TIMEOUT_MS); }),
+    ]);
+    clearTimeout(timer);
+
+    if (!running(context)) this.resumeOnGesture(context);
+  }
+
+  /** Retry the resume on the user's next interaction, once. */
+  private resumeOnGesture(context: AudioContext): void {
+    if (this.gestureArmed) return;
+    this.gestureArmed = true;
+    const retry = () => {
+      this.gestureArmed = false;
+      for (const event of GESTURES) removeEventListener(event, retry);
+      // Inside the gesture's own task, which is the whole point.
+      context.resume().catch(() => { /* a closed context is not worth a report */ });
+    };
+    for (const event of GESTURES) addEventListener(event, retry, { once: true });
   }
 
   push(chunk: Float32Array): void {

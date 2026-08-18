@@ -35,11 +35,22 @@ downloading. Not suitable for mobile data.
 | `src/textNorm.ts` | Vietnamese text normalization, port of `zerotts.text_norm` |
 | `src/codec.ts` | MOSS decoder: batch + KV-cached streaming |
 | `src/tokenizer.ts` | BPE over `tokenizer.json` |
-| `src/loader.ts` | resolve repo URLs, create sessions, load voices |
+| `src/loader.ts` | create sessions from the downloaded graphs |
+| `src/repo.ts` | resolve repo URLs, size the download, load voices |
+| `src/worker.ts` | the Web Worker the model runs in |
+| `src/workerClient.ts` | main-thread handle on that worker |
 | `src/cache.ts` | download progress + Cache API persistence |
 | `src/player.ts` | AudioWorklet ring buffer, WAV export |
 | `src/rng.ts` | seedable PRNG — the sampler's draws are graph *inputs* |
-| `src/main.ts` | demo UI wiring |
+| `src/samples.ts` | the sample texts, shared with the Python UI |
+| `src/main.ts` | demo UI wiring (imports no runtime code) |
+
+The model runs in a Web Worker: ORT-web's WASM backend computes on the calling
+thread, and two graph calls per 80 ms frame on the UI thread freeze the tab for
+the whole take. `main.ts` therefore imports nothing that pulls in
+`onnxruntime-web` — it sends text to the worker and gets audio chunks back. See
+[../docs/BROWSER.md](../docs/BROWSER.md) for the two subtleties (cancellation
+needs a macrotask; chunks are transferred, not copied).
 
 ## Parity checks
 
@@ -116,9 +127,6 @@ because each one fails *quietly*.
 
 ## Known gaps
 
-- Generation runs on the main thread. It should move into a Web Worker
-  (`worker.ts`) — the per-frame loop otherwise competes with rendering and can
-  stutter playback under load.
 - WASM only — there is no WebGPU path. Its kernels are not bit-identical to the
   CPU path, and since this model samples *inside* the graph, small numeric
   differences change which token is drawn, which showed up as degraded output
