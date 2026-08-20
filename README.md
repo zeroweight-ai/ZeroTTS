@@ -6,7 +6,7 @@
 
 ### Vietnamese Zero-Shot Text-to-Speech (TTS) with real-time streaming and voice cloning from seconds of audio. Fast, natural, and optimised for CPU inference.
 
-[![PyPI](https://img.shields.io/pypi/v/zerotts?color=3775AB)](https://pypi.org/project/zerotts/)
+[![PyPI](https://img.shields.io/pypi/v/zerotts?color=3775AB&cacheSeconds=3600)](https://pypi.org/project/zerotts/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/zeroweight-ai/ZeroTTS/blob/main/LICENSE)
 [![ONNX](https://img.shields.io/badge/ONNX-Runtime-005CED?logo=onnx&logoColor=white)](https://onnxruntime.ai/)
 [![HuggingFace](https://img.shields.io/badge/🤗-Weights-yellow)](https://huggingface.co/zeroweight-ai/ZeroTTS)
@@ -225,15 +225,15 @@ audio = tts.synthesize("…", voice=my_latents)
 
 Measured on **[ZeroBench-TTS](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)** 
 
-Every system reads **normalized text** — dates, numbers and acronyms already
-spoken out, from the benchmark's own curated reading. 
+Every system reads **raw text** — dates, numbers and acronyms verbatim, exactly
+as they appear in the wild, with no text frontend in front of the model. 
 
 | | **ZeroTTS** | OmniVoice | XTTS-v2-vietnamse | viXTTS |
 |---|:-:|:-:|:-:|:-:|
-| **WER** ↓ | **0.56 %** | 2.12 % | 7.27 % | 8.61 % |
-| **Naturalness** (UTMOS) ↑ | **2.91** | 2.75 | 2.49 | 2.34 |
-| **Voice similarity** (SSIM) ↑ | 0.938 | **0.951** | 0.941 | 0.935 |
-| **Dead air** (excess silence) ↓ | **0.029 s** | 0.386 s | 0.568 s | 0.215 s |
+| **WER** ↓ | **1.03 %** | 4.13 % | 16.42 % | 18.40 % |
+| **Naturalness** (UTMOS) ↑ | **2.91** | 2.76 | 2.43 | 2.35 |
+| **Voice similarity** (SSIM) ↑ | 0.936 | **0.950** | 0.940 | 0.935 |
+| **Dead air** (excess silence) ↓ | **0.029 s** | 0.340 s | 0.532 s | 0.233 s |
 | **RTF, CPU** ↓ | **0.50×** | 6.12× | 0.71× | 0.73× |
 | **Time to first audio, CPU** ↓ | **~70 ms** | ~34 s | ~6.1 s | ~5.1 s |
 | Size | **202 M** params, 0.86 GB fp32, CPU | 3.1 GB, GPU | 1.9 GB, GPU | 1.9 GB, GPU |

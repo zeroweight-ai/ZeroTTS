@@ -81,8 +81,7 @@ cost — are in the
 ## Headline — normalized text (n = 137)
 
 Every system reads the benchmark's curated spoken-out form: dates, numbers and
-acronyms already expanded. This matches the [README](../README.md#benchmarks)
-table, and is the condition a Vietnamese TTS system meets in production, where
+acronyms already expanded. This is the condition a Vietnamese TTS system meets in production, where
 a text frontend runs ahead of the model. ZeroTTS ships one
 (`normalize_vi_text`, applied by default) which reproduces the benchmark's
 reading on 34 of the 35 items that need normalization; neither baseline ships a
@@ -119,7 +118,8 @@ model's own grapheme-to-speech ability.
 | `challenging` — acronyms, dates, % | 39 | **1.75 %** | 4.46 % | 27.86 % | 31.85 % |
 | **overall** | 137 | **1.03 %** | **4.13 %** | **16.42 %** | **18.40 %** |
 
-Raw-text overall:
+Raw-text overall — this is the table in the
+[README](../README.md#benchmarks):
 
 | Model | **WER** | median | SSIM | UTMOS | Excess silence |
 |---|---|---|---|---|---|
