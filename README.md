@@ -21,8 +21,8 @@ the next open model**, and it runs faster than real time on a laptop CPU.
   audio (up to 30 seconds). No fine-tuning, no per-speaker training.
 * ⚡ **Real-time on CPU, streaming** — ~2× faster than real time (RTF 0.5×),
   first audio chunk in ~70 ms. No GPU required.
-* 🇻🇳 **Built for Vietnamese** — tones, code-switched English, and a built-in
-  normalizer that reads `31/12/2026` and `ZeroTTS` the way a person would.
+* 🇻🇳 **Built for Vietnamese** — tones, code-switched English, and 
+  reads words like `31/12/2026` and `ZeroTTS` without text normalizer.
 
 ## Samples
 
@@ -236,7 +236,7 @@ as they appear in the wild, with no text frontend in front of the model.
 | **Dead air** (excess silence) ↓ | **0.029 s** | 0.340 s | 0.532 s | 0.233 s |
 | **RTF, CPU** ↓ | **0.50×** | 6.12× | 0.71× | 0.73× |
 | **Time to first audio, CPU** ↓ | **~70 ms** | ~34 s | ~6.1 s | ~5.1 s |
-| Size | **202 M** params, 0.86 GB fp32, CPU | 3.1 GB, GPU | 1.9 GB, GPU | 1.9 GB, GPU |
+| **Parameters**  ↓ | **202 M** | 775 M | 467 M | 467 M |
 
 **4× fewer word errors than the next-best system**, and the fastest of the four
 on CPU. The gap is much wider in latency than in throughput: the two XTTS
