@@ -11,6 +11,7 @@
 [![ONNX](https://img.shields.io/badge/ONNX-Runtime-005CED?logo=onnx&logoColor=white)](https://onnxruntime.ai/)
 [![HuggingFace](https://img.shields.io/badge/🤗-Weights-yellow)](https://huggingface.co/zeroweight-ai/ZeroTTS)
 [![Benchmark](https://img.shields.io/badge/🤗-ZeroBench--TTS-orange)](https://huggingface.co/datasets/zeroweight-ai/ZeroBench-TTS)
+[![Blog](https://img.shields.io/badge/Blog-ZeroTTS-black)](https://zeroweight.ai/blog/zero-tts)
 
 </div>
 
