@@ -146,7 +146,7 @@ class ZeroTTS:
         is on the critical path for TTFA even though it runs once per utterance."""
         text_ids = np.zeros((1, 1), dtype=np.int64)
         txt_lengths = np.ones(1, dtype=np.int64)
-        h, packed_kv, full_valid, text_states, text_valid = self._prefix_step_init(
+        h, packed_kv, full_valid, cross_kv, text_valid = self._prefix_step_init(
             text_ids, txt_lengths, self.null_voice_emb)
         seen = np.zeros((1, self.num_codebooks, self.codebook_size), dtype=bool)
         _ctrl, codes = self._local_decode_frame(
@@ -156,7 +156,7 @@ class ZeroTTS:
         self._prefix_step_frame(
             codes[:, None, :], np.array([0], dtype=np.int64), packed_kv, full_valid,
             n_voice=self.null_voice_emb.shape[1],
-            text_states=text_states, text_valid=text_valid)
+            cross_kv=cross_kv, text_valid=text_valid)
 
     # ── voices ───────────────────────────────────────────────────────────────
 
@@ -193,7 +193,7 @@ class ZeroTTS:
         only the voice differs between guidance branches.
 
         Returns (h (B, d) predicting frame 0, packed_kv, full_valid,
-        text_states, text_valid).
+        cross_kv, text_valid).
         """
         B = voice_emb.shape[0]
         V = voice_emb.shape[1]
@@ -201,7 +201,13 @@ class ZeroTTS:
         if text_ids.shape[0] != B:
             text_ids = np.broadcast_to(text_ids, (B, L))
             txt_lengths = np.broadcast_to(txt_lengths, (B,))
-        text_states, text_valid, soa_embed = self.text_encoder_sess.run(
+        # The encoder also returns cross_kv: every decoder layer's
+        # cross-attention K and V over this text, already projected, QK-normed
+        # and RoPE-rotated. They cannot change within an utterance, so
+        # prefix_step takes them precomputed instead of re-deriving both
+        # projections from text_states on every frame. text_states itself is no
+        # longer fed anywhere; it is returned for inspection only.
+        _text_states, text_valid, soa_embed, cross_kv = self.text_encoder_sess.run(
             None,
             {"text_ids": np.ascontiguousarray(text_ids),
              "txt_lengths": np.ascontiguousarray(txt_lengths)},
@@ -222,15 +228,15 @@ class ZeroTTS:
                 "new_bidirectional": np.concatenate(
                     [np.ones((B, V), dtype=bool), np.zeros((B, 1), dtype=bool)], axis=1),
                 "past_valid": np.zeros((B, 0), dtype=bool),
-                "text_states": text_states,
+                "cross_kv": cross_kv,
                 "text_valid": text_valid,
             },
         )
-        return hidden[:, -1, :], packed_kv, full_valid, text_states, text_valid
+        return hidden[:, -1, :], packed_kv, full_valid, cross_kv, text_valid
 
     def _prefix_step_frame(self, frame_codes: np.ndarray, frame_index: np.ndarray,
                            packed_kv: np.ndarray, full_valid: np.ndarray, n_voice: int = 0,
-                           text_states=None, text_valid=None):
+                           cross_kv=None, text_valid=None):
         """Advance the global transformer by one frame (T=1, S_past = cache len).
 
         ``n_voice`` shifts the position id: the voice block occupies logical
@@ -255,7 +261,7 @@ class ZeroTTS:
                 "new_valid": np.ones((B, 1), dtype=bool),
                 "packed_kv": packed_kv,
                 "past_valid": full_valid,
-                "text_states": text_states,
+                "cross_kv": cross_kv,
                 "new_bidirectional": np.zeros((B, 1), dtype=bool),
                 "text_valid": text_valid,
             },
@@ -332,7 +338,7 @@ class ZeroTTS:
         txt_lengths = np.array([text_ids.shape[1]], dtype=np.int64)
 
         t_ttft0 = time.perf_counter() if timing is not None else None
-        h, packed_kv, full_valid, text_states, text_valid = self._prefix_step_init(
+        h, packed_kv, full_valid, cross_kv, text_valid = self._prefix_step_init(
             text_ids, txt_lengths, voice_emb)
 
         step_times = [] if timing is not None else None
@@ -372,7 +378,7 @@ class ZeroTTS:
 
             h, packed_kv, full_valid = self._prefix_step_frame(
                 codes[:, None, :], np.array([t], dtype=np.int64), packed_kv, full_valid,
-                n_voice=n_voice, text_states=text_states, text_valid=text_valid)
+                n_voice=n_voice, cross_kv=cross_kv, text_valid=text_valid)
             t += 1
 
         if timing is not None:
