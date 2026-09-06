@@ -1,0 +1,4 @@
+[submodule "cpp/vendor-ggml"]
+	path = cpp/vendor-ggml
+	url = https://github.com/ggml-org/ggml.git
+	branch = master

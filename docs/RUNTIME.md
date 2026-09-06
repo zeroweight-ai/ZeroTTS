@@ -21,10 +21,20 @@ All from `config.json`.
 | out | `text_states` | `(B, L, D)` | float32 |
 | out | `text_valid` | `(B, L)` | bool |
 | out | `soa_embed` | `(B, 1, D)` | float32 |
+| out | `cross_kv` | `(n_layers, 2, B, n_heads, L, d_head)` | float32 |
 
-`text_states` / `text_valid` are then passed into **every** `prefix_step` call —
-the graph cross-attends to them, so they must be kept alive for the whole
+`cross_kv` is every decoder layer's cross-attention K and V over this text —
+projected, QK-normed and RoPE-rotated here, once. It and `text_valid` are passed
+into **every** `prefix_step` call, so both must be kept alive for the whole
 utterance rather than consumed once.
+
+`text_states` is the encoder's own output and is **not** consumed by
+`prefix_step`; it is returned for inspection. Earlier exports fed `text_states`
+in instead, and `prefix_step` redid both cross-attention projections over the
+whole text on every frame — ~45 us per text token per frame, for a value that
+cannot change within an utterance. A runtime written against those graphs will
+fail on this one with an unknown-input error, which is the intended way to find
+out.
 
 (The file was called `char_embed.onnx` in older exports. Same graph.)
 
@@ -44,7 +54,8 @@ both.
 | `new_bidirectional` | `[true×V, false]` | `(B, 1)` false | bool |
 | `packed_kv` | `(n_layers, 2, B, n_heads, 0, d_head)` | previous output | float32 |
 | `past_valid` | `(B, 0)` | previous `full_valid` | bool |
-| `text_states`, `text_valid` | from the text encoder | same | float32 / bool |
+| `cross_kv` | `(n_layers, 2, B, n_heads, L, d_head)` from the text encoder | same | float32 |
+| `text_valid` | from the text encoder | same | bool |
 
 Outputs: `hidden (B, T, D)` — take `[:, -1, :]` — plus the new `packed_kv` and
 `full_valid`, which feed straight back in next call.
@@ -86,7 +97,7 @@ port be tested for bit-exact agreement against the Python runtime.
 ## The loop
 
 ```
-text_states, text_valid, soa = text_encoder(text_ids, txt_lengths)
+text_states, text_valid, soa, cross_kv = text_encoder(text_ids, txt_lengths)
 h, kv, valid                 = prefix_step(cold start with [voice ‖ soa])
 
 seen  = zeros(1, K, C, bool)

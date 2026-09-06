@@ -9,6 +9,7 @@
  */
 
 import { DownloadProgress } from './cache';
+import type { Backend } from './repo';
 import {
   GenerateParams, LoadedInfo, WorkerRequest, WorkerResponse,
 } from './workerProtocol';
@@ -67,16 +68,21 @@ export class TtsWorker {
     });
   }
 
-  downloadInfo(repo: string): Promise<{ bytes: number; cached: boolean }> {
-    return this.request({ type: 'downloadInfo', id: this.nextId++, repo });
+  downloadInfo(
+    repo: string, backend?: Backend, gguf?: string,
+  ): Promise<{ bytes: number; cached: boolean }> {
+    return this.request({ type: 'downloadInfo', id: this.nextId++, repo, backend, gguf });
   }
 
   clearCache(): Promise<void> {
     return this.request({ type: 'clearCache', id: this.nextId++ });
   }
 
-  load(repo: string, onProgress?: (p: DownloadProgress) => void): Promise<LoadedInfo> {
-    return this.request({ type: 'load', id: this.nextId++, repo }, { onProgress });
+  load(
+    repo: string, onProgress?: (p: DownloadProgress) => void,
+    backend?: Backend, gguf?: string,
+  ): Promise<LoadedInfo> {
+    return this.request({ type: 'load', id: this.nextId++, repo, backend, gguf }, { onProgress });
   }
 
   /**

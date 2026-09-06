@@ -1,7 +1,8 @@
 /** Minimal Node loader so parity.mjs can import the .ts source directly.
  *  esbuild strips the types and inlines the `?raw` abbreviation table. */
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { transformSync } from 'esbuild';
 
 export async function resolve(specifier, context, next) {
@@ -9,6 +10,15 @@ export async function resolve(specifier, context, next) {
     const base = specifier.slice(0, -4);
     const resolved = await next(base, context);
     return { ...resolved, url: resolved.url + '?raw', shortCircuit: true };
+  }
+  // src/ imports its siblings without a file extension, which Node's ESM
+  // resolver does not do on its own — only the bundler does. Without this,
+  // anything that reaches past the first module fails on `./rng`.
+  if (specifier.startsWith('.') && context.parentURL?.startsWith('file:')) {
+    const abs = path.resolve(path.dirname(fileURLToPath(context.parentURL)), specifier);
+    if (!existsSync(abs) && existsSync(abs + '.ts')) {
+      return { url: pathToFileURL(abs + '.ts').href, format: 'module', shortCircuit: true };
+    }
   }
   return next(specifier, context);
 }

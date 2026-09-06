@@ -13,17 +13,28 @@ npm run build      # static bundle in js/dist/, deployable anywhere
 
 ## The download
 
-**The weights are fp32 and not quantized**, so the demo fetches roughly
+Depends on the backend. The default (ggml/GGUF) fetches
 
 | | |
 |---|---|
-| `text_encoder.onnx` | ~280 MB |
-| `prefix_step.onnx` | ~391 MB |
+| `gguf/zerotts-f32.gguf` | ~772 MB |
+| codec decoder (ONNX) | ~45 MB |
+| **total** | **~820 MB** |
+
+and onnxruntime-web fetches the fp32 graphs instead
+
+| | |
+|---|---|
+| `text_encoder.onnx` | ~323 MB |
+| `prefix_step.onnx` | ~348 MB |
 | `local_frame_decode.onnx` | ~187 MB |
 | codec decoder | ~45 MB |
-| **total** | **~900 MB** |
+| **total** | **~903 MB** |
 
 once, then persists it (Cache API / OPFS) so later visits are instant.
+
+(The two ONNX graphs changed size when the cross-attention K/V moved from
+`prefix_step` into the text encoder; the total did not.)
 
 Cached copies are keyed by the file's **ETag**, not by its URL. Everything is
 fetched from `.../resolve/main/...`, which is a moving target: publishing a new
@@ -31,13 +42,12 @@ revision on the Hub leaves the URL identical and the bytes different, so a
 URL-keyed cache would serve the old file forever — and silently, since a stale
 voice still decodes, it just isn't the voice you shipped. A HEAD per file (six
 of them, already needed to size the progress bar) turns a re-published voice
-into a 30 KB re-download and leaves the ~900 MB of graphs alone.
+into a 30 KB re-download and leaves the weights alone.
 
-This is a deliberate quality-over-size choice, not an oversight. It targets
-desktop broadband; it is not suitable for mobile data, and the demo says so
-before it starts downloading. If you need a smaller build, quantizing to int8
-(~250 MB) or fp16 (~430 MB) is straightforward with
-`onnxruntime.quantization` — but validate the result against
+The ONNX path is fp32 by choice: int8 quantization of these graphs was tried
+and came out **slower** than fp32 in WebAssembly, for the same instruction-set
+reason described under the ggml backend below. If you want a smaller download,
+take the GGUF backend rather than quantizing these. Either way, validate against
 [the benchmark](BENCHMARKS.md) before trusting it, because nothing here has been
 measured at reduced precision.
 
@@ -106,6 +116,40 @@ specifically bite in JavaScript.
   codes. It is the only practical way to keep a port correct across re-exports.
 * **External data files.** The `.data` files beside the codec graphs must be
   registered with ORT-web explicitly; they are not fetched implicitly.
+
+## A second backend: ggml/GGUF — now the default
+
+[`cpp/`](../cpp/) reimplements the generation loop on ggml, compiled to WASM,
+reading a GGUF file instead of the three ONNX graphs. The demo uses it by
+default in its **unquantized** form: 6.1x realtime against onnxruntime's 4.2x,
+bit-exact against it, and a 772 MB download against ~858 MB. Quantized GGUFs
+(206 MB / 124 MB) are selectable when download size is the binding constraint.
+onnxruntime-web remains selectable, and is still the only backend that
+implements CFG.
+
+Two findings from building it are worth keeping:
+
+**Quantization does not buy speed in WebAssembly.** Quantized weights are
+*slower* than fp32 at every thread count measured — SIMD128 has no integer
+dot-product instruction, so a q8_0 block costs ~20 SIMD ops per 32 MACs against
+fp32's 8 FMAs. (The same instruction-set gap is why quantizing the ONNX graphs
+to int8 also came out slower.) fp32 GGUF is the fastest build at every thread
+count, which is why it is the default despite being the largest — quantization
+here buys download size and costs both speed and exactness.
+
+**The largest single win was algorithmic, and it has been folded back into the
+ONNX graphs.** `prefix_step.onnx` took `text_states` as a per-frame input, so it
+re-projected every decoder layer's cross-attention K/V over the whole text on
+each frame — 45 us per text token per frame, for a result that cannot change
+within an utterance. The text encoder now emits those K/V once and `prefix_step`
+consumes them: byte-identical output, 1.07x on a short sentence and **1.28x on
+the ~120-token segments `chunkText` produces**, and per-frame cost no longer
+depends on text length. That closed most of the gap between the two backends.
+
+See [cpp/README.md](../cpp/README.md) for the measurements and
+[js/bench-ggml.html](../js/bench-ggml.html) (under `npm run dev`) to re-run them
+on other hardware — worth doing, since the fp32-beats-quantized result should
+invert on a machine that is short of memory bandwidth rather than of compute.
 
 ## Execution providers
 

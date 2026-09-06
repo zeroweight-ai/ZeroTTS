@@ -94,8 +94,29 @@ interface PrefixState {
   hidden: ort.Tensor;       // (B, D) — predicts the next frame
   packedKv: ort.Tensor;
   fullValid: ort.Tensor;
-  textStates: ort.Tensor;
+  /** Every decoder layer's cross-attention K/V over this segment's text, from
+   *  the text encoder. Fixed for the whole utterance — see the note in
+   *  prefixStepInit. */
+  crossKv: ort.Tensor;
   textValid: ort.Tensor;
+}
+
+/**
+ * Whatever produces a segment's frame codes. `ZeroTTSBrowser` implements this
+ * itself with the ONNX graphs; `ZeroTTSGgml` (ggmlBackend.ts) is the other
+ * implementation. Everything downstream — chunking, the streaming codec
+ * session, inter-segment silence — is backend-independent and lives here, so
+ * swapping runtimes swaps only this.
+ *
+ * Codes come back as BigInt64Array from ORT (which demands int64 there) and
+ * Int32Array from ggml; packFrames reads both.
+ */
+export interface FrameSource {
+  readonly numCodebooks: number;
+  generateFrames(
+    text: string, voiceEmb: Float32Array | null, options: Partial<SamplingOptions>,
+    seed?: number, signal?: AbortSignal, sharedRng?: Rng,
+  ): AsyncGenerator<BigInt64Array | Int32Array>;
 }
 
 export class ZeroTTSBrowser {
@@ -109,7 +130,9 @@ export class ZeroTTSBrowser {
   private readonly codebookSize: number;
 
   constructor(
-    private sessions: Sessions,
+    /** The ONNX hot-path graphs. Null when `frameSource` supplies the frames —
+     *  the ggml backend loads no ONNX graphs except the codec's. */
+    private sessions: Sessions | null,
     private codec: MossCodecDecoder,
     private tokenizer: BpeTokenizer,
     private config: ZeroTTSConfig,
@@ -117,6 +140,8 @@ export class ZeroTTSBrowser {
     /** The codec's canonical silence frame (length numCodebooks), or null when
      *  the model directory predates silence_frame.npy — see synthesizeStream. */
     private silenceFrame: BigInt64Array | null = null,
+    /** When set, frames come from here instead of from `sessions`. */
+    private frameSource: FrameSource | null = null,
   ) {
     this.sampleRate = config.sample_rate;
     this.numCodebooks = config.num_codebooks;
@@ -131,12 +156,23 @@ export class ZeroTTSBrowser {
   /** Push one dummy request through the hot-path sessions so first-call latency
    *  reflects steady state rather than lazy allocator setup. */
   async warmup(): Promise<void> {
+    // Only the ORT sessions have lazy first-call setup worth paying up front;
+    // the ggml backend allocates its graphs per call either way.
+    if (!this.sessions) return;
     const rng = new Rng(0);
     const state = await this.prefixStepInit(big([1, 2]), 2, this.nullVoiceEmb, 1);
     const seen = new Uint8Array(this.numCodebooks * this.codebookSize);
     const { codes } = await this.localDecodeFrame(
       state.hidden, true, DEFAULT_SAMPLING, seen, 1, rng);
     await this.prefixStepFrame(codes, 0, state, this.nVoiceQueries, 1);
+  }
+
+  private requireSessions(): Sessions {
+    if (!this.sessions) {
+      throw new Error('this ZeroTTSBrowser has no ONNX sessions — it generates '
+                    + 'frames through its frame source');
+    }
+    return this.sessions;
   }
 
   // ── graph calls ────────────────────────────────────────────────────────────
@@ -154,7 +190,14 @@ export class ZeroTTSBrowser {
       return out;
     })();
 
-    const [textStates, textValid, soaEmbed] = await run(this.sessions.textEncoder, {
+    // The text encoder also returns cross_kv: each decoder layer's
+    // cross-attention K and V over this text, already projected, QK-normed and
+    // rotated. They cannot change within an utterance, so prefix_step takes
+    // them precomputed rather than re-deriving both projections from
+    // text_states on every frame — which is what it used to do, at ~45 us per
+    // text token per frame. text_states itself is no longer fed anywhere.
+    const sessions = this.requireSessions();
+    const [, textValid, soaEmbed, crossKv] = await run(sessions.textEncoder, {
       text_ids: i64(idsBatched, [B, textLen]),
       txt_lengths: i64(new Array(B).fill(textLen), [B]),
     });
@@ -174,7 +217,7 @@ export class ZeroTTSBrowser {
     const bidirectional = new Uint8Array(B * T);
     for (let b = 0; b < B; b++) bidirectional.fill(1, b * T, b * T + V);
 
-    const [hidden, packedKv, fullValid] = await run(this.sessions.prefixStep, {
+    const [hidden, packedKv, fullValid] = await run(sessions.prefixStep, {
       external_embed: new ort.Tensor('float32', external, [B, T, D]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B * T).fill(1), [B, T]),
       frame_codes: i64(new BigInt64Array(B * T * this.numCodebooks),
@@ -185,12 +228,12 @@ export class ZeroTTSBrowser {
         [this.nLayers, 2, B, this.nHeads, 0, this.dHead]),
       new_bidirectional: new ort.Tensor('bool', bidirectional, [B, T]),
       past_valid: new ort.Tensor('bool', new Uint8Array(0), [B, 0]),
-      text_states: textStates,
+      cross_kv: crossKv,
       text_valid: textValid,
     });
 
     return {
-      hidden: lastPosition(hidden), packedKv, fullValid, textStates, textValid,
+      hidden: lastPosition(hidden), packedKv, fullValid, crossKv, textValid,
     };
   }
 
@@ -209,7 +252,7 @@ export class ZeroTTSBrowser {
     // Position: the voice block holds 0..V-1, <soa> is at V, frame t at V+1+t.
     const pos = new BigInt64Array(B).fill(BigInt(nVoice + 1 + frameIndex));
 
-    const [hidden, packedKv, fullValid] = await run(this.sessions.prefixStep, {
+    const [hidden, packedKv, fullValid] = await run(this.requireSessions().prefixStep, {
       external_embed: new ort.Tensor('float32', new Float32Array(B * this.dModel),
         [B, 1, this.dModel]),
       use_external_embed: new ort.Tensor('bool', new Uint8Array(B), [B, 1]),
@@ -218,14 +261,14 @@ export class ZeroTTSBrowser {
       new_valid: new ort.Tensor('bool', new Uint8Array(B).fill(1), [B, 1]),
       packed_kv: state.packedKv,
       past_valid: state.fullValid,
-      text_states: state.textStates,
+      cross_kv: state.crossKv,
       new_bidirectional: new ort.Tensor('bool', new Uint8Array(B), [B, 1]),
       text_valid: state.textValid,
     });
 
     return {
       hidden: lastPosition(hidden), packedKv, fullValid,
-      textStates: state.textStates, textValid: state.textValid,
+      crossKv: state.crossKv, textValid: state.textValid,
     };
   }
 
@@ -234,7 +277,7 @@ export class ZeroTTSBrowser {
     seenMask: Uint8Array, B: number, rng: Rng,
   ): Promise<{ isEoa: boolean; codes: BigInt64Array }> {
     const K = this.numCodebooks;
-    const [isEoaT, codesT] = await run(this.sessions.localFrameDecode, {
+    const [isEoaT, codesT] = await run(this.requireSessions().localFrameDecode, {
       global_hidden: hidden,
       forbid_eoa: new ort.Tensor('bool', Uint8Array.from([forbidEoa ? 1 : 0]), [1]),
       text_temperature: new ort.Tensor('float32', Float32Array.from([opts.textTemperature]), [1]),
@@ -270,7 +313,11 @@ export class ZeroTTSBrowser {
      *  a fresh Rng per segment from the same seed would replay the identical
      *  draws for every segment. */
     sharedRng?: Rng,
-  ): AsyncGenerator<BigInt64Array> {
+  ): AsyncGenerator<BigInt64Array | Int32Array> {
+    if (this.frameSource) {
+      yield* this.frameSource.generateFrames(text, voiceEmb, options, seed, signal, sharedRng);
+      return;
+    }
     const opts = { ...DEFAULT_SAMPLING, ...options };
     const rng = sharedRng ?? new Rng(seed);
     let voice = voiceEmb ?? this.nullVoiceEmb;
@@ -314,7 +361,7 @@ export class ZeroTTSBrowser {
     text: string, voiceEmb: Float32Array | null, options: Partial<SamplingOptions> = {},
     seed?: number, signal?: AbortSignal,
   ): Promise<Float32Array> {
-    const frames: BigInt64Array[] = [];
+    const frames: (BigInt64Array | Int32Array)[] = [];
     for await (const f of this.generateFrames(text, voiceEmb, options, seed, signal)) {
       frames.push(f);
     }
@@ -360,7 +407,7 @@ export class ZeroTTSBrowser {
     // same seed would give every segment identical random draws.
     const rng = new Rng(seed);
     const silence = this.silenceFrame;
-    let buffer: BigInt64Array[] = [];
+    let buffer: (BigInt64Array | Int32Array)[] = [];
 
     const flush = async () => {
       const [codes, K, n] = packFrames(buffer, this.numCodebooks);
@@ -391,8 +438,11 @@ export class ZeroTTSBrowser {
   }
 }
 
-/** Frames (each length K) -> (K, T) int32, the layout the codec wants. */
-function packFrames(frames: BigInt64Array[], K: number): [Int32Array, number, number] {
+/** Frames (each length K) -> (K, T) int32, the layout the codec wants.
+ *  Accepts either width: ORT hands back int64, ggml int32. */
+function packFrames(
+  frames: (BigInt64Array | Int32Array)[], K: number,
+): [Int32Array, number, number] {
   const T = frames.length;
   const out = new Int32Array(K * T);
   for (let t = 0; t < T; t++) {

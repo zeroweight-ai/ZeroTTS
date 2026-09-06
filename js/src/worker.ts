@@ -15,7 +15,9 @@
 
 import { clearCache } from './cache';
 import { loadModel } from './loader';
-import { DEFAULT_REPO, downloadInfo, loadVoice, repoBaseUrl } from './repo';
+import {
+  Backend, DEFAULT_BACKEND, defaultRepo, downloadInfo, loadVoice, repoBaseUrl,
+} from './repo';
 import { ZeroTTSBrowser } from './synthesizer';
 import { GenerateParams, LoadedInfo, WorkerRequest, WorkerResponse } from './workerProtocol';
 
@@ -97,9 +99,11 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   try {
     switch (message.type) {
       case 'downloadInfo': {
+        const backend = message.backend ?? DEFAULT_BACKEND;
         post({
           type: 'result', id,
-          value: await downloadInfo(repoBaseUrl(message.repo || DEFAULT_REPO)),
+          value: await downloadInfo(
+            repoBaseUrl(message.repo || defaultRepo(backend)), backend, message.gguf),
         });
         break;
       }
@@ -109,15 +113,19 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
         break;
       }
       case 'load': {
+        const backend = message.backend ?? DEFAULT_BACKEND;
         const loaded = await loadModel({
-          repo: message.repo || DEFAULT_REPO,
+          backend,
+          gguf: message.gguf,
+          repo: message.repo || defaultRepo(backend),
           onProgress: (progress) => post({ type: 'progress', id, progress }),
         });
         tts = loaded.tts;
         base = loaded.base;
         voices.clear();
         const info: LoadedInfo = {
-          voices: loaded.voices, base: loaded.base, sampleRate: loaded.tts.sampleRate,
+          voices: loaded.voices, base: loaded.base,
+          sampleRate: loaded.tts.sampleRate, backend: loaded.backend,
         };
         post({ type: 'result', id, value: info });
         break;
