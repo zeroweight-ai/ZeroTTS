@@ -21,10 +21,40 @@ npm run build      # static bundle in dist/
 
 ## The download
 
-The weights are fp32 and unquantized — about **900 MB** total, fetched once and
-persisted via the Cache API. That is a deliberate quality-over-size decision
-(see [../docs/BROWSER.md](../docs/BROWSER.md)); the UI states the size before
-downloading. Not suitable for mobile data.
+**~820 MB** on the default (ggml/GGUF) backend — a 772 MB fp32 GGUF plus the
+45 MB ONNX codec decoder — fetched once and persisted via the Cache API. The
+onnxruntime backend fetches ~900 MB of fp32 graphs instead. Smaller quantized
+GGUFs are selectable (q8_0 at 206 MB, q4_0 at 124 MB) but are *slower*, not
+faster — see below. The UI states the size before downloading either way. See
+[../docs/BROWSER.md](../docs/BROWSER.md).
+
+## Backends
+
+The demo ships two, and **ggml/GGUF is the default**:
+
+| | download | realtime | notes |
+|---|---:|---:|---|
+| **ggml/GGUF fp32** (default) | 772 MB | 6.1x | bit-exact against ONNX; no CFG |
+| ggml/GGUF q8_0 | 206 MB | 3.6x | 4.9% of codes drawn differently |
+| ggml/GGUF q4_0 | 124 MB | 4.1x | 36.5% differently |
+| onnxruntime-web | ~858 MB | 4.2x | the only one with CFG |
+
+Realtime figures at 4 threads on one machine; the ggml backend takes
+`min(hardwareConcurrency, 8)` and gains from the extra threads, onnxruntime
+caps at 4 and does not.
+
+`src/ggmlBackend.ts` is the browser-side wrapper for [`../cpp/`](../cpp/) — same
+`generateFrames` signature as `synthesizer.ts`, verified to produce identical
+frame codes at fp32. Everything downstream of frame generation (chunking, the
+streaming codec session, inter-segment silence) is shared, so the two backends
+differ only in `FrameSource`. The codec itself stays on onnxruntime either way.
+
+`bench-ggml.html` runs both side by side. Two things `../cpp/README.md`
+documents that are worth knowing here: quantized weights are *slower* than fp32
+in WebAssembly — which is why the default is the *unquantized* GGUF, and the
+cross-attention K/V recompute that used to dominate `prefix_step.onnx` has been
+fixed in the ONNX graphs too — worth ~1.28x at the segment lengths `chunkText`
+produces.
 
 ## Layout
 
@@ -44,6 +74,8 @@ downloading. Not suitable for mobile data.
 | `src/rng.ts` | seedable PRNG — the sampler's draws are graph *inputs* |
 | `src/samples.ts` | the sample texts, shared with the Python UI |
 | `src/main.ts` | demo UI wiring (imports no runtime code) |
+| `src/ggmlBackend.ts` | the ggml/GGUF backend (see [../cpp/](../cpp/)) |
+| `src/benchGgml.ts` | the ONNX-vs-ggml A/B page |
 
 The model runs in a Web Worker: ORT-web's WASM backend computes on the calling
 thread, and two graph calls per 80 ms frame on the UI thread freeze the tab for
@@ -71,6 +103,14 @@ last bits at chunk seams when comparing streaming to batch decode — that is th
 KV-cached decoder, not an error — but the codes must not.)
 
 **Text normalization vs. Python** — see below.
+
+**ggml vs. ONNX** — the third, and the one that keeps the two backends honest
+about each other. An fp32 GGUF must reproduce the ONNX frame codes exactly:
+
+```bash
+npm install --no-save onnxruntime-node
+npm run parity:ggml
+```
 
 ## Normalizer parity
 

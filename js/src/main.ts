@@ -16,7 +16,9 @@ import bannerUrl from '../../docs/assets/banner.png';
 import { fetchWithCache } from './cache';
 import { textSegments } from './chunking';
 import { normalizeViText } from './textNorm';
-import { DEFAULT_REPO, voicePreviewUrl } from './repo';
+import {
+  Backend, DEFAULT_BACKEND, DEFAULT_GGUF, GGUF_BUILDS, defaultRepo, voicePreviewUrl,
+} from './repo';
 import { loadSampleTexts } from './samples';
 import { StreamPlayer, toWavBlob } from './player';
 import { TtsWorker } from './workerClient';
@@ -37,6 +39,9 @@ const els = {
   text: $<HTMLTextAreaElement>('text'),
   voice: $<HTMLSelectElement>('voice'),
   repo: $<HTMLInputElement>('repo'),
+  backend: $<HTMLSelectElement>('backend'),
+  quant: $<HTMLSelectElement>('quant'),
+  quantField: $<HTMLElement>('quant-field'),
   seed: $<HTMLInputElement>('seed'),
   cfg: $<HTMLInputElement>('cfg'),
   temperature: $<HTMLInputElement>('temperature'),
@@ -84,16 +89,58 @@ function live(on: boolean): void {
   els.livePill.classList.toggle('on', on);
 }
 
+/** The chosen runtime. The two read different model repositories, so this also
+ *  decides what `repo` defaults to. */
+function backend(): Backend {
+  return (els.backend.value as Backend) || DEFAULT_BACKEND;
+}
+
+function repo(): string {
+  return els.repo.value || defaultRepo(backend());
+}
+
+/** Only one GGUF is ever fetched — whichever this names. The others in the
+ *  repository are alternatives, not extra downloads. */
+function gguf(): string | undefined {
+  return backend() === 'ggml' ? (els.quant.value || DEFAULT_GGUF) : undefined;
+}
+
+for (const build of GGUF_BUILDS) {
+  const option = document.createElement('option');
+  option.value = build.file;
+  option.textContent = build.label;
+  option.selected = build.file === DEFAULT_GGUF;
+  els.quant.append(option);
+}
+
+function updateBackendUi(): void {
+  els.quantField.hidden = backend() !== 'ggml';
+}
+updateBackendUi();
+
+/** Sequence number for the size lookup. Changing backend, quantization or repo
+ *  all fire one, each involves a HEAD per file, and they do not come back in
+ *  the order they were sent — without this a slow lookup for the previous
+ *  selection lands after the current one and reports the wrong size. */
+let sizeRequest = 0;
+
 async function refreshSizeNote(): Promise<void> {
+  const mine = ++sizeRequest;
+  const kind = backend() === 'ggml'
+    ? `GGUF ${(gguf() ?? '').replace(/^gguf\/zerotts-|\.gguf$/g, '')}`
+    : 'ONNX fp32';
   try {
-    const info = await tts.downloadInfo(els.repo.value || DEFAULT_REPO);
+    const info = await tts.downloadInfo(repo(), backend(), gguf());
+    if (mine !== sizeRequest) return;
     els.sizeNote.textContent = info.cached
       ? `Mô hình đã có sẵn trên máy (${mb(info.bytes)}) — tải sẽ rất nhanh.`
-      : `Lần đầu sẽ tải khoảng ${mb(info.bytes)} (fp32, chưa lượng tử hoá) và ` +
+      : `Lần đầu sẽ tải khoảng ${mb(info.bytes)} (${kind}) và ` +
         `lưu lại cho những lần sau. Nên dùng máy tính với mạng nhanh.`;
   } catch {
-    els.sizeNote.textContent =
-      'Lần đầu sẽ tải khoảng 900 MB (fp32, chưa lượng tử hoá) và lưu lại cho những lần sau.';
+    if (mine !== sizeRequest) return;
+    els.sizeNote.textContent = backend() === 'ggml'
+      ? 'Lần đầu sẽ tải khoảng 820 MB (GGUF f32) và lưu lại cho những lần sau.'
+      : 'Lần đầu sẽ tải khoảng 900 MB (ONNX fp32) và lưu lại cho những lần sau.';
   }
 }
 
@@ -102,11 +149,11 @@ els.load.addEventListener('click', async () => {
   try {
     status('Đang tải mô hình…');
     progress(0);
-    const loaded = await tts.load(els.repo.value || DEFAULT_REPO, (p) => {
+    const loaded = await tts.load(repo(), (p) => {
       if (p.overallTotal > 0) progress(p.overallLoaded / p.overallTotal);
       els.sizeNote.textContent =
         `Đang tải ${p.file.split('/').pop()} — ${mb(p.overallLoaded)} / ${mb(p.overallTotal)}`;
-    });
+    }, backend(), gguf());
     voices = loaded.voices;
     base = loaded.base;
     sampleRate = loaded.sampleRate;
@@ -122,7 +169,8 @@ els.load.addEventListener('click', async () => {
     player = new StreamPlayer(sampleRate);
     progress(null);
     els.sizeNote.textContent =
-      `Đã sẵn sàng — ${voices.voices.length} giọng, ${sampleRate / 1000} kHz.`;
+      `Đã sẵn sàng — ${voices.voices.length} giọng, ${sampleRate / 1000} kHz, `
+      + `bộ máy ${loaded.backend}.`;
     status(`Ready — ${voices.voices.length} voice(s), ${sampleRate / 1000} kHz.`);
     els.voice.disabled = false;
     els.generate.disabled = false;
@@ -366,6 +414,19 @@ function renderHistory(): void {
 
 els.voice.addEventListener('change', updateVoiceUi);
 els.repo.addEventListener('change', refreshSizeNote);
+
+// The two backends read different repositories, so switching one moves the
+// other unless the user has typed their own.
+els.quant.addEventListener('change', refreshSizeNote);
+
+els.backend.addEventListener('change', () => {
+  updateBackendUi();
+  const current = els.repo.value.trim();
+  if (!current || current === defaultRepo('ggml') || current === defaultRepo('onnx')) {
+    els.repo.value = defaultRepo(backend());
+  }
+  void refreshSizeNote();
+});
 
 els.banner.src = bannerUrl;
 els.text.value = DEFAULT_TEXT;

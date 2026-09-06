@@ -284,8 +284,21 @@
     <summary>Tuỳ chọn nâng cao</summary>
 
     <div class="field">
+      <label for="backend">Bộ máy suy luận</label>
+      <select id="backend">
+        <option value="ggml" selected>ggml / GGUF — nhẹ hơn, nhanh hơn</option>
+        <option value="onnx">onnxruntime-web — bản gốc, hỗ trợ CFG</option>
+      </select>
+    </div>
+
+    <div class="field" id="quant-field">
+      <label for="quant">Bản lượng tử hoá</label>
+      <select id="quant"></select>
+    </div>
+
+    <div class="field">
       <label for="repo">Model repository</label>
-      <input id="repo" value="zeroweight-ai/ZeroTTS" />
+      <input id="repo" value="zeroweight-ai/ZeroTTS-GGUF" />
     </div>
 
     <div class="field row">

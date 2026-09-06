@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZeroTTS backend benchmark</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 60rem; }
+    h1 { font-size: 1.2rem; }
+    label { display: block; margin: .4rem 0; }
+    input[type=text] { width: 100%; }
+    button { padding: .4rem .9rem; margin-right: .5rem; }
+    pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; white-space: pre-wrap; }
+    table { border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ddd; padding: .3rem .6rem; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>ZeroTTS: onnxruntime-web vs ggml/GGUF</h1>
+  <p>Both backends run the same text, voice, seed and sampling options, so the
+     frame codes are comparable and the wall time is the only variable.
+     Cross-origin isolated: <b id="coi"></b>, hardwareConcurrency: <b id="hc"></b>.</p>
+
+  <label>Text <input id="text" type="text"
+    value="Xin chào các bạn, hôm nay trời rất đẹp và tôi muốn đi dạo." /></label>
+  <label>Voice <input id="voice" type="text" value="kimoanh" /></label>
+  <label>Threads <input id="threads" type="number" value="4" min="1" max="16" /></label>
+  <label>GGUF <select id="gguf">
+    <option>zerotts-q4_0.gguf</option>
+    <option>zerotts-f16.gguf</option>
+    <option>zerotts-q5_0.gguf</option>
+    <option selected>zerotts-q8_0.gguf</option>
+    <option>zerotts-f32.gguf</option>
+  </select></label>
+
+  <p>
+    <button id="run-onnx">Run onnxruntime-web</button>
+    <button id="run-ggml">Run ggml</button>
+  </p>
+  <div id="results"></div>
+  <pre id="log"></pre>
+  <script type="module" src="/src/benchGgml.ts"></script>
+</body>
+</html>

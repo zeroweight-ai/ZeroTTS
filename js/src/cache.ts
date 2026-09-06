@@ -92,19 +92,31 @@ function head(url: string): Promise<HeadInfo | null> {
   return info;
 }
 
+/**
+ * Absolute form of a URL that may be root-relative.
+ *
+ * `repoBaseUrl` accepts a leading-slash path so a repo can be served from the
+ * same origin (which is how the model is loaded from a local checkout), and
+ * `new URL()` throws on those without a base. Cache keys have to be absolute
+ * and comparable, so everything here goes through this first.
+ */
+function absolute(url: string): string {
+  return new URL(url, self.location.href).toString();
+}
+
 /** The cache key for a URL at a given version. */
 function versioned(url: string, etag: string | null): string {
-  if (!etag) return url;
-  const key = new URL(url);
+  const key = new URL(url, self.location.href);
+  if (!etag) return key.toString();
   key.searchParams.set(VERSION_PARAM, etag);
   return key.toString();
 }
 
 /** True when `request` is some version of `url` — any version, or none. */
 function isVersionOf(requestUrl: string, url: string): boolean {
-  const stripped = new URL(requestUrl);
+  const stripped = new URL(requestUrl, self.location.href);
   stripped.searchParams.delete(VERSION_PARAM);
-  return stripped.toString() === url;
+  return stripped.toString() === absolute(url);
 }
 
 /**

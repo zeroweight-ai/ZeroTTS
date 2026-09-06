@@ -10,15 +10,21 @@ import * as ort from 'onnxruntime-web';
 
 import { fetchWithCache, ProgressFn, totalBytes } from './cache';
 import { CodecMeta, MossCodecDecoder } from './codec';
-import { DEFAULT_REPO, modelUrls, repoBaseUrl } from './repo';
+import {
+  Backend, DEFAULT_BACKEND, DEFAULT_GGUF, defaultRepo, modelUrls, repoBaseUrl,
+} from './repo';
 import { BpeTokenizer } from './tokenizer';
 import { ZeroTTSBrowser } from './synthesizer';
+import type { ZeroTTSGgml } from './ggmlBackend';
 import { VoiceIndex, ZeroTTSConfig } from './types';
 
 // Re-exported so the runtime side keeps one import site; the definitions live in
 // repo.ts because the page needs them without the runtime.
+export type { Backend } from './repo';
 export {
-  DEFAULT_REPO, downloadInfo, loadVoice, modelUrls, repoBaseUrl, voicePreviewUrl,
+  DEFAULT_BACKEND, DEFAULT_GGUF, DEFAULT_REPO, GGUF_BUILDS, GGUF_REPO, ONNX_REPO,
+  defaultRepo, downloadInfo, loadVoice, modelFiles, modelUrls, repoBaseUrl,
+  voicePreviewUrl,
 } from './repo';
 
 export interface LoadOptions {
@@ -26,16 +32,23 @@ export interface LoadOptions {
   revision?: string;
   onProgress?: ProgressFn;
   threads?: number;
+  /** Which runtime generates frames. Defaults to ggml — see repo.ts. */
+  backend?: Backend;
+  /** Which GGUF to fetch, for the ggml backend. */
+  gguf?: string;
 }
 
 export interface LoadedModel {
   tts: ZeroTTSBrowser;
   voices: VoiceIndex;
   base: string;
+  backend: Backend;
 }
 
 export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel> {
-  const base = repoBaseUrl(options.repo ?? DEFAULT_REPO, options.revision);
+  const backend = options.backend ?? DEFAULT_BACKEND;
+  const gguf = options.gguf ?? DEFAULT_GGUF;
+  const base = repoBaseUrl(options.repo ?? defaultRepo(backend), options.revision);
 
   // Multi-threaded WASM needs SharedArrayBuffer, which needs the page to be
   // cross-origin isolated (the COOP/COEP headers in vite.config.ts). Asking for
@@ -59,7 +72,7 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
     graphOptimizationLevel: 'all',
   };
 
-  const overall = { loaded: 0, total: await totalBytes(modelUrls(base)) };
+  const overall = { loaded: 0, total: await totalBytes(modelUrls(base, backend, gguf)) };
   const get = (path: string) =>
     fetchWithCache(`${base}/${path}`, options.onProgress, overall);
   const getJson = async (path: string) => {
@@ -91,22 +104,41 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
     }],
   };
 
-  const [prefixBuf, localBuf, textBuf, decodeFull, decodeStep, nullVoiceBuf] =
-    await Promise.all([
+  // The ggml backend fetches one GGUF where the ONNX backend fetches three
+  // graphs; the codec and the small side files are the same either way.
+  const [decodeFull, decodeStep, nullVoiceBuf] = await Promise.all([
+    get('onnx/codec/moss_audio_tokenizer_decode_full.onnx'),
+    get('onnx/codec/moss_audio_tokenizer_decode_step.onnx'),
+    get('null_voice_emb.npy'),
+  ]);
+  const codec = await MossCodecDecoder.create(
+    codecMeta, { decodeFull, decodeStep }, codecOptions);
+
+  const tokenizer = await BpeTokenizer.create(tokenizerJson);
+
+  let sessions: {
+    textEncoder: ort.InferenceSession;
+    prefixStep: ort.InferenceSession;
+    localFrameDecode: ort.InferenceSession;
+  } | null = null;
+  let frameSource: ZeroTTSGgml | null = null;
+
+  if (backend === 'ggml') {
+    const { ZeroTTSGgml } = await import('./ggmlBackend');
+    frameSource = await ZeroTTSGgml.create(await get(gguf), tokenizer, options.threads);
+  } else {
+    const [prefixBuf, localBuf, textBuf] = await Promise.all([
       get('onnx/prefix_step.onnx'),
       get('onnx/local_frame_decode.onnx'),
       get('onnx/text_encoder.onnx'),
-      get('onnx/codec/moss_audio_tokenizer_decode_full.onnx'),
-      get('onnx/codec/moss_audio_tokenizer_decode_step.onnx'),
-      get('null_voice_emb.npy'),
     ]);
-
-  const [prefixStep, localFrameDecode, textEncoder, codec] = await Promise.all([
-    ort.InferenceSession.create(prefixBuf, sessionOptions),
-    ort.InferenceSession.create(localBuf, sessionOptions),
-    ort.InferenceSession.create(textBuf, sessionOptions),
-    MossCodecDecoder.create(codecMeta, { decodeFull, decodeStep }, codecOptions),
-  ]);
+    const [prefixStep, localFrameDecode, textEncoder] = await Promise.all([
+      ort.InferenceSession.create(prefixBuf, sessionOptions),
+      ort.InferenceSession.create(localBuf, sessionOptions),
+      ort.InferenceSession.create(textBuf, sessionOptions),
+    ]);
+    sessions = { textEncoder, prefixStep, localFrameDecode };
+  }
 
   // The codec's canonical silence frame, used to pad between segments. Absent
   // in model directories built before it was shipped; the synthesizer then
@@ -118,13 +150,12 @@ export async function loadModel(options: LoadOptions = {}): Promise<LoadedModel>
     console.warn('silence_frame.npy missing — segments will not be padded');
   }
 
-  const tokenizer = await BpeTokenizer.create(tokenizerJson);
   const tts = new ZeroTTSBrowser(
-    { textEncoder, prefixStep, localFrameDecode },
-    codec, tokenizer, config, parseNpyFloat32(nullVoiceBuf), silenceFrame);
+    sessions, codec, tokenizer, config, parseNpyFloat32(nullVoiceBuf),
+    silenceFrame, frameSource);
 
   await tts.warmup();
-  return { tts, voices, base };
+  return { tts, voices, base, backend };
 }
 
 /**
