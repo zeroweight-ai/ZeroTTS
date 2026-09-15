@@ -23,23 +23,20 @@ from pathlib import Path
 
 DEFAULT_REPO_ID = "zeroweight-ai/ZeroTTS"
 
-# The exact model revision this release was built against.
+# The model revision this package resolves by default: always the latest on the
+# Hub's default branch.
 #
-# Without it, `snapshot_download` resolves `main`, which couples every released
-# version of this package to whatever the Hub serves *today*. That is not
-# hypothetical: re-exporting the graphs so `prefix_step` takes precomputed
-# cross-attention K/V instead of `text_states` broke `pip install zerotts`
-# retroactively, for every version already published, the moment it was merged
-# — a runtime cannot be fixed after the fact, and the failure lands on users who
-# changed nothing.
+# This is deliberately NOT a pinned commit. Every released version of the
+# package therefore tracks whatever the Hub serves today, so a model change
+# reaches users without a package release — and, by the same mechanism, an
+# incompatible re-export of the graphs breaks already-published versions
+# retroactively (it has happened before: moving `prefix_step` to precomputed
+# cross-attention K/V instead of `text_states`). Keeping Hub graph changes
+# backward-compatible with shipped runtimes is now a repo-side obligation.
 #
-# Pinning makes a release reproducible: an old version keeps resolving the
-# graphs it was written for, and a model change is a deliberate bump here rather
-# than an instant break in the field.
-#
-# **Bump this whenever the shipped graphs change**, in the same commit that
-# adapts the runtime to them.
-DEFAULT_REVISION = "8a0c3c29f6f047011f5cae02d0b14475a690be86"
+# Callers who need reproducibility pass `revision=` explicitly (or `--revision`
+# on the CLI) with a commit SHA.
+DEFAULT_REVISION = "main"
 
 # voice.bin is browser-only and duplicates voice.npz; never worth the bytes here.
 _ALLOW_PATTERNS = [
@@ -78,16 +75,14 @@ def resolve_model_dir(
     ``model_id`` is either an existing local directory (used as-is, nothing is
     fetched) or a Hugging Face repo id.
 
-    ``revision`` defaults to DEFAULT_REVISION — but only for DEFAULT_REPO_ID.
-    Any other repo id resolves its own default branch, because this pin is a
-    commit in one specific repository and forcing it on a fork or a mirror would
-    fail to resolve rather than fall back.
+    ``revision`` defaults to DEFAULT_REVISION ("main"), i.e. the latest
+    published model; pass a commit SHA to pin.
     """
     path = Path(model_id).expanduser()
     if path.is_dir():
         return path
 
-    if revision is None and str(model_id) == DEFAULT_REPO_ID:
+    if revision is None:
         revision = DEFAULT_REVISION
 
     from huggingface_hub import snapshot_download
