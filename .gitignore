@@ -27,3 +27,4 @@ js/public/ggml/models
 
 # internal planning docs must never land in the public repo
 docs/PLAN.md
+checkpoints/

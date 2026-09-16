@@ -16,11 +16,14 @@ through. Fix: let ORT fold the graph first (``ORT_ENABLE_BASIC`` +
 425 ``MatMulInteger`` nodes.
 
 Usage:
-    python tools/quantize_onnx_int8.py --src models/zerotts --dst models/zerotts-int8
+    python tools/quantize_onnx_int8.py
+    python tools/quantize_onnx_int8.py --model <hf-repo-or-local-dir> --dst out/
 
-Everything is copied verbatim (config, tokenizer, voices, codec) and the three
-hot graphs are replaced with their int8 versions. The codec decoder stays fp32 —
-it is not on the per-frame hot path.
+The fp32 model is resolved the same way the runtime resolves it (``zerotts.hub``):
+a Hugging Face repo id by default, downloaded and cached, or an existing local
+directory used as-is. Everything is copied verbatim (config, tokenizer,
+voices, codec) and the three hot graphs are replaced with their int8 versions.
+The codec decoder stays fp32 — it is not on the per-frame hot path.
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ from __future__ import annotations
 import argparse
 import collections
 import shutil
+import stat
 import sys
 import time
 from pathlib import Path
@@ -35,6 +39,10 @@ from pathlib import Path
 import onnx
 import onnxruntime as ort
 from onnxruntime.quantization import QuantType, quantize_dynamic
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from zerotts import hub  # noqa: E402
 
 # The three hot graphs (docs/RUNTIME.md). The codec decoder under onnx/codec/
 # is copied through untouched.
@@ -79,23 +87,34 @@ def main() -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    ap.add_argument("--src", type=Path, default=Path("models/zerotts"),
-                    help="fp32 model directory (default: models/zerotts)")
-    ap.add_argument("--dst", type=Path, default=Path("models/zerotts-int8"),
-                    help="int8 output directory (default: models/zerotts-int8)")
+    ap.add_argument("--model", default=hub.DEFAULT_REPO_ID,
+                    help=f"fp32 source: HF repo id or local model directory "
+                         f"(default: {hub.DEFAULT_REPO_ID})")
+    ap.add_argument("--revision", default=None,
+                    help="HF revision to pin (default: the Hub's default branch)")
+    ap.add_argument("--dst", type=Path, default=Path("checkpoints/zerotts-int8"),
+                    help="int8 output directory (default: checkpoints/zerotts-int8)")
     args = ap.parse_args()
 
-    if not (args.src / "config.json").is_file():
-        ap.error(f"{args.src} does not look like a ZeroTTS model directory "
+    src = hub.resolve_model_dir(args.model, revision=args.revision)
+    if not (src / "config.json").is_file():
+        ap.error(f"{src} does not look like a ZeroTTS model directory "
                  "(no config.json)")
+    print(f"fp32 source: {src}")
 
-    shutil.copytree(args.src, args.dst, dirs_exist_ok=True)
+    # The HF cache stores blobs as read-only symlinks; copy their contents so
+    # the int8 directory is self-contained and never writes back into the cache,
+    # and make the copies writable so the graphs below can be overwritten.
+    shutil.copytree(src, args.dst, dirs_exist_ok=True, symlinks=False)
+    for f in args.dst.rglob("*"):
+        if f.is_file():
+            f.chmod(f.stat().st_mode | stat.S_IWUSR)
 
     total_in = total_out = 0
     print(f"{'graph':28s} {'fp32':>7s} {'int8':>7s} {'MatMul':>7s} "
           f"{'MatMulInteger':>13s}   time")
     for name in GRAPHS:
-        stats = quantize_one(args.src / "onnx" / name, args.dst / "onnx" / name)
+        stats = quantize_one(src / "onnx" / name, args.dst / "onnx" / name)
         total_in += stats["size_in"]
         total_out += stats["size_out"]
         print(f"{name:28s} {stats['size_in'] / 1e6:7.0f}M "

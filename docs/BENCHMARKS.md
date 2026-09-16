@@ -49,8 +49,10 @@ The fp32 ONNX graphs are memory-bandwidth-bound on an ordinary DDR4 desktop, so
 int8 quantization — which [cpp/README.md](../cpp/README.md) finds is *slower*
 than fp32 in WebAssembly, whose SIMD128 has no integer dot-product — *does* buy
 speed on the native `onnxruntime` CPU path.
-[`tools/quantize_onnx_int8.py`](../tools/quantize_onnx_int8.py) writes an int8
-copy of a model directory; the figures below are what it produced, then timed.
+[`tools/quantize_onnx_int8.py`](../tools/quantize_onnx_int8.py) downloads the
+published fp32 model and writes an int8 copy of it to `checkpoints/zerotts-int8`
+(`--model` takes another repo id or a local directory, `--dst` another output
+path); the figures below are what it produced, then timed.
 
 Measured 2026-09-16 on one machine — Ryzen 5 5600 / DDR4 / Windows 11,
 onnxruntime-node 1.x under Bun 1.3.10, 6 threads, CPU execution provider, voice
