@@ -43,6 +43,46 @@ generation time alone, no streaming involved — is 3-11× slower than real time
 on CPU, because it's a GPU-sized model (3.1 GB vs. ZeroTTS's 0.86 GB) doing
 autoregressive diffusion-LM decoding without CUDA kernels to lean on.
 
+## int8 quantization — native x86
+
+The fp32 ONNX graphs are memory-bandwidth-bound on an ordinary DDR4 desktop, so
+int8 quantization — which [cpp/README.md](../cpp/README.md) finds is *slower*
+than fp32 in WebAssembly, whose SIMD128 has no integer dot-product — *does* buy
+speed on the native `onnxruntime` CPU path.
+[`tools/quantize_onnx_int8.py`](../tools/quantize_onnx_int8.py) writes an int8
+copy of a model directory; the figures below are what it produced, then timed.
+
+Measured 2026-09-16 on one machine — Ryzen 5 5600 / DDR4 / Windows 11,
+onnxruntime-node 1.x under Bun 1.3.10, 6 threads, CPU execution provider, voice
+`maichi`, one ~9 s Vietnamese sentence, 3 runs. This is the **native**
+onnxruntime path (Node/Bun), not the ggml/WASM one, which cannot read these
+graphs.
+
+| graph | fp32 | int8 | `MatMulInteger` |
+|---|---:|---:|---:|
+| `local_frame_decode.onnx` | 187 MB | 83 MB | 425 |
+| `prefix_step.onnx` | 348 MB | 125 MB | 72 |
+| `text_encoder.onnx` | 323 MB | 100 MB | 72 |
+| **total** | **858 MB** | **309 MB** | |
+
+End-to-end: RTF 0.47–0.50×, against 1.1–1.6× for fp32 on the same machine; first
+audio chunk ~150 ms (was ~230 ms). Per frame, `local_frame_decode` — 76 % of the
+fp32 wall time — dropped from 67 ms to 19 ms (`prefix_step` was 13 ms; the codec
+is ~90 ms per 10-frame chunk and is not quantized here). A listening test by the
+project owner heard no difference vs fp32 on `maichi`.
+
+Why it helps here and not in WASM: `local_frame_decode` is the 4-layer local
+transformer unrolled 16× (once per codebook) into ~7,500 nodes, and every depth
+step re-reads all 34.6 M weights — ~2.2 GB of weight traffic per frame, enough
+to saturate DDR4. int8 quarter-cuts that traffic, exactly the "genuinely
+bandwidth-starved machine" case [cpp/README.md](../cpp/README.md) predicts
+should invert the WebAssembly result.
+
+**Not measured:** teacher-forced code drift (the repo's `zerotts-quality`
+method, which [cpp/README.md](../cpp/README.md) uses to count how many frame
+codes a quantized build draws differently from fp32), other CPUs, other voices,
+and the WASM path. Run that before trusting int8 where exactness matters.
+
 ## How scoring works
 
 **Nothing in this repo computes a metric.** `evaluation/run_benchmark.py`
