@@ -49,7 +49,9 @@ and came out **slower** than fp32 in WebAssembly, for the same instruction-set
 reason described under the ggml backend below. If you want a smaller download,
 take the GGUF backend rather than quantizing these. Either way, validate against
 [the benchmark](BENCHMARKS.md) before trusting it, because nothing here has been
-measured at reduced precision.
+measured at reduced precision. That WebAssembly result does not transfer to the
+native CPU path: on a bandwidth-starved x86 machine int8 *is* faster — see
+[the int8 section of BENCHMARKS.md](BENCHMARKS.md).
 
 `text_encoder.onnx` runs **once per utterance**, not per frame, so it can be
 loaded lazily after the two hot-path graphs and does not delay the first audio.

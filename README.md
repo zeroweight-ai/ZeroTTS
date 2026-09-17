@@ -283,6 +283,25 @@ ZeroTTS's time-to-first-audio comes from its real streaming path — first audio
 not first full utterance. The three baselines have no working CPU streaming
 path, so their TTFA is the time to the complete utterance. 
 
+### Quantization
+
+On an ordinary DDR4 desktop the fp32 graphs are memory-bandwidth-bound, so an
+int8 copy roughly halves RTF. Build one (it downloads the fp32 model from the
+Hub and writes `checkpoints/zerotts-int8`), then point the runtime at it:
+
+```bash
+python tools/quantize_onnx_int8.py
+zerotts say "Xin chào" --model checkpoints/zerotts-int8 --voice maichi -o out.wav
+```
+
+```python
+from zerotts import ZeroTTS
+
+tts = ZeroTTS.from_pretrained("checkpoints/zerotts-int8")
+audio = tts.synthesize("Hôm nay trời đẹp quá.", voice="maichi")
+tts.save_audio(audio, "out.wav")
+```
+
 ## Credits
 
 Speech codec: **[MOSS-Audio-Tokenizer-Nano](https://github.com/OpenMOSS/MOSS-Audio-Tokenizer)**
