@@ -467,6 +467,10 @@ zerotts_context * zerotts_init_from_file(const char * path, int n_threads) {
     return out;
 }
 
+// fmemopen is POSIX-only; MSVC has no equivalent, and the native drivers
+// (zerotts-bench / zerotts-quality) load from a path, not a buffer. This entry
+// point exists solely for the Emscripten build, so it is compiled out on MSVC.
+#if !defined(_MSC_VER)
 zerotts_context * zerotts_init_from_buffer(const void * data, size_t size, int n_threads) {
     // gguf has no parse-from-memory entry point, so the buffer is handed to it
     // through an in-memory FILE. The browser build always takes this path: the
@@ -492,6 +496,7 @@ zerotts_context * zerotts_init_from_buffer(const void * data, size_t size, int n
     ggml_free(L.meta);
     return out;
 }
+#endif
 
 void zerotts_free(zerotts_context * m) {
     if (!m) return;
